@@ -73,17 +73,22 @@ export default function HomePage() {
       result = result.filter(
         (article) =>
           article.title.toLowerCase().includes(query) ||
-          article.description.toLowerCase().includes(query)
+          article.description.toLowerCase().includes(query) ||
+          article.source.toLowerCase().includes(query)
       );
     }
 
     // Apply category filter
     if (selectedCategory !== 'All') {
       result = result.filter((article) => {
+        // First try matching the article's category field
+        if (article.category && article.category.toLowerCase() === selectedCategory.toLowerCase()) {
+          return true;
+        }
+        // Fallback to text search in title and description
         const title = article.title.toLowerCase();
         const desc = article.description.toLowerCase();
         const categoryLower = selectedCategory.toLowerCase();
-
         return title.includes(categoryLower) || desc.includes(categoryLower);
       });
     }
@@ -113,11 +118,11 @@ export default function HomePage() {
       <section className="bg-gradient-to-b from-card to-background border-b border-border py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-balance text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Tech News Delivered
-            <span className="text-accent"> Daily</span>
+            Global News Aggregator
+            <span className="text-accent"> All In One Place</span>
           </h1>
           <p className="text-balance text-lg text-muted-foreground mb-8 max-w-2xl">
-            Stay updated with the latest technology news from industry leaders like TechCrunch, The Verge, and NY Times.
+            Discover news from 25+ trusted sources covering Technology, Global News, Business, Sports, Entertainment, Education, and more.
           </p>
 
           {/* Search Bar */}

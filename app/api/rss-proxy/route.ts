@@ -4,11 +4,45 @@ export const runtime = 'nodejs';
 export const maxDuration = 30;
 
 const VALID_FEEDS = [
-  'https://feeds.feedburner.com/TechCrunch/',
-  'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
-  'https://www.theverge.com/rss/index.xml',
+  // Global News
+  'https://feeds.bbci.co.uk/news/world/rss.xml',
+  'https://rss.cnn.com/rss/edition.rss',
+  'https://www.aljazeera.com/xml/rss/all.xml',
+  'https://www.reutersagency.com/feed/?best-topics=top-news',
   'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms',
   'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en',
+  
+  // Tech & Innovation
+  'http://feeds.feedburner.com/TechCrunch/',
+  'https://www.theverge.com/rss/index.xml',
+  'https://www.wired.com/feed/rss',
+  'https://news.ycombinator.com/rss',
+  'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+  
+  // Business & Finance
+  'https://www.bloomberg.com/feed/podcast/etf-report.xml',
+  'https://www.forbes.com/in/feed/',
+  'https://www.ft.com/?format=rss',
+  
+  // Sports
+  'https://www.espn.com/espn/rss/news',
+  'https://feeds.bbci.co.uk/sport/rss.xml',
+  
+  // Entertainment & Culture
+  'https://www.rollingstone.com/feed/',
+  'https://variety.com/feed/',
+  
+  // Learning & Education
+  'https://feeds.feedburner.com/tedtalks_video',
+  'https://www.khanacademy.org/about/blog/rss.xml',
+  
+  // Social Media Digest
+  'https://www.reddit.com/.rss',
+  'https://www.reddit.com/r/worldnews/.rss',
+  
+  // Random Interesting Content
+  'https://www.boredpanda.com/feed/',
+  'https://www.mentalfloss.com/rss.xml',
 ];
 
 export async function GET(request: NextRequest) {

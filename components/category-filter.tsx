@@ -1,6 +1,16 @@
 'use client';
 
-const CATEGORIES = ['All', 'AI', 'Gadgets', 'Startups', 'Cybersecurity'];
+const CATEGORIES = [
+  'All',
+  'Global News',
+  'Tech & Innovation',
+  'Business & Finance',
+  'Sports',
+  'Entertainment & Culture',
+  'Learning & Education',
+  'Social Media Digest',
+  'Random Interesting',
+];
 
 interface CategoryFilterProps {
   selectedCategory: string;
@@ -14,7 +24,7 @@ export function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryF
         <button
           key={category}
           onClick={() => onCategoryChange(category)}
-          className={`px-4 py-2 rounded-full font-medium transition-all text-sm ${
+          className={`px-4 py-2 rounded-full font-medium transition-all text-sm whitespace-nowrap ${
             selectedCategory === category
               ? 'bg-accent text-accent-foreground'
               : 'border border-border text-foreground hover:border-accent hover:text-accent'

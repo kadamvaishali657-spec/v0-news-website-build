@@ -12,10 +12,11 @@ export interface Article {
 export interface RSSFeed {
   url: string;
   title: string;
+  category?: string;
 }
 
 // Parse RSS feed using JavaScript/XML parsing
-export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Article[]> {
+export async function parseFeed(feedUrl: string, feedTitle: string, category?: string): Promise<Article[]> {
   try {
     console.log(`[v0] Fetching feed: ${feedTitle} from ${feedUrl}`);
     let text: string | null = null;
@@ -36,7 +37,7 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
         if (data.content) {
           console.log(`[v0] Server proxy succeeded for ${feedTitle}`);
           text = data.content;
-          return await parseFeedContent(text, feedTitle);
+          return await parseFeedContent(text, feedTitle, category);
         }
       } else {
         console.warn(`[v0] Server proxy returned status ${proxyResponse.status} for ${feedTitle}`);
@@ -66,7 +67,7 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
       if (response.ok) {
         console.log(`[v0] Direct fetch succeeded for ${feedTitle}`);
         text = await response.text();
-        return await parseFeedContent(text, feedTitle);
+        return await parseFeedContent(text, feedTitle, category);
       } else {
         console.warn(`[v0] Direct fetch returned status ${response.status} for ${feedTitle}`);
       }
@@ -92,7 +93,7 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
       if (response.ok) {
         console.log(`[v0] allorigins proxy succeeded for ${feedTitle}`);
         text = await response.text();
-        return await parseFeedContent(text, feedTitle);
+        return await parseFeedContent(text, feedTitle, category);
       }
     } catch (error) {
       lastError = error as Error;
@@ -108,7 +109,7 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
   }
 }
 
-async function parseFeedContent(text: string, feedTitle: string): Promise<Article[]> {
+async function parseFeedContent(text: string, feedTitle: string, category?: string): Promise<Article[]> {
   try {
     if (!text || typeof text !== 'string') {
       console.error(`[v0] Invalid feed content from ${feedTitle}`);
@@ -184,6 +185,7 @@ async function parseFeedContent(text: string, feedTitle: string): Promise<Articl
           pubDate: new Date(pubDateStr),
           image: image && image.trim().length > 0 ? image.trim() : undefined,
           source: feedTitle,
+          category: category,
         };
 
         articles.push(article);
@@ -212,7 +214,7 @@ function cleanText(text: string): string {
 export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
   try {
     const results = await Promise.all(
-      feeds.map(feed => parseFeed(feed.url, feed.title))
+      feeds.map(feed => parseFeed(feed.url, feed.title, feed.category))
     );
     
     const allArticles = results.flat();
@@ -235,26 +237,47 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
 }
 
 export const DEFAULT_FEEDS: RSSFeed[] = [
-  {
-    url: 'https://feeds.feedburner.com/TechCrunch/',
-    title: 'TechCrunch',
-  },
-  {
-    url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
-    title: 'NY Times Technology',
-  },
-  {
-    url: 'https://www.theverge.com/rss/index.xml',
-    title: 'The Verge',
-  },
-  {
-    url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms',
-    title: 'Times of India',
-  },
-  {
-    url: 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en',
-    title: 'Google News India',
-  },
+  // Global News
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', title: 'BBC World News', category: 'Global News' },
+  { url: 'https://rss.cnn.com/rss/edition.rss', title: 'CNN Top Stories', category: 'Global News' },
+  { url: 'https://www.aljazeera.com/xml/rss/all.xml', title: 'Al Jazeera English', category: 'Global News' },
+  { url: 'https://www.reutersagency.com/feed/?best-topics=top-news', title: 'Reuters World News', category: 'Global News' },
+  
+  // Tech & Innovation
+  { url: 'http://feeds.feedburner.com/TechCrunch/', title: 'TechCrunch', category: 'Tech & Innovation' },
+  { url: 'https://www.theverge.com/rss/index.xml', title: 'The Verge', category: 'Tech & Innovation' },
+  { url: 'https://www.wired.com/feed/rss', title: 'Wired', category: 'Tech & Innovation' },
+  { url: 'https://news.ycombinator.com/rss', title: 'Hacker News', category: 'Tech & Innovation' },
+  
+  // Business & Finance
+  { url: 'https://www.bloomberg.com/feed/podcast/etf-report.xml', title: 'Bloomberg Markets', category: 'Business & Finance' },
+  { url: 'https://www.forbes.com/in/feed/', title: 'Forbes Top Headlines', category: 'Business & Finance' },
+  { url: 'https://www.ft.com/?format=rss', title: 'Financial Times', category: 'Business & Finance' },
+  
+  // Sports
+  { url: 'https://www.espn.com/espn/rss/news', title: 'ESPN Top Headlines', category: 'Sports' },
+  { url: 'https://feeds.bbci.co.uk/sport/rss.xml', title: 'BBC Sport', category: 'Sports' },
+  
+  // Entertainment & Culture
+  { url: 'https://www.rollingstone.com/feed/', title: 'Rolling Stone', category: 'Entertainment & Culture' },
+  { url: 'https://variety.com/feed/', title: 'Variety', category: 'Entertainment & Culture' },
+  
+  // Learning & Education
+  { url: 'https://feeds.feedburner.com/tedtalks_video', title: 'TED Talks', category: 'Learning & Education' },
+  { url: 'https://www.khanacademy.org/about/blog/rss.xml', title: 'Khan Academy Blog', category: 'Learning & Education' },
+  
+  // Social Media Digest
+  { url: 'https://www.reddit.com/.rss', title: 'Reddit Front Page', category: 'Social Media Digest' },
+  { url: 'https://www.reddit.com/r/worldnews/.rss', title: 'Reddit r/worldnews', category: 'Social Media Digest' },
+  
+  // Random Interesting Content
+  { url: 'https://www.boredpanda.com/feed/', title: 'Bored Panda', category: 'Random Interesting' },
+  { url: 'https://www.mentalfloss.com/rss.xml', title: 'Mental Floss', category: 'Random Interesting' },
+  
+  // India-specific
+  { url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms', title: 'Times of India', category: 'Global News' },
+  { url: 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en', title: 'Google News India', category: 'Global News' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml', title: 'NY Times Technology', category: 'Tech & Innovation' },
 ];
 
 // Fallback sample data for development/testing when feeds are unavailable
