@@ -17,50 +17,76 @@ export interface RSSFeed {
 // Parse RSS feed using JavaScript/XML parsing
 export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Article[]> {
   try {
-    // Try direct fetch first, then fall back to proxy
-    let response: Response;
-    
+    let response: Response | null = null;
+    let lastError: Error | null = null;
+
+    // List of CORS proxies to try in order
+    const proxies = [
+      (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      (url: string) => `https://cors-anywhere.herokuapp.com/${url}`,
+      (url: string) => `https://thingproxy.freeboard.io/fetch/${url}`,
+    ];
+
+    // Try direct fetch first
     try {
-      // Attempt direct fetch with timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
       response = await fetch(feedUrl, {
         signal: controller.signal,
         headers: {
           'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       });
-      
+
       clearTimeout(timeoutId);
+
+      if (response.ok) {
+        return await parseFeedContent(await response.text(), feedTitle);
+      }
     } catch (error) {
-      // Fall back to CORS proxy
-      console.warn(`Direct fetch failed for ${feedUrl}, trying proxy...`);
-      const corsProxy = 'https://api.allorigins.win/raw?url=';
-      const url = corsProxy + encodeURIComponent(feedUrl);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
-      response = await fetch(url, {
-        signal: controller.signal,
-      });
-      
-      clearTimeout(timeoutId);
-    }
-    
-    if (!response.ok) {
-      console.error(`Failed to fetch RSS feed from ${feedUrl}: ${response.statusText}`);
-      return [];
+      lastError = error as Error;
     }
 
-    const text = await response.text();
+    // Try CORS proxies
+    for (const proxyFn of proxies) {
+      try {
+        const proxyUrl = proxyFn(feedUrl);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        response = await fetch(proxyUrl, {
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          return await parseFeedContent(await response.text(), feedTitle);
+        }
+      } catch (error) {
+        lastError = error as Error;
+        continue;
+      }
+    }
+
+    console.error(`Failed to fetch RSS feed from ${feedUrl}:`, lastError?.message || 'Unknown error');
+    return [];
+  } catch (error) {
+    console.error(`Error fetching RSS feed from ${feedUrl}:`, error);
+    return [];
+  }
+}
+
+async function parseFeedContent(text: string, feedTitle: string): Promise<Article[]> {
+  try {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(text, 'text/xml');
 
     // Check for parsing errors
     if (xmlDoc.documentElement.nodeName === 'parsererror') {
-      console.error(`Failed to parse RSS feed from ${feedUrl}`);
+      console.error(`Failed to parse RSS feed from ${feedTitle}`);
       return [];
     }
 
@@ -73,21 +99,21 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
         const link = item.querySelector('link')?.textContent || '';
         const description = item.querySelector('description')?.textContent || '';
         const pubDateStr = item.querySelector('pubDate')?.textContent || new Date().toISOString();
-        
+
         // Extract image from various possible locations in RSS
         let image: string | undefined;
-        
+
         // Try to find image in different RSS formats
         const mediaContent = item.querySelector('media\\:content, [url]');
         if (mediaContent && mediaContent.getAttribute('url')) {
           image = mediaContent.getAttribute('url') || undefined;
         }
-        
+
         const mediaThumb = item.querySelector('media\\:thumbnail');
         if (!image && mediaThumb && mediaThumb.getAttribute('url')) {
           image = mediaThumb.getAttribute('url') || undefined;
         }
-        
+
         // Try enclosure
         const enclosure = item.querySelector('enclosure');
         if (!image && enclosure && enclosure.getAttribute('url')) {
@@ -119,16 +145,15 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
 
         articles.push(article);
       } catch (error) {
-        console.error('Error parsing individual item:', error);
+        // Silently skip individual items that fail to parse
       }
     });
 
     return articles;
   } catch (error) {
-    console.error(`Error fetching/parsing RSS feed from ${feedUrl}:`, error);
+    console.error(`Error parsing RSS feed content from ${feedTitle}:`, error);
     return [];
   }
-}
 
 function cleanText(text: string): string {
   // Remove HTML tags
@@ -169,5 +194,13 @@ export const DEFAULT_FEEDS: RSSFeed[] = [
   {
     url: 'https://www.theverge.com/rss/index.xml',
     title: 'The Verge',
+  },
+  {
+    url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms',
+    title: 'Times of India',
+  },
+  {
+    url: 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en',
+    title: 'Google News India',
   },
 ];

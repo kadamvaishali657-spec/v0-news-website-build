@@ -2,13 +2,15 @@
 
 import { Article } from '@/lib/rss-parser';
 import { ExternalLink, Calendar } from 'lucide-react';
-import Image from 'next/image';
+import { useState } from 'react';
 
 interface NewsCardProps {
   article: Article;
 }
 
 export function NewsCard({ article }: NewsCardProps) {
+  const [imageError, setImageError] = useState(false);
+
   const formattedDate = new Date(article.pubDate).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -18,16 +20,15 @@ export function NewsCard({ article }: NewsCardProps) {
   return (
     <article className="group h-full flex flex-col bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Image Container */}
-      {article.image && (
+      {article.image && !imageError && (
         <div className="relative w-full h-48 overflow-hidden bg-muted">
-          <Image
+          <img
             src={article.image}
             alt={article.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={() => setImageError(true)}
+            crossOrigin="anonymous"
+            loading="lazy"
           />
         </div>
       )}
