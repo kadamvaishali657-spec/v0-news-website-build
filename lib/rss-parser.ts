@@ -17,11 +17,13 @@ export interface RSSFeed {
 // Parse RSS feed using JavaScript/XML parsing
 export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Article[]> {
   try {
+    console.log(`[v0] Fetching feed: ${feedTitle} from ${feedUrl}`);
     let text: string | null = null;
     let lastError: Error | null = null;
 
-    // Try server-side proxy first (most reliable)
+    // Strategy 1: Try server-side proxy first
     try {
+      console.log(`[v0] Attempting server-side proxy for ${feedTitle}`);
       const proxyResponse = await fetch(`/api/rss-proxy?url=${encodeURIComponent(feedUrl)}`, {
         method: 'GET',
         headers: {
@@ -31,62 +33,77 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
 
       if (proxyResponse.ok) {
         const data = await proxyResponse.json();
-        text = data.content;
-        return await parseFeedContent(text, feedTitle);
+        if (data.content) {
+          console.log(`[v0] Server proxy succeeded for ${feedTitle}`);
+          text = data.content;
+          return await parseFeedContent(text, feedTitle);
+        }
+      } else {
+        console.warn(`[v0] Server proxy returned status ${proxyResponse.status} for ${feedTitle}`);
       }
     } catch (error) {
       lastError = error as Error;
-      console.warn(`[v0] Proxy fetch failed for ${feedTitle}, trying direct fetch...`);
+      console.warn(`[v0] Server proxy fetch failed for ${feedTitle}: ${lastError.message}`);
     }
 
-    // Fallback: Try direct fetch
+    // Strategy 2: Try direct fetch with shorter timeout
     try {
+      console.log(`[v0] Attempting direct fetch for ${feedTitle}`);
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       const response = await fetch(feedUrl, {
         signal: controller.signal,
         headers: {
           'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0',
+          'Cache-Control': 'no-cache',
         },
       });
 
       clearTimeout(timeoutId);
 
       if (response.ok) {
+        console.log(`[v0] Direct fetch succeeded for ${feedTitle}`);
         text = await response.text();
         return await parseFeedContent(text, feedTitle);
+      } else {
+        console.warn(`[v0] Direct fetch returned status ${response.status} for ${feedTitle}`);
       }
     } catch (error) {
       lastError = error as Error;
-      console.warn(`[v0] Direct fetch failed for ${feedTitle}, trying CORS proxy...`);
+      console.warn(`[v0] Direct fetch failed for ${feedTitle}: ${lastError.message}`);
     }
 
-    // Fallback: Try public CORS proxy
+    // Strategy 3: Try allorigins CORS proxy (simpler alternative)
     try {
+      console.log(`[v0] Attempting allorigins CORS proxy for ${feedTitle}`);
       const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       const response = await fetch(proxyUrl, {
         signal: controller.signal,
+        cache: 'no-store',
       });
 
       clearTimeout(timeoutId);
 
       if (response.ok) {
+        console.log(`[v0] allorigins proxy succeeded for ${feedTitle}`);
         text = await response.text();
         return await parseFeedContent(text, feedTitle);
       }
     } catch (error) {
       lastError = error as Error;
+      console.warn(`[v0] allorigins proxy failed for ${feedTitle}: ${lastError.message}`);
     }
 
-    console.error(`[v0] Failed to fetch RSS feed ${feedTitle}:`, lastError?.message || 'Unknown error');
+    // All strategies failed
+    console.error(`[v0] All fetch strategies failed for ${feedTitle}: ${lastError?.message}`);
     return [];
   } catch (error) {
-    console.error(`[v0] Error in parseFeed for ${feedTitle}:`, error);
+    console.error(`[v0] Unexpected error in parseFeed for ${feedTitle}:`, error);
     return [];
   }
 }
