@@ -17,22 +17,34 @@ export interface RSSFeed {
 // Parse RSS feed using JavaScript/XML parsing
 export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Article[]> {
   try {
-    let response: Response | null = null;
+    let text: string | null = null;
     let lastError: Error | null = null;
 
-    // List of CORS proxies to try in order
-    const proxies = [
-      (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      (url: string) => `https://cors-anywhere.herokuapp.com/${url}`,
-      (url: string) => `https://thingproxy.freeboard.io/fetch/${url}`,
-    ];
+    // Try server-side proxy first (most reliable)
+    try {
+      const proxyResponse = await fetch(`/api/rss-proxy?url=${encodeURIComponent(feedUrl)}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
 
-    // Try direct fetch first
+      if (proxyResponse.ok) {
+        const data = await proxyResponse.json();
+        text = data.content;
+        return await parseFeedContent(text, feedTitle);
+      }
+    } catch (error) {
+      lastError = error as Error;
+      console.warn(`[v0] Proxy fetch failed for ${feedTitle}, trying direct fetch...`);
+    }
+
+    // Fallback: Try direct fetch
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      response = await fetch(feedUrl, {
+      const response = await fetch(feedUrl, {
         signal: controller.signal,
         headers: {
           'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml',
@@ -43,55 +55,65 @@ export async function parseFeed(feedUrl: string, feedTitle: string): Promise<Art
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        return await parseFeedContent(await response.text(), feedTitle);
+        text = await response.text();
+        return await parseFeedContent(text, feedTitle);
+      }
+    } catch (error) {
+      lastError = error as Error;
+      console.warn(`[v0] Direct fetch failed for ${feedTitle}, trying CORS proxy...`);
+    }
+
+    // Fallback: Try public CORS proxy
+    try {
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(proxyUrl, {
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        text = await response.text();
+        return await parseFeedContent(text, feedTitle);
       }
     } catch (error) {
       lastError = error as Error;
     }
 
-    // Try CORS proxies
-    for (const proxyFn of proxies) {
-      try {
-        const proxyUrl = proxyFn(feedUrl);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-
-        response = await fetch(proxyUrl, {
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          return await parseFeedContent(await response.text(), feedTitle);
-        }
-      } catch (error) {
-        lastError = error as Error;
-        continue;
-      }
-    }
-
-    console.error(`Failed to fetch RSS feed from ${feedUrl}:`, lastError?.message || 'Unknown error');
+    console.error(`[v0] Failed to fetch RSS feed ${feedTitle}:`, lastError?.message || 'Unknown error');
     return [];
   } catch (error) {
-    console.error(`Error fetching RSS feed from ${feedUrl}:`, error);
+    console.error(`[v0] Error in parseFeed for ${feedTitle}:`, error);
     return [];
   }
 }
 
 async function parseFeedContent(text: string, feedTitle: string): Promise<Article[]> {
   try {
+    if (!text || typeof text !== 'string') {
+      console.error(`[v0] Invalid feed content from ${feedTitle}`);
+      return [];
+    }
+
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(text, 'text/xml');
 
     // Check for parsing errors
     if (xmlDoc.documentElement.nodeName === 'parsererror') {
-      console.error(`Failed to parse RSS feed from ${feedTitle}`);
+      console.error(`[v0] Failed to parse XML from ${feedTitle}`);
       return [];
     }
 
     const articles: Article[] = [];
     const items = xmlDoc.querySelectorAll('item');
+
+    if (items.length === 0) {
+      console.warn(`[v0] No items found in feed ${feedTitle}`);
+      return [];
+    }
 
     items.forEach((item, index) => {
       try {
@@ -100,16 +122,20 @@ async function parseFeedContent(text: string, feedTitle: string): Promise<Articl
         const description = item.querySelector('description')?.textContent || '';
         const pubDateStr = item.querySelector('pubDate')?.textContent || new Date().toISOString();
 
+        if (!link || !title.trim()) {
+          return; // Skip items without essential data
+        }
+
         // Extract image from various possible locations in RSS
         let image: string | undefined;
 
         // Try to find image in different RSS formats
-        const mediaContent = item.querySelector('media\\:content, [url]');
+        const mediaContent = item.querySelector('[url]');
         if (mediaContent && mediaContent.getAttribute('url')) {
           image = mediaContent.getAttribute('url') || undefined;
         }
 
-        const mediaThumb = item.querySelector('media\\:thumbnail');
+        const mediaThumb = item.querySelector('media\\:thumbnail, thumbnail');
         if (!image && mediaThumb && mediaThumb.getAttribute('url')) {
           image = mediaThumb.getAttribute('url') || undefined;
         }
@@ -118,7 +144,7 @@ async function parseFeedContent(text: string, feedTitle: string): Promise<Articl
         const enclosure = item.querySelector('enclosure');
         if (!image && enclosure && enclosure.getAttribute('url')) {
           const encUrl = enclosure.getAttribute('url');
-          if (encUrl && (encUrl.includes('.jpg') || encUrl.includes('.png') || encUrl.includes('.gif'))) {
+          if (encUrl && (encUrl.includes('.jpg') || encUrl.includes('.png') || encUrl.includes('.gif') || encUrl.includes('.jpeg'))) {
             image = encUrl;
           }
         }
@@ -127,33 +153,35 @@ async function parseFeedContent(text: string, feedTitle: string): Promise<Articl
         if (!image) {
           const content = item.querySelector('content\\:encoded')?.textContent || '';
           const descWithContent = (description + content);
-          const imgMatch = descWithContent.match(/<img[^>]+src=["']([^"']+)["']/);
+          const imgMatch = descWithContent.match(/<img[^>]+src=["']([^"']+)["']/i);
           if (imgMatch && imgMatch[1]) {
             image = imgMatch[1];
           }
         }
 
         const article: Article = {
-          id: `${feedTitle}-${index}-${Date.now()}`,
-          title: cleanText(title),
-          description: cleanText(description.substring(0, 200)),
-          link,
+          id: `${feedTitle}-${index}-${Date.now()}-${Math.random()}`,
+          title: cleanText(title).substring(0, 200),
+          description: cleanText(description).substring(0, 250),
+          link: link.trim(),
           pubDate: new Date(pubDateStr),
-          image,
+          image: image && image.trim().length > 0 ? image.trim() : undefined,
           source: feedTitle,
         };
 
         articles.push(article);
       } catch (error) {
-        // Silently skip individual items that fail to parse
+        console.warn(`[v0] Error parsing individual item from ${feedTitle}:`, error);
       }
     });
 
+    console.log(`[v0] Successfully parsed ${articles.length} articles from ${feedTitle}`);
     return articles;
   } catch (error) {
-    console.error(`Error parsing RSS feed content from ${feedTitle}:`, error);
+    console.error(`[v0] Error parsing RSS feed content from ${feedTitle}:`, error);
     return [];
   }
+}
 
 function cleanText(text: string): string {
   // Remove HTML tags
