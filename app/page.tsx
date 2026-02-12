@@ -40,9 +40,7 @@ export default function HomePage() {
       setLoading(true);
       setError(null);
       try {
-        console.log('[v0] Starting to fetch articles from feeds');
         const articles = await fetchAllFeeds(feeds);
-        console.log(`[v0] Successfully fetched ${articles.length} articles`);
         
         if (articles.length === 0) {
           setError('No articles loaded. RSS feeds may be temporarily unavailable. Try again in a moment.');
@@ -51,7 +49,6 @@ export default function HomePage() {
         setArticles(articles);
         setCurrentPage(1);
       } catch (err) {
-        console.error('[v0] Error loading articles:', err);
         setError('Failed to load news. Please try again later.');
       } finally {
         setLoading(false);

@@ -18,13 +18,11 @@ export interface RSSFeed {
 // Parse RSS feed using JavaScript/XML parsing
 export async function parseFeed(feedUrl: string, feedTitle: string, category?: string): Promise<Article[]> {
   try {
-    console.log(`[v0] Fetching feed: ${feedTitle} from ${feedUrl}`);
     let text: string | null = null;
     let lastError: Error | null = null;
 
     // Strategy 1: Try server-side proxy first
     try {
-      console.log(`[v0] Attempting server-side proxy for ${feedTitle}`);
       const proxyResponse = await fetch(`/api/rss-proxy?url=${encodeURIComponent(feedUrl)}`, {
         method: 'GET',
         headers: {
@@ -35,21 +33,16 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
       if (proxyResponse.ok) {
         const data = await proxyResponse.json();
         if (data.content) {
-          console.log(`[v0] Server proxy succeeded for ${feedTitle}`);
           text = data.content;
           return await parseFeedContent(text, feedTitle, category);
         }
-      } else {
-        console.warn(`[v0] Server proxy returned status ${proxyResponse.status} for ${feedTitle}`);
       }
     } catch (error) {
       lastError = error as Error;
-      console.warn(`[v0] Server proxy fetch failed for ${feedTitle}: ${lastError.message}`);
     }
 
     // Strategy 2: Try direct fetch with shorter timeout
     try {
-      console.log(`[v0] Attempting direct fetch for ${feedTitle}`);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
 
@@ -65,20 +58,15 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        console.log(`[v0] Direct fetch succeeded for ${feedTitle}`);
         text = await response.text();
         return await parseFeedContent(text, feedTitle, category);
-      } else {
-        console.warn(`[v0] Direct fetch returned status ${response.status} for ${feedTitle}`);
       }
     } catch (error) {
       lastError = error as Error;
-      console.warn(`[v0] Direct fetch failed for ${feedTitle}: ${lastError.message}`);
     }
 
     // Strategy 3: Try allorigins CORS proxy (simpler alternative)
     try {
-      console.log(`[v0] Attempting allorigins CORS proxy for ${feedTitle}`);
       const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -91,20 +79,16 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        console.log(`[v0] allorigins proxy succeeded for ${feedTitle}`);
         text = await response.text();
         return await parseFeedContent(text, feedTitle, category);
       }
     } catch (error) {
       lastError = error as Error;
-      console.warn(`[v0] allorigins proxy failed for ${feedTitle}: ${lastError.message}`);
     }
 
     // All strategies failed
-    console.error(`[v0] All fetch strategies failed for ${feedTitle}: ${lastError?.message}`);
     return [];
   } catch (error) {
-    console.error(`[v0] Unexpected error in parseFeed for ${feedTitle}:`, error);
     return [];
   }
 }
@@ -112,7 +96,6 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
 async function parseFeedContent(text: string, feedTitle: string, category?: string): Promise<Article[]> {
   try {
     if (!text || typeof text !== 'string') {
-      console.error(`[v0] Invalid feed content from ${feedTitle}`);
       return [];
     }
 
@@ -121,7 +104,6 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
 
     // Check for parsing errors
     if (xmlDoc.documentElement.nodeName === 'parsererror') {
-      console.error(`[v0] Failed to parse XML from ${feedTitle}`);
       return [];
     }
 
@@ -129,7 +111,6 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
     const items = xmlDoc.querySelectorAll('item');
 
     if (items.length === 0) {
-      console.warn(`[v0] No items found in feed ${feedTitle}`);
       return [];
     }
 
@@ -190,14 +171,12 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
 
         articles.push(article);
       } catch (error) {
-        console.warn(`[v0] Error parsing individual item from ${feedTitle}:`, error);
+        // Silently skip malformed items
       }
     });
 
-    console.log(`[v0] Successfully parsed ${articles.length} articles from ${feedTitle}`);
     return articles;
   } catch (error) {
-    console.error(`[v0] Error parsing RSS feed content from ${feedTitle}:`, error);
     return [];
   }
 }
@@ -221,7 +200,6 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
     
     // If no articles fetched, use fallback data
     if (allArticles.length === 0) {
-      console.warn('[v0] No articles fetched from RSS feeds, using fallback data');
       return FALLBACK_ARTICLES;
     }
     
@@ -230,7 +208,6 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
     
     return allArticles;
   } catch (error) {
-    console.error('[v0] Error fetching all feeds:', error);
     // Return fallback on error
     return FALLBACK_ARTICLES;
   }
@@ -239,9 +216,9 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
 export const DEFAULT_FEEDS: RSSFeed[] = [
   // Global News
   { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', title: 'BBC World News', category: 'Global News' },
-  { url: 'https://rss.cnn.com/rss/edition.rss', title: 'CNN Top Stories', category: 'Global News' },
   { url: 'https://www.aljazeera.com/xml/rss/all.xml', title: 'Al Jazeera English', category: 'Global News' },
-  { url: 'https://www.reutersagency.com/feed/?best-topics=top-news', title: 'Reuters World News', category: 'Global News' },
+  { url: 'https://feeds.bloomberg.com/markets/news.rss', title: 'Bloomberg News', category: 'Global News' },
+  { url: 'https://feeds.reuters.com/news/artsculture', title: 'Reuters News', category: 'Global News' },
   
   // Tech & Innovation
   { url: 'http://feeds.feedburner.com/TechCrunch/', title: 'TechCrunch', category: 'Tech & Innovation' },
@@ -250,9 +227,9 @@ export const DEFAULT_FEEDS: RSSFeed[] = [
   { url: 'https://news.ycombinator.com/rss', title: 'Hacker News', category: 'Tech & Innovation' },
   
   // Business & Finance
-  { url: 'https://www.bloomberg.com/feed/podcast/etf-report.xml', title: 'Bloomberg Markets', category: 'Business & Finance' },
-  { url: 'https://www.forbes.com/in/feed/', title: 'Forbes Top Headlines', category: 'Business & Finance' },
-  { url: 'https://www.ft.com/?format=rss', title: 'Financial Times', category: 'Business & Finance' },
+  { url: 'https://feeds.bloomberg.com/technology/news.rss', title: 'Bloomberg Tech', category: 'Business & Finance' },
+  { url: 'https://www.forbes.com/feed/', title: 'Forbes', category: 'Business & Finance' },
+  { url: 'https://feeds.ft.com/home/rss', title: 'Financial Times', category: 'Business & Finance' },
   
   // Sports
   { url: 'https://www.espn.com/espn/rss/news', title: 'ESPN Top Headlines', category: 'Sports' },
@@ -267,7 +244,6 @@ export const DEFAULT_FEEDS: RSSFeed[] = [
   { url: 'https://www.khanacademy.org/about/blog/rss.xml', title: 'Khan Academy Blog', category: 'Learning & Education' },
   
   // Social Media Digest
-  { url: 'https://www.reddit.com/.rss', title: 'Reddit Front Page', category: 'Social Media Digest' },
   { url: 'https://www.reddit.com/r/worldnews/.rss', title: 'Reddit r/worldnews', category: 'Social Media Digest' },
   
   // Random Interesting Content
