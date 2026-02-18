@@ -6,6 +6,7 @@ import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
 import { Pagination } from '@/components/pagination';
+import { ChatBot } from '@/components/chatbot';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2 } from 'lucide-react';
 
@@ -202,6 +203,9 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Chatbot */}
+      <ChatBot articles={articles} />
     </div>
   );
 }

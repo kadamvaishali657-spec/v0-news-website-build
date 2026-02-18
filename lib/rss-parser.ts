@@ -203,10 +203,21 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
       return FALLBACK_ARTICLES;
     }
     
-    // Sort by publication date, newest first
-    allArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+    // Separate India news from other articles
+    const indiaNewsSources = ['Times of India', 'Google News India'];
+    const indiaArticles = allArticles.filter(article => 
+      indiaNewsSources.includes(article.source)
+    );
+    const otherArticles = allArticles.filter(article => 
+      !indiaNewsSources.includes(article.source)
+    );
     
-    return allArticles;
+    // Sort each group by publication date, newest first
+    indiaArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+    otherArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+    
+    // Return India news first, then other articles
+    return [...indiaArticles, ...otherArticles];
   } catch (error) {
     // Return fallback on error
     return FALLBACK_ARTICLES;
