@@ -9,6 +9,7 @@ import { Pagination } from '@/components/pagination';
 import { ChatBot } from '@/components/chatbot';
 import { SidebarNav } from '@/components/sidebar-nav';
 import { BottomNav } from '@/components/bottom-nav';
+import { NewsletterCTA } from '@/components/newsletter-cta';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2 } from 'lucide-react';
 
@@ -201,6 +202,9 @@ export default function HomePage() {
         )}
         </div>
       </main>
+
+      {/* Newsletter CTA */}
+      <NewsletterCTA />
 
       {/* Footer */}
       <footer className="bg-card border-t border-border mt-16">

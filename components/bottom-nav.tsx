@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Search, Bookmark, Settings } from 'lucide-react';
+import { Home, Search, Bookmark, Settings, Mail } from 'lucide-react';
 
 export function BottomNav() {
   return (
@@ -24,12 +24,20 @@ export function BottomNav() {
           <span className="text-xs font-medium">Search</span>
         </Link>
         <Link 
-          href="/#saved" 
+          href="/saved" 
           className="flex flex-col items-center gap-1 px-4 py-3 text-muted-foreground hover:text-accent transition-colors"
           title="Saved"
         >
           <Bookmark className="w-6 h-6" />
           <span className="text-xs font-medium">Saved</span>
+        </Link>
+        <Link 
+          href="/newsletter" 
+          className="flex flex-col items-center gap-1 px-4 py-3 text-muted-foreground hover:text-accent transition-colors"
+          title="Newsletter"
+        >
+          <Mail className="w-6 h-6" />
+          <span className="text-xs font-medium">Newsletter</span>
         </Link>
         <Link 
           href="/admin" 
