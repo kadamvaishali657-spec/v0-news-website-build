@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Settings, Menu, X, ChevronDown } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog } from 'lucide-react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -64,17 +64,35 @@ export function Header() {
 
             {/* Additional Links */}
             <Link 
-              href="/#trending" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium"
+              href="/trending" 
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
+              <Flame className="w-4 h-4" />
               Trending
             </Link>
 
             <Link 
-              href="/#saved" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium"
+              href="/saved" 
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
+              <Bookmark className="w-4 h-4" />
               Saved
+            </Link>
+
+            <Link 
+              href="/search" 
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+            >
+              <Search className="w-4 h-4" />
+              Search
+            </Link>
+
+            <Link 
+              href="/settings" 
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+            >
+              <Cog className="w-4 h-4" />
+              Settings
             </Link>
 
             {/* Admin Button */}
@@ -140,19 +158,39 @@ export function Header() {
             </div>
 
             <Link 
-              href="/#trending" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium"
+              href="/trending" 
+              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
               onClick={() => setMobileMenuOpen(false)}
             >
+              <Flame className="w-4 h-4" />
               Trending
             </Link>
 
             <Link 
-              href="/#saved" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium"
+              href="/saved" 
+              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
               onClick={() => setMobileMenuOpen(false)}
             >
+              <Bookmark className="w-4 h-4" />
               Saved
+            </Link>
+
+            <Link 
+              href="/search" 
+              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Search className="w-4 h-4" />
+              Search
+            </Link>
+
+            <Link 
+              href="/settings" 
+              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Cog className="w-4 h-4" />
+              Settings
             </Link>
 
             <Link 
