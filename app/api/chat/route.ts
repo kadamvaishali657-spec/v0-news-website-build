@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateText } from 'ai';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -14,6 +13,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid messages format' },
         { status: 400 }
+      );
+    }
+
+    const groqApiKey = process.env.GROQ_API_KEY;
+    if (!groqApiKey) {
+      return NextResponse.json(
+        { error: 'Groq API key not configured. Please set GROQ_API_KEY environment variable.' },
+        { status: 500 }
       );
     }
 
@@ -40,26 +47,50 @@ When discussing specific articles, be accurate and cite the article title and so
 
 Current time: ${new Date().toLocaleString()}`;
 
-    // Create messages array with system message
-    const conversationMessages = [
+    // Prepare messages for Groq API
+    const groqMessages = [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
       ...messages.map((msg: ChatMessage) => ({
-        role: msg.role as 'user' | 'assistant',
+        role: msg.role,
         content: msg.content,
       })),
     ];
 
-    // Use Vercel AI Gateway to stream response
-    const response = await generateText({
-      model: 'groq/llama-3.3-70b-versatile', // Using Vercel AI Gateway which handles Groq
-      system: systemPrompt,
-      messages: conversationMessages,
-      temperature: 0.7,
-      maxTokens: 1024,
+    // Call Groq API directly
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${groqApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: groqMessages,
+        temperature: 0.7,
+        max_tokens: 1024,
+        top_p: 1,
+        stream: false,
+      }),
     });
+
+    if (!groqResponse.ok) {
+      const error = await groqResponse.text();
+      console.error('Groq API error:', error);
+      return NextResponse.json(
+        { error: 'Failed to generate response from Groq' },
+        { status: groqResponse.status }
+      );
+    }
+
+    const groqData = await groqResponse.json();
+    const assistantMessage = groqData.choices?.[0]?.message?.content || '';
 
     return NextResponse.json({
       role: 'assistant',
-      content: response.text,
+      content: assistantMessage,
     });
   } catch (error) {
     console.error('Chat API error:', error);
