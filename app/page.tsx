@@ -7,6 +7,8 @@ import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
 import { Pagination } from '@/components/pagination';
 import { ChatBot } from '@/components/chatbot';
+import { SidebarNav } from '@/components/sidebar-nav';
+import { BottomNav } from '@/components/bottom-nav';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2 } from 'lucide-react';
 
@@ -128,7 +130,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex gap-8">
+        {/* Sidebar Navigation */}
+        <SidebarNav selectedCategory={selectedCategory} onCategorySelect={setSelectedCategory} />
+
+        {/* Main Content */}
+        <div className="flex-1 pb-20 md:pb-0">
         {/* Featured Section */}
         {!loading && featuredArticles.length > 0 && (
           <section className="mb-16">
@@ -192,6 +199,7 @@ export default function HomePage() {
             )}
           </>
         )}
+        </div>
       </main>
 
       {/* Footer */}
@@ -206,6 +214,9 @@ export default function HomePage() {
 
       {/* Chatbot */}
       <ChatBot articles={articles} />
+
+      {/* Mobile Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 }
