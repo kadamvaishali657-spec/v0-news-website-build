@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
-import { Settings, Moon, Sun, Bell, Share2 } from 'lucide-react';
+import { Settings, Moon, Sun, Bell, Share2, BarChart3, Trash2 } from 'lucide-react';
+import { getAnalyticsReport } from '@/lib/analytics';
 
 export default function SettingsPage() {
   const [darkMode, setDarkMode] = useState(false);
@@ -13,6 +14,7 @@ export default function SettingsPage() {
     linkedin: true,
     whatsapp: true,
   });
+  const [analyticsReport, setAnalyticsReport] = useState<any>(null);
 
   useEffect(() => {
     // Load saved preferences
@@ -23,6 +25,12 @@ export default function SettingsPage() {
       setNotifications(prefs.notifications || true);
       setEmailDigest(prefs.emailDigest || false);
       setShareSettings(prefs.shareSettings || shareSettings);
+    }
+
+    // Load analytics
+    const report = getAnalyticsReport();
+    if (report) {
+      setAnalyticsReport(report);
     }
   }, []);
 
@@ -35,6 +43,14 @@ export default function SettingsPage() {
     };
     localStorage.setItem('user-preferences', JSON.stringify(preferences));
     alert('Settings saved successfully!');
+  };
+
+  const clearAnalytics = () => {
+    if (confirm('Are you sure you want to clear all analytics data?')) {
+      localStorage.removeItem('analytics-events');
+      setAnalyticsReport(null);
+      alert('Analytics data cleared.');
+    }
   };
 
   return (
@@ -140,6 +156,55 @@ export default function SettingsPage() {
           >
             Save Settings
           </button>
+
+          {/* Analytics Dashboard */}
+          <div className="bg-card rounded-lg border border-border p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-accent" />
+              Usage Analytics
+            </h2>
+            
+            {analyticsReport ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-background rounded p-4">
+                    <p className="text-sm text-muted-foreground mb-1">Total Events</p>
+                    <p className="text-2xl font-bold text-accent">{analyticsReport.totalEvents}</p>
+                  </div>
+                  <div className="bg-background rounded p-4">
+                    <p className="text-sm text-muted-foreground mb-1">Article Views</p>
+                    <p className="text-2xl font-bold text-accent">
+                      {analyticsReport.byType.article_view || 0}
+                    </p>
+                  </div>
+                </div>
+
+                {analyticsReport.topArticles && analyticsReport.topArticles.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold text-foreground mb-3">Top 5 Articles</p>
+                    <div className="space-y-2">
+                      {analyticsReport.topArticles.slice(0, 5).map((item: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between bg-background rounded p-3">
+                          <span className="text-sm text-foreground truncate">{item.id}</span>
+                          <span className="text-sm font-semibold text-accent">{item.views} views</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={clearAnalytics}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-background rounded transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Clear Analytics
+                </button>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-sm">No analytics data yet. Start browsing articles to see stats.</p>
+            )}
+          </div>
         </div>
       </main>
     </div>
