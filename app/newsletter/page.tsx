@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Header } from '@/components/header';
 import { BottomNav } from '@/components/bottom-nav';
-import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, CheckCircle, AlertCircle, MessageSquare } from 'lucide-react';
 
 const FREQUENCY_OPTIONS = [
   { value: 'daily', label: 'Daily Digest', description: 'Get the top stories every morning' },
@@ -211,6 +211,24 @@ export default function NewsletterPage() {
               Update your preferences or unsubscribe anytime.
             </p>
           </div>
+        </div>
+
+        {/* Support Section */}
+        <div className="mt-16 bg-accent/10 border border-border rounded-lg p-8">
+          <div className="flex items-center gap-3 mb-4">
+            <MessageSquare className="w-6 h-6 text-accent" />
+            <h2 className="text-2xl font-bold text-foreground">Need Help?</h2>
+          </div>
+          <p className="text-muted-foreground mb-6">
+            Have questions about your subscription or need assistance? Get in touch with our support team.
+          </p>
+          <a
+            href="mailto:workwithme785@gmail.com?subject=Newsletter%20Support"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent/90 transition-colors"
+          >
+            <Mail className="w-4 h-4" />
+            Contact Support
+          </a>
         </div>
       </main>
 

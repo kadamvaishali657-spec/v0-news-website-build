@@ -76,12 +76,21 @@ export function NewsletterCTA() {
             </Button>
           </form>
 
-          <Link
-            href="/newsletter"
-            className="px-4 py-2 text-sm text-accent hover:text-accent/80 font-medium underline"
-          >
-            Customize topics
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/newsletter"
+              className="px-4 py-2 text-sm text-accent hover:text-accent/80 font-medium underline"
+            >
+              Customize topics
+            </Link>
+            <span className="text-muted-foreground">or</span>
+            <a
+              href="mailto:workwithme785@gmail.com?subject=Newsletter%20Support"
+              className="px-4 py-2 text-sm text-accent hover:text-accent/80 font-medium underline"
+            >
+              Get support
+            </a>
+          </div>
         </div>
       </div>
     </section>
