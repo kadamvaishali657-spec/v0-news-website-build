@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
-import { createGroq } from '@ai-sdk/groq';
-
-const groq = createGroq({
-  apiKey: process.env.GROQ_API_KEY,
-});
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -48,30 +43,28 @@ Current time: ${new Date().toLocaleString()}`;
     // Create messages array with system message
     const conversationMessages = [
       ...messages.map((msg: ChatMessage) => ({
-        role: msg.role,
+        role: msg.role as 'user' | 'assistant',
         content: msg.content,
       })),
     ];
 
-    // Generate response using Groq
-    const { text } = await generateText({
-      model: groq('llama-3.3-70b-versatile'),
+    // Use Vercel AI Gateway to stream response
+    const response = await generateText({
+      model: 'groq/llama-3.3-70b-versatile', // Using Vercel AI Gateway which handles Groq
       system: systemPrompt,
       messages: conversationMessages,
       temperature: 0.7,
-      maxTokens: 500,
+      maxTokens: 1024,
     });
 
     return NextResponse.json({
-      success: true,
-      message: text,
+      role: 'assistant',
+      content: response.text,
     });
   } catch (error) {
     console.error('Chat API error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
     return NextResponse.json(
-      { error: `Failed to generate response: ${errorMessage}` },
+      { error: 'Failed to generate response' },
       { status: 500 }
     );
   }

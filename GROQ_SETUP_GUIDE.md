@@ -1,105 +1,119 @@
-# Groq API Setup Guide
+# Chatbot Setup - Vercel AI Gateway (Zero Config)
+
+## Overview
+
+The chatbot uses the **Vercel AI Gateway** to access fast LLM models. This means **NO additional setup or API keys are required** - it works out of the box!
+
+## How It Works
+
+- ✅ Uses Vercel AI Gateway (zero-configuration)
+- ✅ Model: `groq/llama-3.3-70b-versatile` via Vercel's infrastructure
+- ✅ No API keys needed
+- ✅ Automatic scaling
+- ✅ Works locally and in production
 
 ## Quick Start
 
-The chatbot feature requires a Groq API key to function. Here's how to set it up:
-
-## Step 1: Create a Groq Account
-
-1. Visit [console.groq.com](https://console.groq.com)
-2. Click "Sign up" or "Sign in" (if you already have an account)
-3. Complete the registration/login process
-
-## Step 2: Generate API Key
-
-1. Once logged in, navigate to the **API Keys** section
-2. Click **"Create New API Key"**
-3. Give it a descriptive name (e.g., "News Website Chatbot")
-4. Copy the generated API key
-
-## Step 3: Add to Your Project
-
-### For Local Development
-
-1. Create or update `.env.local` in your project root:
-
-```bash
-# .env.local
-GROQ_API_KEY=your_copied_api_key_here
-```
-
-2. Restart your dev server:
+1. **Local Development:**
 ```bash
 pnpm dev
 ```
 
-### For Production (Vercel)
+2. **Open the website** and click the chatbot button (💬) in the bottom-right corner
 
-1. Go to your Vercel project dashboard
-2. Navigate to **Settings** → **Environment Variables**
-3. Add a new variable:
-   - **Name**: `GROQ_API_KEY`
-   - **Value**: Your Groq API key
-4. Select the environment (Production/Preview/Development)
-5. Click **"Save"**
+3. **Start chatting!** The chatbot will respond immediately
 
-6. Redeploy your project to apply the changes
+That's it! No configuration needed.
 
-## Step 4: Verify Setup
+## Features
 
-1. Start your development server: `pnpm dev`
-2. Navigate to your website
-3. Click the chatbot button (💬) in the bottom-right corner
-4. Type a message and send
+The chatbot can:
+- Answer questions about news articles on your site
+- Provide summaries of stories
+- Search and recommend articles
+- Have general conversations about news
+- Discuss current events
 
-If you see a response, the setup is successful! ✅
+## Deployment
+
+Simply deploy to Vercel as normal:
+
+```bash
+git push
+```
+
+The chatbot will work immediately in production without any additional setup.
+
+## Architecture
+
+**Files:**
+- `app/api/chat/route.ts` - API endpoint using Vercel AI Gateway
+- `hooks/use-chat.ts` - Chat state management
+- `components/chatbot.tsx` - Main UI component
+- `components/chat-message.tsx` - Message display
+- `components/chat-input.tsx` - Message input
+
+**Model Info:**
+- **Provider:** Groq (via Vercel AI Gateway)
+- **Model:** Llama 3.3 70B Versatile
+- **Speed:** ~100 tokens/second
+- **Perfect for:** News discussion, summarization, Q&A
 
 ## Troubleshooting
 
-### "Invalid API Key" Error
-- Verify you copied the entire key correctly
-- Make sure there are no extra spaces before/after the key
-- Check the key hasn't expired in Groq console
+### Chatbot button not appearing
+- Clear browser cache (Ctrl+Shift+Delete)
+- Check browser console for JavaScript errors (F12)
+- Ensure JavaScript is enabled
 
-### "401 Unauthorized"
-- The API key is not being read by the application
-- Verify `.env.local` file exists in the project root
-- Restart your dev server after adding the key
+### "Failed to generate response" error
+- Check your internet connection
+- Verify the website loads correctly
+- Try sending a simpler message
+- Wait a moment and try again (rate limit)
 
-### "Rate Limited"
-- You've exceeded the API rate limit
-- Check your usage in Groq console
-- Upgrade your plan if needed
+### No response from chatbot
+1. Open DevTools (F12)
+2. Go to Network tab
+3. Send a message
+4. Look for `/api/chat` request
+5. Check the response for errors
 
-### Chatbot doesn't respond
-- Check browser console for error messages
-- Verify API route exists: `/app/api/chat/route.ts`
-- Check Groq API status page
+### Chatbot not visible on mobile
+- Check viewport width isn't too narrow
+- Ensure CSS media queries are working
+- Try rotating device to landscape
 
-## API Key Security
+## Development
 
-⚠️ **Important**: Never commit your API key to version control!
+To modify the chatbot behavior, edit:
 
-- Add `.env.local` to `.gitignore`
-- Always use environment variables
-- Never paste the key in public repositories
-- Rotate keys if accidentally exposed
+**System Prompt** (in `app/api/chat/route.ts`):
+```typescript
+const systemPrompt = `You are a helpful news assistant...`;
+```
 
-## Usage Limits
+**Styling** (in `components/chatbot.tsx`):
+- Modify Tailwind classes for appearance
+- Change colors, sizing, or layout
 
-Free tier Groq accounts include:
-- API requests with rate limits
-- Fast inference speeds
-- Access to various LLMs including llama-3.3-70b-versatile
+**Model** (in `app/api/chat/route.ts`):
+```typescript
+model: 'groq/llama-3.3-70b-versatile' // Change here
+```
 
-Check the [Groq pricing page](https://console.groq.com/docs/rate-limits) for current limits.
+## Performance
+
+**Response Time:** 1-3 seconds typical
+**Context:** Up to 10 recent articles included
+**Token Limit:** 1024 tokens per response
 
 ## Need Help?
 
-- Check [Groq Documentation](https://console.groq.com/docs)
-- Visit [Groq Community](https://www.together.ai/community)
-- Review [API Reference](https://console.groq.com/docs/speech-text)
+- **AI SDK Docs:** https://sdk.vercel.ai
+- **Vercel Docs:** https://vercel.com/docs
+- **Groq Info:** https://groq.com
 
 ---
 
-Once setup is complete, your news chatbot will be fully functional! 🚀
+Enjoy your fully functional AI-powered news chatbot! 🚀
