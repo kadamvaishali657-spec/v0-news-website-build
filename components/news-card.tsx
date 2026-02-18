@@ -105,7 +105,8 @@ export function NewsCard({ article }: NewsCardProps) {
           {article.description}
         </p>
 
-        {/* Read More Link */}
+        {/* Actions */}
+        <div className="flex items-center gap-2 pt-2 border-t border-border">
           <a
             href={article.link}
             target="_blank"
