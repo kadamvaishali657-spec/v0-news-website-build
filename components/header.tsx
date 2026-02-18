@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog, Mail, HelpCircle } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog, Mail, HelpCircle, Edit3 } from 'lucide-react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -101,6 +101,14 @@ export function Header() {
             >
               <Mail className="w-4 h-4" />
               Newsletter
+            </Link>
+
+            <Link 
+              href="/publish" 
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1 bg-accent/20"
+            >
+              <Edit3 className="w-4 h-4" />
+              Publish
             </Link>
 
             <Link 
@@ -216,6 +224,15 @@ export function Header() {
             >
               <Mail className="w-4 h-4" />
               Newsletter
+            </Link>
+
+            <Link 
+              href="/publish" 
+              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1 bg-accent/20"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Edit3 className="w-4 h-4" />
+              Publish
             </Link>
 
             <Link 

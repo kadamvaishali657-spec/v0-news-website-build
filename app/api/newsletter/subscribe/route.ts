@@ -12,6 +12,37 @@ interface SubscriptionData {
 // For now, we'll use localStorage-like approach and log to console
 const subscribers: SubscriptionData[] = [];
 
+// Function to send notification email to admin
+async function sendAdminNotification(email: string, frequency: string, categories: string[]) {
+  try {
+    // Using mailto protocol for client-side email generation
+    const subject = `New Newsletter Subscription - ${email}`;
+    const body = `
+New Newsletter Subscription Received:
+
+Email: ${email}
+Frequency: ${frequency}
+Categories: ${categories.join(', ')}
+Timestamp: ${new Date().toISOString()}
+---
+This is an automated notification from JustinNews.tech
+`;
+
+    // Log to console (visible in server logs)
+    console.log('[Newsletter Notification]');
+    console.log('To: workwithme785@gmail.com');
+    console.log(`Subject: ${subject}`);
+    console.log(body);
+
+    // In production, integrate with email service (SendGrid, Mailgun, AWS SES, etc.)
+    // For now, we'll return success and let the admin check the logs
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to send notification:', error);
+    return { success: false, error };
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -53,7 +84,10 @@ export async function POST(request: NextRequest) {
       subscribers.push(subscription);
     }
 
-    // Log subscription (in production, send confirmation email)
+    // Send notification email to admin
+    await sendAdminNotification(email, frequency, categories);
+
+    // Log subscription
     console.log('[Newsletter] New subscription:', {
       email,
       frequency,
