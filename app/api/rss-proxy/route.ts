@@ -6,9 +6,9 @@ export const maxDuration = 30;
 const VALID_FEEDS = [
   // Global News
   'https://feeds.bbci.co.uk/news/world/rss.xml',
-  'https://rss.cnn.com/rss/edition.rss',
   'https://www.aljazeera.com/xml/rss/all.xml',
-  'https://www.reutersagency.com/feed/?best-topics=top-news',
+  'https://feeds.bloomberg.com/markets/news.rss',
+  'https://feeds.reuters.com/news/artsculture',
   'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms',
   'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en',
   
@@ -18,11 +18,11 @@ const VALID_FEEDS = [
   'https://www.wired.com/feed/rss',
   'https://news.ycombinator.com/rss',
   'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
+  'https://feeds.bloomberg.com/technology/news.rss',
   
   // Business & Finance
-  'https://www.bloomberg.com/feed/podcast/etf-report.xml',
-  'https://www.forbes.com/in/feed/',
-  'https://www.ft.com/?format=rss',
+  'https://www.forbes.com/feed/',
+  'https://feeds.ft.com/home/rss',
   
   // Sports
   'https://www.espn.com/espn/rss/news',
@@ -37,7 +37,6 @@ const VALID_FEEDS = [
   'https://www.khanacademy.org/about/blog/rss.xml',
   
   // Social Media Digest
-  'https://www.reddit.com/.rss',
   'https://www.reddit.com/r/worldnews/.rss',
   
   // Random Interesting Content
@@ -64,8 +63,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log(`[RSS Proxy] Fetching: ${feedUrl}`);
-    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000);
 
@@ -84,7 +81,6 @@ export async function GET(request: NextRequest) {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      console.warn(`[RSS Proxy] Feed returned ${response.status} for ${feedUrl}`);
       return NextResponse.json(
         { error: `Feed server returned ${response.status}` },
         { status: response.status }
@@ -95,14 +91,11 @@ export async function GET(request: NextRequest) {
     const text = await response.text();
 
     if (!text || text.length === 0) {
-      console.warn(`[RSS Proxy] Empty content from ${feedUrl}`);
       return NextResponse.json(
         { error: 'Feed returned empty content' },
         { status: 204 }
       );
     }
-
-    console.log(`[RSS Proxy] Successfully fetched ${text.length} bytes from ${feedUrl}`);
 
     return NextResponse.json({
       content: text,
@@ -111,7 +104,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`[RSS Proxy] Error fetching ${feedUrl}: ${errorMessage}`);
 
     // Return appropriate error based on type
     if (errorMessage.includes('abort')) {

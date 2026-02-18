@@ -19,7 +19,7 @@ export default function AdminPage() {
         const parsed = JSON.parse(savedFeeds);
         setFeeds(parsed);
       } catch (e) {
-        console.error('Error parsing saved feeds:', e);
+        // Silently ignore parse errors
       }
     }
   }, []);
