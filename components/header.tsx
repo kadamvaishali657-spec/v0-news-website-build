@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog, Mail, HelpCircle } from 'lucide-react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -93,6 +93,22 @@ export function Header() {
             >
               <Cog className="w-4 h-4" />
               Settings
+            </Link>
+
+            <Link 
+              href="/newsletter" 
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+            >
+              <Mail className="w-4 h-4" />
+              Newsletter
+            </Link>
+
+            <Link 
+              href="/support" 
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+            >
+              <HelpCircle className="w-4 h-4" />
+              Support
             </Link>
 
             {/* Admin Button */}
@@ -191,6 +207,24 @@ export function Header() {
             >
               <Cog className="w-4 h-4" />
               Settings
+            </Link>
+
+            <Link 
+              href="/newsletter" 
+              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Mail className="w-4 h-4" />
+              Newsletter
+            </Link>
+
+            <Link 
+              href="/support" 
+              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <HelpCircle className="w-4 h-4" />
+              Support
             </Link>
 
             <Link 
