@@ -89,8 +89,8 @@ Current time: ${new Date().toLocaleString()}`;
     const assistantMessage = groqData.choices?.[0]?.message?.content || '';
 
     return NextResponse.json({
-      role: 'assistant',
-      content: assistantMessage,
+      success: true,
+      message: assistantMessage,
     });
   } catch (error) {
     console.error('Chat API error:', error);
