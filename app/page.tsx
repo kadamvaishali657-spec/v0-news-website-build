@@ -15,11 +15,6 @@ import { Loader2 } from 'lucide-react';
 
 const ARTICLES_PER_PAGE = 12;
 
-export const metadata = {
-  title: 'JustinNews.tech - Tech News Aggregator',
-  description: 'Real-time technology news aggregated from 25+ premium sources. Get the latest news from TechCrunch, The Verge, Wired, and more with advanced filtering and AI insights.',
-}
-
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
