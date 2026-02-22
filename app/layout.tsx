@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google'
 
 import './globals.css'
 
 const _geist = Geist({ subsets: ['latin'] })
 const _geistMono = Geist_Mono({ subsets: ['latin'] })
+const _playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' })
 
 export const viewport: Viewport = {
   themeColor: '#F59E0B',
@@ -50,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">{children}</body>
+      <body className={`${_playfair.variable} font-sans antialiased bg-background text-foreground`}>{children}</body>
     </html>
   )
 }
