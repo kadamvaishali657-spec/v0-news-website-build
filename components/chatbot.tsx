@@ -74,18 +74,8 @@ export function ChatBot({ articles }: ChatBotProps) {
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 ? (
               <div className="text-center text-muted-foreground text-sm py-8">
-                <p className="mb-3 font-semibold">Hi! I'm your News Assistant.</p>
-                <p className="mb-4">I can help you with:</p>
-                <div className="space-y-2 text-xs text-left">
-                  <p>📰 Discuss news articles and current events</p>
-                  <p>🔍 Help you search for topics</p>
-                  <p>📚 Summarize news stories</p>
-                  <p>✍️ Guide you on publishing articles</p>
-                  <p>📧 Assist with newsletter setup</p>
-                  <p>⚙️ Explain site features</p>
-                  <p>💾 Help with saving articles</p>
-                </div>
-                <p className="mt-4 text-xs">Ask me anything about news or how to use the site!</p>
+                <p className="mb-2">👋 Hi! I'm your news assistant.</p>
+                <p>Ask me about articles, get summaries, or find news on topics you're interested in!</p>
               </div>
             ) : (
               <>
