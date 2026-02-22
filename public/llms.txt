@@ -1,0 +1,79 @@
+JustinNews.tech - AI-Powered Technology News Aggregator
+
+ABOUT
+JustinNews.tech is a cutting-edge news aggregation platform that combines real-time RSS feed parsing with AI-powered insights. We aggregate technology news from 25+ premium sources including TechCrunch, The Verge, NY Times, Wired, and more across 8 categories: Global News, Technology & Innovation, Business & Finance, Sports, Entertainment, Education & Learning, Social Media Trends, and Random Discoveries.
+
+MISSION
+Our mission is to democratize access to high-quality technology news by aggregating diverse sources, filtering information by user preferences, and providing AI-powered analysis through our intelligent chatbot assistant.
+
+CORE FEATURES
+- Real-Time News Aggregation: Automatic RSS feed parsing from 25+ premium sources
+- Advanced Search & Filtering: Full-text search across titles, descriptions, and sources with category and date filtering
+- User-Generated Content: Platform for publishing your own articles that appear in the main feed
+- Article Bookmarking: Save and organize articles for later reading
+- AI Chat Assistant: Groq-powered chatbot for discussing news, getting summaries, and recommendations
+- Newsletter Subscription: Customize daily, weekly, or monthly news digests by topic
+- Analytics Dashboard: Track your reading habits and engagement metrics
+- Dark/Light Mode: Theme customization for comfortable reading
+- Mobile Optimized: Full responsive design for all devices
+
+SITE SECTIONS
+1. Home (/) - Main feed with all aggregated articles
+2. Articles (/article/[id]) - Internal article reader with metadata and sharing
+3. Saved (/saved) - Personal article bookmarks
+4. Trending (/trending) - 24 most recent articles
+5. Search (/search) - Advanced search with filters
+6. Publish (/publish) - User article publishing
+7. Newsletter (/newsletter) - Email digest signup
+8. Settings (/settings) - Preferences and analytics
+9. Support (/support) - Help and contact information
+10. Admin (/admin) - RSS feed management
+
+TECHNOLOGY STACK
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS
+- Backend: Next.js API Routes, Groq AI (Llama 3.3 70B)
+- Storage: localStorage with database-ready architecture
+- Design: Professional light theme with serif typography (Playfair Display)
+
+CONTENT CATEGORIES
+- Global News: International coverage and world events
+- Technology & Innovation: Latest tech developments, gadgets, AI, cybersecurity
+- Business & Finance: Startup news, investments, market updates
+- Sports: Sports coverage and updates
+- Entertainment: Entertainment and pop culture news
+- Education & Learning: Educational resources and learning platforms
+- Social Media Trends: Viral content and social media updates
+- Random Discoveries: Curated interesting articles
+
+DATA & PRIVACY
+All user data is stored locally in browser localStorage. No data is sent to external servers except for:
+- Newsletter subscriptions (email validated on server)
+- AI chat requests (through Groq API)
+- RSS feed parsing (standard web requests)
+
+SUPPORT CONTACT
+Email: workwithme785@gmail.com
+Website: https://justinnews.tech
+Support Page: https://justinnews.tech/support
+
+CHANGELOG
+- Added YourStory.com-inspired professional design overhaul
+- Implemented Playfair Display serif fonts for editorial credibility
+- Enhanced chatbot to answer questions about all site features
+- Integrated analytics tracking system
+- Added user article publishing with main feed integration
+- Implemented settings-aware share buttons and theme preferences
+- Added internal article reader with analytics
+- Deployed complete responsive mobile design
+
+FUTURE ROADMAP
+- Database backend integration (Supabase/PostgreSQL)
+- Real email sending for newsletters
+- User authentication and cross-device sync
+- Content moderation system for published articles
+- Advanced analytics with detailed insights
+- Social media integration
+- API for third-party integrations
+- Dark mode refinement
+
+For more information about specific features, visit https://justinnews.tech or contact support.
