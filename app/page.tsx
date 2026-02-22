@@ -138,47 +138,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="bg-white border-b border-gray-200 py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h2 className="text-3xl font-serif font-bold text-gray-900 mb-4">
-                Your Daily Technology News Hub
-              </h2>
-              <p className="text-lg text-gray-700 mb-4">
-                JustinNews.tech is a professional technology news aggregation platform that delivers real-time updates from over 25 premium news sources. We curate the latest developments in artificial intelligence, startups, gadgets, cybersecurity, and global technology innovations.
-              </p>
-              <p className="text-gray-600 mb-6">
-                Our platform combines advanced RSS feed parsing, AI-powered insights, and user-friendly design to help you stay informed about the technology shaping our world. With personalized news categories, saved articles, and an intelligent chatbot assistant, JustinNews.tech is your complete technology news solution.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-                <h3 className="text-3xl font-bold text-blue-600 mb-2">25+</h3>
-                <p className="text-gray-700 font-semibold">News Sources</p>
-                <p className="text-sm text-gray-600">From top publications</p>
-              </div>
-              <div className="bg-indigo-50 rounded-lg p-6 border border-indigo-200">
-                <h3 className="text-3xl font-bold text-indigo-600 mb-2">8</h3>
-                <p className="text-gray-700 font-semibold">Content Categories</p>
-                <p className="text-sm text-gray-600">Diverse tech topics</p>
-              </div>
-              <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
-                <h3 className="text-3xl font-bold text-purple-600 mb-2">Real-time</h3>
-                <p className="text-gray-700 font-semibold">Updates</p>
-                <p className="text-sm text-gray-600">Fresh content hourly</p>
-              </div>
-              <div className="bg-pink-50 rounded-lg p-6 border border-pink-200">
-                <h3 className="text-3xl font-bold text-pink-600 mb-2">AI</h3>
-                <p className="text-gray-700 font-semibold">Powered Analysis</p>
-                <p className="text-sm text-gray-600">Smart insights</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex gap-8">
         {/* Sidebar Navigation */}
         <SidebarNav selectedCategory={selectedCategory} onCategorySelect={setSelectedCategory} />

@@ -1,47 +1,12 @@
 User-agent: *
 Allow: /
-Allow: /article/
-Allow: /saved
-Allow: /trending
-Allow: /search
-Allow: /newsletter
-Allow: /settings
-Allow: /support
 Allow: /admin
-Allow: /publish
+
+Sitemap: https://justinnews.tech/sitemap.xml
 
 Disallow: /_next/
 Disallow: /api/
-Disallow: /private/
-
-Crawl-delay: 1
-Request-rate: 30/60
-
-Sitemap: https://justinnews.tech/sitemap.xml
-Sitemap: https://justinnews.tech/robots.txt
-
-# AI & LLM Crawlers
-User-agent: GPTBot
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
 
 User-agent: Googlebot
 Allow: /
-Allow: /article/
 Allow: /admin
-
-User-agent: Bingbot
-Allow: /
-Allow: /article/
-
-# LLM Configuration
-# This file is accessible at https://justinnews.tech/llms.txt
-# For AI and LLM integration information
