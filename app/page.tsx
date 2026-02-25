@@ -46,18 +46,11 @@ export default function HomePage() {
       try {
         const articles = await fetchAllFeeds(feeds);
         
-        // Load user-published articles from localStorage
-        const userPublished = localStorage.getItem('user-published-articles');
-        const publishedArticles = userPublished ? JSON.parse(userPublished) : [];
-        
-        // Combine all articles with published articles at the top
-        const allArticles = [...publishedArticles, ...articles];
-        
-        if (allArticles.length === 0) {
+        if (articles.length === 0) {
           setError('No articles loaded. RSS feeds may be temporarily unavailable. Try again in a moment.');
         }
         
-        setArticles(allArticles);
+        setArticles(articles);
         setCurrentPage(1);
       } catch (err) {
         setError('Failed to load news. Please try again later.');
