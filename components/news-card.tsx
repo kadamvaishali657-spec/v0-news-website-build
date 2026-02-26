@@ -1,15 +1,26 @@
 'use client';
 
 import { Article } from '@/lib/rss-parser';
-import { ExternalLink, Calendar, Bookmark, Share2, Clock, ArrowUpRight } from 'lucide-react';
-import { useState } from 'react';
+import { ExternalLink, Calendar, Bookmark, Share2, Clock, ArrowUpRight, Twitter, Linkedin, MessageCircle, Link2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { formatRelativeTime } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface NewsCardProps {
   article: Article;
 }
 
 export function NewsCard({ article }: NewsCardProps) {
+  const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isSaved, setIsSaved] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -17,11 +28,13 @@ export function NewsCard({ article }: NewsCardProps) {
     return saved ? JSON.parse(saved).some((a: Article) => a.id === article.id) : false;
   });
 
-  const formattedDate = new Date(article.pubDate).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const formattedDate = mounted
+    ? formatRelativeTime(article.pubDate)
+    : new Date(article.pubDate).toLocaleDateString();
 
   // Estimate reading time (average 200 words per minute)
   const wordCount = (article.title + ' ' + article.description).split(/\s+/).length;
@@ -34,9 +47,17 @@ export function NewsCard({ article }: NewsCardProps) {
     if (!isSaved) {
       articles.push(article);
       setIsSaved(true);
+      toast({
+        title: "Article saved",
+        description: "You can find your saved articles in the 'Saved' section.",
+      });
     } else {
       articles = articles.filter((a: Article) => a.id !== article.id);
       setIsSaved(false);
+      toast({
+        title: "Article removed",
+        description: "The article has been removed from your saved list.",
+      });
     }
     
     localStorage.setItem('saved-articles', JSON.stringify(articles));
@@ -64,7 +85,10 @@ export function NewsCard({ article }: NewsCardProps) {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(article.link);
-    alert('Link copied to clipboard!');
+    toast({
+      title: "Link copied",
+      description: "The article link has been copied to your clipboard.",
+    });
   };
 
   return (
@@ -90,9 +114,15 @@ export function NewsCard({ article }: NewsCardProps) {
           <span className="inline-block px-2 py-1 bg-accent text-accent-foreground text-xs font-medium rounded">
             {article.source}
           </span>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="w-3 h-3" />
-            {formattedDate}
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" />
+              {formattedDate}
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {readingTime} min read
+            </div>
           </div>
         </div>
 
@@ -108,57 +138,56 @@ export function NewsCard({ article }: NewsCardProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-2 border-t border-border">
-          <Link
-            href={`/article/${encodeURIComponent(article.id)}`}
-            className="flex-1 flex items-center gap-2 px-3 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90 transition-colors font-medium text-sm"
+          <Button
+            asChild
+            className="flex-1"
           >
-            Read Article
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
+            <Link href={`/article/${encodeURIComponent(article.id)}`}>
+              Read Article
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </Button>
 
-          <button
+          <Button
+            variant={isSaved ? "default" : "secondary"}
+            size="icon"
             onClick={handleSave}
-            className={`p-2 rounded transition-colors ${
-              isSaved 
-                ? 'bg-accent text-accent-foreground' 
-                : 'bg-muted text-muted-foreground hover:bg-accent/20'
-            }`}
-            title={isSaved ? 'Remove from saved' : 'Save article'}
+            aria-label={isSaved ? "Remove from saved" : "Save article"}
+            title={isSaved ? "Remove from saved" : "Save article"}
           >
-            <Bookmark className="w-4 h-4" fill={isSaved ? 'currentColor' : 'none'} />
-          </button>
+            <Bookmark className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} />
+          </Button>
 
-          <div className="relative group">
-            <button className="p-2 rounded bg-muted text-muted-foreground hover:bg-accent/20 transition-colors">
-              <Share2 className="w-4 h-4" />
-            </button>
-            <div className="absolute right-0 mt-1 w-32 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-1 z-50">
-              <button
-                onClick={() => handleShare('twitter')}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="secondary"
+                size="icon"
+                aria-label="Share article"
+                title="Share article"
               >
+                <Share2 className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => handleShare('twitter')}>
+                <Twitter className="w-4 h-4 mr-2" />
                 Share on Twitter
-              </button>
-              <button
-                onClick={() => handleShare('linkedin')}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
-              >
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleShare('linkedin')}>
+                <Linkedin className="w-4 h-4 mr-2" />
                 Share on LinkedIn
-              </button>
-              <button
-                onClick={() => handleShare('whatsapp')}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
-              >
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleShare('whatsapp')}>
+                <MessageCircle className="w-4 h-4 mr-2" />
                 Share on WhatsApp
-              </button>
-              <button
-                onClick={handleCopyLink}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
-              >
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleCopyLink}>
+                <Link2 className="w-4 h-4 mr-2" />
                 Copy Link
-              </button>
-            </div>
-          </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </article>

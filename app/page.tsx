@@ -5,13 +5,15 @@ import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
+import { NewsGridSkeleton } from '@/components/news-skeleton';
 import { Pagination } from '@/components/pagination';
 import { ChatBot } from '@/components/chatbot';
 import { SidebarNav } from '@/components/sidebar-nav';
 import { BottomNav } from '@/components/bottom-nav';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowUp, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const ARTICLES_PER_PAGE = 12;
 
@@ -24,6 +26,20 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Handle scroll to top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Load feeds from localStorage
   useEffect(() => {
@@ -137,11 +153,11 @@ export default function HomePage() {
 
         {/* Main Content */}
         <div className="flex-1 pb-20 md:pb-0">
-        {/* Featured Section */}
-        {!loading && featuredArticles.length > 0 && (
+        {/* Featured Section - Only show on home with no search/filters */}
+        {!searchQuery && selectedCategory === 'All' && featuredArticles.length > 0 && (
           <section className="mb-16">
             <h2 className="text-2xl font-bold text-foreground mb-6">Featured Stories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredArticles.map((article) => (
                 <NewsCard key={article.id} article={article} />
               ))}
@@ -164,8 +180,8 @@ export default function HomePage() {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 text-accent animate-spin" />
+          <div className="py-8">
+            <NewsGridSkeleton />
           </div>
         )}
 
@@ -194,8 +210,23 @@ export default function HomePage() {
                 )}
               </>
             ) : (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground text-lg">No articles found. Try adjusting your filters.</p>
+              <div className="text-center py-24 bg-card border border-dashed border-border rounded-xl">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-2">No articles found</h3>
+                <p className="text-muted-foreground max-w-xs mx-auto mb-6">
+                  We couldn't find any articles matching your current search or category filters.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('All');
+                  }}
+                >
+                  Clear all filters
+                </Button>
               </div>
             )}
           </>
@@ -221,6 +252,18 @@ export default function HomePage() {
 
       {/* Mobile Bottom Navigation */}
       <BottomNav />
+
+      {/* Back to Top Button */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          size="icon"
+          className="fixed bottom-24 right-6 md:bottom-8 md:right-8 rounded-full shadow-lg z-50 animate-in fade-in slide-in-from-bottom-4"
+          aria-label="Back to top"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
     </div>
   );
 }
