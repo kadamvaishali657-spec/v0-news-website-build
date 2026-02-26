@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 interface AnalyticsEvent {
   type: 'article_view' | 'article_save' | 'article_share' | 'settings_change' | 'search_query' | 'category_filter';
   data: Record<string, any>;
-  timestamp: string;
+  timestamp?: string;
 }
 
 export function logAnalytics(event: AnalyticsEvent) {

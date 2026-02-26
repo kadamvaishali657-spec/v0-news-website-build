@@ -33,7 +33,7 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
       if (proxyResponse.ok) {
         const data = await proxyResponse.json();
         if (data.content) {
-          text = data.content;
+          text = data.content as string;
           return await parseFeedContent(text, feedTitle, category);
         }
       }
@@ -159,7 +159,7 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
         }
 
         const article: Article = {
-          id: `${feedTitle}-${index}-${Date.now()}-${Math.random()}`,
+          id: `${feedTitle.replace(/\s+/g, '-')}-${index}-${hashCode(link)}`,
           title: cleanText(title).substring(0, 200),
           description: cleanText(description).substring(0, 250),
           link: link.trim(),
@@ -181,16 +181,52 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
   }
 }
 
-function cleanText(text: string): string {
-  // Remove HTML tags
-  let clean = text.replace(/<[^>]*>/g, '');
-  // Decode HTML entities
-  const txt = document.createElement('textarea');
-  txt.innerHTML = clean;
-  return txt.value;
+// Simple deterministic hash function for stable article IDs
+function hashCode(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(36);
 }
 
-export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
+// Simple in-memory cache for articles to avoid redundant fetches during navigation
+let articlesCache: Article[] | null = null;
+let cacheTimestamp: number = 0;
+let cacheKey: string = '';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+
+// Reusable textarea for decoding HTML entities
+let memoizedTextarea: HTMLTextAreaElement | null = null;
+
+function cleanText(text: string): string {
+  if (!text) return '';
+  // Remove HTML tags
+  let clean = text.replace(/<[^>]*>/g, '');
+
+  // Return clean text if document is not available (SSR)
+  if (typeof document === 'undefined') return clean;
+
+  // Use a single textarea element to decode HTML entities for better performance
+  if (!memoizedTextarea) {
+    memoizedTextarea = document.createElement('textarea');
+  }
+
+  memoizedTextarea.innerHTML = clean;
+  return memoizedTextarea.value;
+}
+
+export async function fetchAllFeeds(feeds: RSSFeed[], forceRefresh = false): Promise<Article[]> {
+  // Generate a key based on feeds to ensure the cache is feed-aware
+  const currentKey = feeds.map(f => f.url).sort().join('|');
+
+  // Return cached articles if available, fresh, and key matches, unless force refresh is requested
+  if (!forceRefresh && articlesCache && (Date.now() - cacheTimestamp < CACHE_TTL) && currentKey === cacheKey) {
+    return articlesCache;
+  }
+
   try {
     const results = await Promise.all(
       feeds.map(feed => parseFeed(feed.url, feed.title, feed.category))
@@ -217,7 +253,14 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
     otherArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
     
     // Return India news first, then other articles
-    return [...indiaArticles, ...otherArticles];
+    const combined = [...indiaArticles, ...otherArticles];
+
+    // Update cache
+    articlesCache = combined;
+    cacheTimestamp = Date.now();
+    cacheKey = currentKey;
+
+    return combined;
   } catch (error) {
     // Return fallback on error
     return FALLBACK_ARTICLES;

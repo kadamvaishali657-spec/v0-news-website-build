@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog, Mail, HelpCircle, Edit3 } from 'lucide-react';
+import { Shield, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog, Mail, HelpCircle, Edit3 } from 'lucide-react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,7 +53,7 @@ export function Header() {
                 {categories.map((category) => (
                   <Link
                     key={category}
-                    href={`/#category=${category}`}
+                    href={`/?category=${encodeURIComponent(category)}`}
                     className="block px-4 py-2 text-sm text-foreground hover:bg-accent/20 hover:text-accent transition-colors"
                   >
                     {category}
@@ -124,7 +124,7 @@ export function Header() {
               href="/admin" 
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-medium ml-2"
             >
-              <Settings className="w-4 h-4" />
+              <Shield className="w-4 h-4" />
               Admin
             </Link>
           </nav>
@@ -167,7 +167,7 @@ export function Header() {
                   {categories.map((category) => (
                     <Link
                       key={category}
-                      href={`/#category=${category}`}
+                      href={`/?category=${encodeURIComponent(category)}`}
                       className="block px-4 py-2 text-sm text-foreground hover:text-accent transition-colors"
                       onClick={() => {
                         setMobileMenuOpen(false);
@@ -249,7 +249,7 @@ export function Header() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-medium mt-4"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Settings className="w-4 h-4" />
+              <Shield className="w-4 h-4" />
               Admin
             </Link>
           </nav>

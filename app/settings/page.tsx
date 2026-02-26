@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
+import { BottomNav } from '@/components/bottom-nav';
 import { Settings, Moon, Sun, Bell, Share2, BarChart3, Trash2 } from 'lucide-react';
 import { getAnalyticsReport } from '@/lib/analytics';
 
@@ -207,6 +208,8 @@ export default function SettingsPage() {
           </div>
         </div>
       </main>
+
+      <BottomNav />
     </div>
   );
 }

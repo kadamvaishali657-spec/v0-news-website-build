@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
@@ -16,14 +17,25 @@ import { Loader2 } from 'lucide-react';
 const ARTICLES_PER_PAGE = 12;
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
   const [articles, setArticles] = useState<Article[]>([]);
-  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
+
+  // Sync category from URL query parameters
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+      setCurrentPage(1);
+    } else {
+      setSelectedCategory('All');
+    }
+  }, [searchParams]);
 
   // Load feeds from localStorage
   useEffect(() => {
@@ -65,7 +77,7 @@ export default function HomePage() {
   }, [feeds]);
 
   // Filter and search articles
-  useEffect(() => {
+  const filteredArticles = useMemo(() => {
     let result = articles;
 
     // Apply search filter
@@ -94,21 +106,32 @@ export default function HomePage() {
       });
     }
 
-    setFilteredArticles(result);
-    setCurrentPage(1);
+    return result;
   }, [articles, searchQuery, selectedCategory]);
 
   // Paginate articles
-  const startIdx = (currentPage - 1) * ARTICLES_PER_PAGE;
-  const endIdx = startIdx + ARTICLES_PER_PAGE;
-  const paginatedArticles = filteredArticles.slice(startIdx, endIdx);
-  const totalPages = Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE);
+  const { paginatedArticles, totalPages, startIdx, endIdx } = useMemo(() => {
+    const start = (currentPage - 1) * ARTICLES_PER_PAGE;
+    const end = start + ARTICLES_PER_PAGE;
+    return {
+      paginatedArticles: filteredArticles.slice(start, end),
+      totalPages: Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE),
+      startIdx: start,
+      endIdx: end,
+    };
+  }, [filteredArticles, currentPage]);
 
   // Get featured articles (top 5)
-  const featuredArticles = articles.slice(0, 5);
+  const featuredArticles = useMemo(() => articles.slice(0, 5), [articles]);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
+    setCurrentPage(1);
+  }, []);
+
+  const handleCategoryChange = useCallback((category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
   }, []);
 
   return (
@@ -133,7 +156,7 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex gap-8">
         {/* Sidebar Navigation */}
-        <SidebarNav selectedCategory={selectedCategory} onCategorySelect={setSelectedCategory} />
+        <SidebarNav selectedCategory={selectedCategory} onCategorySelect={handleCategoryChange} />
 
         {/* Main Content */}
         <div className="flex-1 pb-20 md:pb-0">
@@ -152,7 +175,7 @@ export default function HomePage() {
         {/* Category Filter */}
         <section className="mb-8">
           <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase">Filter by category</h3>
-          <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+          <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} />
         </section>
 
         {/* Error State */}
