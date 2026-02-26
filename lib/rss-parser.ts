@@ -181,13 +181,24 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
   }
 }
 
+// Reusable textarea for decoding HTML entities
+let memoizedTextarea: HTMLTextAreaElement | null = null;
+
 function cleanText(text: string): string {
+  if (!text) return '';
   // Remove HTML tags
   let clean = text.replace(/<[^>]*>/g, '');
-  // Decode HTML entities
-  const txt = document.createElement('textarea');
-  txt.innerHTML = clean;
-  return txt.value;
+
+  // Return clean text if document is not available (SSR)
+  if (typeof document === 'undefined') return clean;
+
+  // Use a single textarea element to decode HTML entities for better performance
+  if (!memoizedTextarea) {
+    memoizedTextarea = document.createElement('textarea');
+  }
+
+  memoizedTextarea.innerHTML = clean;
+  return memoizedTextarea.value;
 }
 
 export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {

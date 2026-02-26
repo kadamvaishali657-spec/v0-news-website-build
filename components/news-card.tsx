@@ -2,14 +2,14 @@
 
 import { Article } from '@/lib/rss-parser';
 import { ExternalLink, Calendar, Bookmark, Share2, Clock, ArrowUpRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import Link from 'next/link';
 
 interface NewsCardProps {
   article: Article;
 }
 
-export function NewsCard({ article }: NewsCardProps) {
+export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
   const [imageError, setImageError] = useState(false);
   const [isSaved, setIsSaved] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -163,4 +163,4 @@ export function NewsCard({ article }: NewsCardProps) {
       </div>
     </article>
   );
-}
+});
