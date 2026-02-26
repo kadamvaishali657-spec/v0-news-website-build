@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
@@ -16,6 +17,7 @@ import { Loader2 } from 'lucide-react';
 const ARTICLES_PER_PAGE = 12;
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +25,17 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
+
+  // Sync category from URL query parameters
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedCategory(categoryParam);
+      setCurrentPage(1);
+    } else {
+      setSelectedCategory('All');
+    }
+  }, [searchParams]);
 
   // Load feeds from localStorage
   useEffect(() => {

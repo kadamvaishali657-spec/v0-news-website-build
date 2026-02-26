@@ -9,3 +9,7 @@
 ## 2026-02-11 - In-Memory Cache for Client-Side Aggregators
 **Learning:** In a pure client-side aggregator, navigating between Home and Detail pages re-fetches all data by default, causing poor UX and high bandwidth usage.
 **Action:** Implement a simple in-memory cache with a TTL (e.g., 5 mins) to provide instant navigation for recently fetched data.
+
+## 2026-02-11 - Navigation Consistency and Search Params
+**Learning:** In a multi-page Next.js app, using hash-based filtering (e.g., /#category=...) on the home page only works if the user is *already* on that page. It fails when navigating from other pages (like /settings) because the home page component might not be listening for hash changes.
+**Action:** Use URL search parameters (e.g., /?category=...) and sync them via `useSearchParams` in a `useEffect` to ensure consistent cross-page navigation.

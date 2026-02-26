@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, Search, Bookmark, Settings, Mail } from 'lucide-react';
+import { Home, Search, Bookmark, Cog, Mail, Edit3, Shield } from 'lucide-react';
 
 export function BottomNav() {
   return (
@@ -9,43 +9,59 @@ export function BottomNav() {
       <div className="flex items-center justify-around">
         <Link 
           href="/" 
-          className="flex flex-col items-center gap-1 px-4 py-3 text-muted-foreground hover:text-accent transition-colors"
+          className="flex flex-col items-center gap-1 px-2 py-3 text-muted-foreground hover:text-accent transition-colors"
           title="Home"
         >
-          <Home className="w-6 h-6" />
-          <span className="text-xs font-medium">Home</span>
+          <Home className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Home</span>
         </Link>
         <Link 
-          href="/#search" 
-          className="flex flex-col items-center gap-1 px-4 py-3 text-muted-foreground hover:text-accent transition-colors"
+          href="/search"
+          className="flex flex-col items-center gap-1 px-2 py-3 text-muted-foreground hover:text-accent transition-colors"
           title="Search"
         >
-          <Search className="w-6 h-6" />
-          <span className="text-xs font-medium">Search</span>
+          <Search className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Search</span>
         </Link>
         <Link 
           href="/saved" 
-          className="flex flex-col items-center gap-1 px-4 py-3 text-muted-foreground hover:text-accent transition-colors"
+          className="flex flex-col items-center gap-1 px-2 py-3 text-muted-foreground hover:text-accent transition-colors"
           title="Saved"
         >
-          <Bookmark className="w-6 h-6" />
-          <span className="text-xs font-medium">Saved</span>
+          <Bookmark className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Saved</span>
         </Link>
         <Link 
           href="/newsletter" 
-          className="flex flex-col items-center gap-1 px-4 py-3 text-muted-foreground hover:text-accent transition-colors"
+          className="flex flex-col items-center gap-1 px-2 py-3 text-muted-foreground hover:text-accent transition-colors"
           title="Newsletter"
         >
-          <Mail className="w-6 h-6" />
-          <span className="text-xs font-medium">Newsletter</span>
+          <Mail className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Mail</span>
+        </Link>
+        <Link
+          href="/publish"
+          className="flex flex-col items-center gap-1 px-2 py-3 text-muted-foreground hover:text-accent transition-colors"
+          title="Publish"
+        >
+          <Edit3 className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Pub</span>
+        </Link>
+        <Link
+          href="/settings"
+          className="flex flex-col items-center gap-1 px-2 py-3 text-muted-foreground hover:text-accent transition-colors"
+          title="Settings"
+        >
+          <Cog className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Set</span>
         </Link>
         <Link 
           href="/admin" 
-          className="flex flex-col items-center gap-1 px-4 py-3 text-muted-foreground hover:text-accent transition-colors"
+          className="flex flex-col items-center gap-1 px-2 py-3 text-muted-foreground hover:text-accent transition-colors"
           title="Admin"
         >
-          <Settings className="w-6 h-6" />
-          <span className="text-xs font-medium">Admin</span>
+          <Shield className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Admin</span>
         </Link>
       </div>
     </nav>

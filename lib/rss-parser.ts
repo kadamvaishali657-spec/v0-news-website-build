@@ -195,6 +195,7 @@ function hashCode(str: string): string {
 // Simple in-memory cache for articles to avoid redundant fetches during navigation
 let articlesCache: Article[] | null = null;
 let cacheTimestamp: number = 0;
+let cacheKey: string = '';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
 
 // Reusable textarea for decoding HTML entities
@@ -218,8 +219,11 @@ function cleanText(text: string): string {
 }
 
 export async function fetchAllFeeds(feeds: RSSFeed[], forceRefresh = false): Promise<Article[]> {
-  // Return cached articles if available and fresh, unless force refresh is requested
-  if (!forceRefresh && articlesCache && (Date.now() - cacheTimestamp < CACHE_TTL)) {
+  // Generate a key based on feeds to ensure the cache is feed-aware
+  const currentKey = feeds.map(f => f.url).sort().join('|');
+
+  // Return cached articles if available, fresh, and key matches, unless force refresh is requested
+  if (!forceRefresh && articlesCache && (Date.now() - cacheTimestamp < CACHE_TTL) && currentKey === cacheKey) {
     return articlesCache;
   }
 
@@ -254,6 +258,7 @@ export async function fetchAllFeeds(feeds: RSSFeed[], forceRefresh = false): Pro
     // Update cache
     articlesCache = combined;
     cacheTimestamp = Date.now();
+    cacheKey = currentKey;
 
     return combined;
   } catch (error) {
