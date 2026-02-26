@@ -136,10 +136,10 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Security fix: Do not return the full subscriber data to avoid information leakage
   return NextResponse.json(
     {
       subscribed: true,
-      subscription: subscriber,
     },
     { status: 200 }
   );
