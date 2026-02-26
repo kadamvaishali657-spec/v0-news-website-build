@@ -15,78 +15,115 @@ export interface RSSFeed {
   category?: string;
 }
 
+// In-memory cache for fetched feeds to improve performance and reduce redundant network requests
+interface CacheEntry {
+  articles: Article[];
+  timestamp: number;
+}
+
+// Use globalThis to ensure the cache persists across HMR and module re-evaluations in development
+const CACHE_KEY = '_jt_feed_cache';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL
+
+if (typeof globalThis !== 'undefined' && !(globalThis as any)[CACHE_KEY]) {
+  (globalThis as any)[CACHE_KEY] = {};
+}
+
+const getCache = (): Record<string, CacheEntry> => {
+  if (typeof globalThis !== 'undefined') {
+    return (globalThis as any)[CACHE_KEY] || {};
+  }
+  return {};
+};
+
+// Basic cache eviction: remove expired entries periodically
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    const cache = getCache();
+    Object.keys(cache).forEach(url => {
+      if (now - cache[url].timestamp > CACHE_TTL) {
+        delete cache[url];
+      }
+    });
+  }, CACHE_TTL);
+}
+
 // Parse RSS feed using JavaScript/XML parsing
 export async function parseFeed(feedUrl: string, feedTitle: string, category?: string): Promise<Article[]> {
-  try {
-    let text: string | null = null;
-    let lastError: Error | null = null;
+  const cache = getCache();
 
+  // Check cache first
+  const now = Date.now();
+  const cached = cache[feedUrl];
+  if (cached && (now - cached.timestamp < CACHE_TTL)) {
+    return cached.articles;
+  }
+
+  let text: string | null = null;
+
+  try {
     // Strategy 1: Try server-side proxy first
     try {
       const proxyResponse = await fetch(`/api/rss-proxy?url=${encodeURIComponent(feedUrl)}`, {
         method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        },
+        headers: { 'Accept': 'application/json' },
       });
 
       if (proxyResponse.ok) {
         const data = await proxyResponse.json();
-        if (data.content) {
-          text = data.content;
-          return await parseFeedContent(text, feedTitle, category);
-        }
+        if (data.content) text = data.content;
       }
-    } catch (error) {
-      lastError = error as Error;
+    } catch (error) {}
+
+    // Strategy 2: Try direct fetch with shorter timeout if strategy 1 failed
+    if (!text) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch(feedUrl, {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0',
+            'Cache-Control': 'no-cache',
+          },
+        });
+
+        clearTimeout(timeoutId);
+        if (response.ok) text = await response.text();
+      } catch (error) {}
     }
 
-    // Strategy 2: Try direct fetch with shorter timeout
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+    // Strategy 3: Try allorigins CORS proxy if previous strategies failed
+    if (!text) {
+      try {
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-      const response = await fetch(feedUrl, {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0',
-          'Cache-Control': 'no-cache',
-        },
-      });
+        const response = await fetch(proxyUrl, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
 
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        text = await response.text();
-        return await parseFeedContent(text, feedTitle, category);
-      }
-    } catch (error) {
-      lastError = error as Error;
+        clearTimeout(timeoutId);
+        if (response.ok) text = await response.text();
+      } catch (error) {}
     }
 
-    // Strategy 3: Try allorigins CORS proxy (simpler alternative)
-    try {
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feedUrl)}`;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+    if (text) {
+      const articles = await parseFeedContent(text, feedTitle, category);
 
-      const response = await fetch(proxyUrl, {
-        signal: controller.signal,
-        cache: 'no-store',
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        text = await response.text();
-        return await parseFeedContent(text, feedTitle, category);
+      // Cache results if successful
+      if (articles.length > 0) {
+        cache[feedUrl] = { articles, timestamp: Date.now() };
       }
-    } catch (error) {
-      lastError = error as Error;
+
+      return articles;
     }
 
-    // All strategies failed
     return [];
   } catch (error) {
     return [];
@@ -159,7 +196,8 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
         }
 
         const article: Article = {
-          id: `${feedTitle}-${index}-${Date.now()}-${Math.random()}`,
+          // Combined link hash and index to ensure both stability and uniqueness
+          id: `${hashCode(link.trim())}-${index}`,
           title: cleanText(title).substring(0, 200),
           description: cleanText(description).substring(0, 250),
           link: link.trim(),
@@ -181,13 +219,34 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
   }
 }
 
+// Helper to generate deterministic hashes for stable article IDs
+function hashCode(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
+
+// Memoize a textarea element for efficient HTML entity decoding across calls
+let memoizedTextarea: HTMLTextAreaElement | null = null;
+
 function cleanText(text: string): string {
   // Remove HTML tags
   let clean = text.replace(/<[^>]*>/g, '');
-  // Decode HTML entities
-  const txt = document.createElement('textarea');
-  txt.innerHTML = clean;
-  return txt.value;
+
+  // Decode HTML entities efficiently by reusing a single DOM element
+  if (typeof document !== 'undefined') {
+    if (!memoizedTextarea) {
+      memoizedTextarea = document.createElement('textarea');
+    }
+    memoizedTextarea.innerHTML = clean;
+    return memoizedTextarea.value;
+  }
+
+  return clean;
 }
 
 export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
