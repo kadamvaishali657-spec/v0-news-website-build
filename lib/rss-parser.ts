@@ -33,7 +33,7 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
       if (proxyResponse.ok) {
         const data = await proxyResponse.json();
         if (data.content) {
-          text = data.content;
+          text = data.content as string;
           return await parseFeedContent(text, feedTitle, category);
         }
       }
@@ -159,7 +159,7 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
         }
 
         const article: Article = {
-          id: `${feedTitle}-${index}-${Date.now()}-${Math.random()}`,
+          id: `${feedTitle.replace(/\s+/g, '-')}-${index}-${hashCode(link)}`,
           title: cleanText(title).substring(0, 200),
           description: cleanText(description).substring(0, 250),
           link: link.trim(),
@@ -181,6 +181,22 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
   }
 }
 
+// Simple deterministic hash function for stable article IDs
+function hashCode(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(36);
+}
+
+// Simple in-memory cache for articles to avoid redundant fetches during navigation
+let articlesCache: Article[] | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+
 // Reusable textarea for decoding HTML entities
 let memoizedTextarea: HTMLTextAreaElement | null = null;
 
@@ -201,7 +217,12 @@ function cleanText(text: string): string {
   return memoizedTextarea.value;
 }
 
-export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
+export async function fetchAllFeeds(feeds: RSSFeed[], forceRefresh = false): Promise<Article[]> {
+  // Return cached articles if available and fresh, unless force refresh is requested
+  if (!forceRefresh && articlesCache && (Date.now() - cacheTimestamp < CACHE_TTL)) {
+    return articlesCache;
+  }
+
   try {
     const results = await Promise.all(
       feeds.map(feed => parseFeed(feed.url, feed.title, feed.category))
@@ -228,7 +249,13 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
     otherArticles.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
     
     // Return India news first, then other articles
-    return [...indiaArticles, ...otherArticles];
+    const combined = [...indiaArticles, ...otherArticles];
+
+    // Update cache
+    articlesCache = combined;
+    cacheTimestamp = Date.now();
+
+    return combined;
   } catch (error) {
     // Return fallback on error
     return FALLBACK_ARTICLES;

@@ -1,3 +1,11 @@
-## 2026-02-11 - Rendering and DOM Optimizations
-**Learning:** In a news aggregator with many articles, repeated DOM operations like creating elements for HTML decoding can become a bottleneck. Similarly, unnecessary re-renders of list items (NewsCards) can impact UI responsiveness during search and filtering.
-**Action:** Use a memoized/reusable DOM element for string processing and apply React.memo/useMemo to stabilize the component tree and derived data.
+## 2026-02-11 - Stable ID Generation & Navigation Performance
+**Learning:** Using non-deterministic IDs (like `Date.now()`) for dynamically fetched items in a Next.js application causes navigation failures because the item ID on the index page won't match the re-fetched ID on the detail page. This also degrades React reconciliation performance.
+**Action:** Always generate deterministic IDs based on unique content (e.g., URL hash) when dealing with third-party data without server-side persistence.
+
+## 2026-02-11 - DOM-based Text Decoding Optimization
+**Learning:** Re-creating a DOM element (like a `textarea`) for every string being decoded (e.g., 200+ articles) is expensive and triggers frequent GC. Reusing a single memoized element is significantly faster.
+**Action:** Implement a singleton/memoized element for utility functions that require DOM access for processing.
+
+## 2026-02-11 - In-Memory Cache for Client-Side Aggregators
+**Learning:** In a pure client-side aggregator, navigating between Home and Detail pages re-fetches all data by default, causing poor UX and high bandwidth usage.
+**Action:** Implement a simple in-memory cache with a TTL (e.g., 5 mins) to provide instant navigation for recently fetched data.
