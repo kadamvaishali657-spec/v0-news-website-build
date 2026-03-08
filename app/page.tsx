@@ -116,18 +116,38 @@ export default function HomePage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-card to-background border-b border-border py-12 md:py-16">
+      <section className="bg-gradient-to-br from-gray-50 via-white to-blue-50 border-b border-gray-200 py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-balance text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Global News Aggregator
-            <span className="text-accent"> All In One Place</span>
-          </h1>
-          <p className="text-balance text-lg text-muted-foreground mb-8 max-w-2xl">
-            Discover news from 25+ trusted sources covering Technology, Global News, Business, Sports, Entertainment, Education, and more.
-          </p>
+          <div className="max-w-3xl">
+            <div className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold mb-4">
+              🔴 LIVE • 25+ Premium News Sources
+            </div>
+            <h1 className="text-balance text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6 leading-tight">
+              Global News at Your Fingertips
+            </h1>
+            <p className="text-balance text-xl text-gray-600 mb-8 leading-relaxed">
+              Real-time news aggregation from 25+ trusted publishers. Stay informed with breaking news, in-depth analysis, and expert insights across Technology, Business, Science, and more.
+            </p>
 
-          {/* Search Bar */}
-          <SearchBar onSearch={handleSearch} />
+            {/* Trust Badges */}
+            <div className="flex flex-wrap gap-4 mb-8">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Verified Sources
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Real-time Updates
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                100+ Articles Daily
+              </div>
+            </div>
+
+            {/* Search Bar */}
+            <SearchBar onSearch={handleSearch} />
+          </div>
         </div>
       </section>
 
@@ -139,9 +159,21 @@ export default function HomePage() {
         <div className="flex-1 pb-20 md:pb-0">
         {/* Featured Section */}
         {!loading && featuredArticles.length > 0 && (
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Featured Stories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <section className="mb-20">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Breaking News</h2>
+                <p className="text-gray-600">The latest stories from around the world</p>
+              </div>
+              <div className="hidden md:flex items-center gap-2 text-sm text-red-600 font-semibold">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+                </span>
+                Live Updates
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
               {featuredArticles.map((article) => (
                 <NewsCard key={article.id} article={article} />
               ))}

@@ -68,10 +68,10 @@ export function NewsCard({ article }: NewsCardProps) {
   };
 
   return (
-    <article className="group h-full flex flex-col bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <article className="group h-full flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-blue-300">
       {/* Image Container */}
       {article.image && !imageError && (
-        <div className="relative w-full h-48 overflow-hidden bg-muted">
+        <div className="relative w-full h-48 overflow-hidden bg-gray-100">
           <img
             src={article.image}
             alt={article.title}
@@ -80,37 +80,38 @@ export function NewsCard({ article }: NewsCardProps) {
             crossOrigin="anonymous"
             loading="lazy"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
       )}
 
       {/* Content */}
-      <div className="flex-1 flex flex-col p-5 gap-4">
+      <div className="flex-1 flex flex-col p-6 gap-4">
         {/* Source & Date */}
         <div className="flex items-center justify-between gap-3">
-          <span className="inline-block px-3 py-1 bg-accent text-accent-foreground text-xs font-semibold rounded-full">
+          <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
             {article.source}
           </span>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
+          <div className="flex items-center gap-1 text-xs text-gray-500 whitespace-nowrap">
             <Calendar className="w-3 h-3" />
             <span>{formattedDate}</span>
           </div>
         </div>
 
         {/* Title */}
-        <h3 className="text-base font-serif font-bold text-foreground line-clamp-3 group-hover:text-accent transition-colors leading-snug">
+        <h3 className="text-base font-serif font-bold text-gray-900 line-clamp-3 group-hover:text-blue-600 transition-colors leading-snug">
           {article.title}
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-2 flex-1 leading-relaxed">
+        <p className="text-sm text-gray-600 line-clamp-2 flex-1 leading-relaxed">
           {article.description}
         </p>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-3 border-t border-border">
+        <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
           <Link
             href={`/article/${encodeURIComponent(article.id)}`}
-            className="flex-1 flex items-center gap-2 px-3 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90 transition-colors font-medium text-sm"
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium text-sm font-sans"
           >
             Read Article
             <ArrowUpRight className="w-4 h-4" />
