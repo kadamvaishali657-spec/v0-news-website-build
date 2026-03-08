@@ -37,39 +37,39 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   :root {
-    --background: 245 246 248;
-    --foreground: 26 31 54;
+    --background: 248 250 252;
+    --foreground: 15 23 42;
     --card: 255 255 255;
-    --card-foreground: 26 31 54;
+    --card-foreground: 15 23 42;
     --popover: 255 255 255;
-    --popover-foreground: 26 31 54;
-    --primary: 0 102 204;
+    --popover-foreground: 15 23 42;
+    --primary: 59 130 246;
     --primary-foreground: 255 255 255;
     --secondary: 107 114 128;
     --secondary-foreground: 255 255 255;
-    --muted: 156 163 175;
-    --muted-foreground: 107 114 128;
-    --accent: 220 38 38;
+    --muted: 148 163 184;
+    --muted-foreground: 100 116 139;
+    --accent: 239 68 68;
     --accent-foreground: 255 255 255;
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
-    --border: 229 231 235;
-    --input: 243 244 246;
-    --ring: 0 102 204;
-    --chart-1: 0 102 204;
+    --border: 226 232 240;
+    --input: 241 245 249;
+    --ring: 59 130 246;
+    --chart-1: 59 130 246;
     --chart-2: 34 197 94;
     --chart-3: 248 113 113;
     --chart-4: 168 85 247;
     --chart-5: 251 146 60;
     --radius: 0.5rem;
     --sidebar-background: 255 255 255;
-    --sidebar-foreground: 26 31 54;
-    --sidebar-primary: 0 102 204;
+    --sidebar-foreground: 15 23 42;
+    --sidebar-primary: 59 130 246;
     --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 243 244 246;
-    --sidebar-accent-foreground: 26 31 54;
-    --sidebar-border: 229 231 235;
-    --sidebar-ring: 0 102 204;
+    --sidebar-accent: 241 245 249;
+    --sidebar-accent-foreground: 15 23 42;
+    --sidebar-border: 226 232 240;
+    --sidebar-ring: 59 130 246;
   }
   .dark {
     --background: 12 15% 3%;
@@ -111,22 +111,17 @@ h1, h2, h3, h4, h5, h6 {
   * {
     @apply border-border;
   }
+  
   body {
     @apply bg-background text-foreground;
     line-height: 1.6;
-    letter-spacing: 0.3px;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply leading-relaxed;
-    letter-spacing: -0.5px;
   }
   
-  p {
+  p, article {
     @apply leading-relaxed;
-  }
-  
-  article {
-    @apply leading-8;
   }
 }
