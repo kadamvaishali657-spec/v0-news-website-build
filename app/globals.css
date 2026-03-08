@@ -90,5 +90,20 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply leading-relaxed;
+    letter-spacing: -0.5px;
+  }
+  
+  p {
+    @apply leading-relaxed;
+  }
+  
+  article {
+    @apply leading-8;
   }
 }

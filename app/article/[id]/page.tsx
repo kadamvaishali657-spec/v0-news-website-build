@@ -170,29 +170,38 @@ export default function ArticlePage() {
         </Link>
 
         {/* Article Header */}
-        <article className="space-y-6">
+        <article className="space-y-8">
           {/* Metadata */}
-          <div className="flex flex-wrap items-center gap-4 text-sm">
-            <span className="px-3 py-1 bg-accent text-accent-foreground rounded-full font-medium">
-              {article.source}
-            </span>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Calendar className="w-4 h-4" />
-              {formattedDate}
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              {readingTime} min read
-            </div>
-            {article.category && (
-              <span className="text-muted-foreground text-xs">
-                {article.category}
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+              <span className="px-3 py-1 bg-accent text-accent-foreground rounded-full font-medium">
+                {article.source}
               </span>
-            )}
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Calendar className="w-4 h-4" />
+                {formattedDate}
+              </div>
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Clock className="w-4 h-4" />
+                {readingTime} min read
+              </div>
+              {article.category && (
+                <span className="text-muted-foreground text-xs">
+                  {article.category}
+                </span>
+              )}
+            </div>
+            
+            {/* Last Updated Information */}
+            <div className="pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                Published: {formattedDate} | Last updated: {formattedDate}
+              </p>
+            </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight text-balance">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground leading-relaxed text-balance">
             {article.title}
           </h1>
 
@@ -212,7 +221,7 @@ export default function ArticlePage() {
 
           {/* Description */}
           <div className="prose prose-invert max-w-none">
-            <p className="text-xl text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-8 text-justify">
               {article.description}
             </p>
           </div>

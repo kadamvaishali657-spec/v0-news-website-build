@@ -84,30 +84,30 @@ export function NewsCard({ article }: NewsCardProps) {
       )}
 
       {/* Content */}
-      <div className="flex-1 flex flex-col p-4 gap-3">
+      <div className="flex-1 flex flex-col p-5 gap-4">
         {/* Source & Date */}
-        <div className="flex items-center justify-between gap-2">
-          <span className="inline-block px-2 py-1 bg-accent text-accent-foreground text-xs font-medium rounded">
+        <div className="flex items-center justify-between gap-3">
+          <span className="inline-block px-3 py-1 bg-accent text-accent-foreground text-xs font-semibold rounded-full">
             {article.source}
           </span>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground whitespace-nowrap">
             <Calendar className="w-3 h-3" />
-            {formattedDate}
+            <span>{formattedDate}</span>
           </div>
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-bold text-foreground line-clamp-3 group-hover:text-accent transition-colors">
+        <h3 className="text-base font-serif font-bold text-foreground line-clamp-3 group-hover:text-accent transition-colors leading-snug">
           {article.title}
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
+        <p className="text-sm text-muted-foreground line-clamp-2 flex-1 leading-relaxed">
           {article.description}
         </p>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-2 border-t border-border">
+        <div className="flex items-center gap-2 pt-3 border-t border-border">
           <Link
             href={`/article/${encodeURIComponent(article.id)}`}
             className="flex-1 flex items-center gap-2 px-3 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90 transition-colors font-medium text-sm"
