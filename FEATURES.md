@@ -1,4 +1,4 @@
-# JustinNews.tech - Complete Features Documentation
+# Just in news - Complete Features Documentation
 
 ## Implemented Features
 
@@ -189,7 +189,7 @@ Responsive Elements:
 **Location**: `app/layout.tsx` + public files
 
 Meta Tags:
-- Title: 'JustinNews.tech - Tech News Aggregator'
+- Title: 'Just in news - Tech News Aggregator'
 - Description: Long-form SEO description
 - Keywords: 15+ tech-related keywords
 - OpenGraph: Title, description, type, URL

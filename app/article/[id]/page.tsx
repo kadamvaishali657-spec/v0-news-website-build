@@ -19,6 +19,19 @@ export default function ArticlePage() {
   const [isSaved, setIsSaved] = useState(false);
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [feeds] = useState(DEFAULT_FEEDS);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // Scroll progress indicator
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Load user preferences
   useEffect(() => {
@@ -33,6 +46,8 @@ export default function ArticlePage() {
     const loadArticle = async () => {
       setLoading(true);
       try {
+        // Fast path: Try to find in cache/pre-loaded articles if possible
+        // But since fetchAllFeeds is now cached, this will be very fast anyway
         const articles = await fetchAllFeeds(feeds);
         const found = articles.find((a) => a.id === articleId);
         
@@ -157,6 +172,12 @@ export default function ArticlePage() {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
+      {/* Progress Bar */}
+      <div
+        className="fixed top-0 left-0 h-1 bg-accent z-[60] transition-all duration-200"
+        style={{ width: `${scrollProgress}%` }}
+      />
+
       <Header />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -170,7 +191,7 @@ export default function ArticlePage() {
         </Link>
 
         {/* Article Header */}
-        <article className="space-y-6">
+        <article className="space-y-8">
           {/* Metadata */}
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <span className="px-3 py-1 bg-accent text-accent-foreground rounded-full font-medium">
@@ -192,13 +213,13 @@ export default function ArticlePage() {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight text-balance">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-[1.1] text-balance tracking-tight">
             {article.title}
           </h1>
 
           {/* Article Image */}
           {article.image && (
-            <div className="relative w-full h-96 bg-muted rounded-lg overflow-hidden">
+            <div className="relative w-full h-[400px] md:h-[500px] bg-muted rounded-2xl overflow-hidden shadow-2xl">
               <img
                 src={article.image}
                 alt={article.title}
@@ -211,36 +232,36 @@ export default function ArticlePage() {
           )}
 
           {/* Description */}
-          <div className="prose prose-invert max-w-none">
-            <p className="text-xl text-muted-foreground leading-relaxed">
+          <div className="max-w-3xl mx-auto prose prose-invert prose-lg md:prose-xl">
+            <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-medium">
               {article.description}
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-3 py-6 border-t border-b border-border">
+          <div className="max-w-3xl mx-auto flex flex-wrap items-center gap-3 py-8 border-t border-b border-border">
             <button
               onClick={handleSave}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-full font-bold transition-all transform hover:scale-105 ${
                 isSaved
-                  ? 'bg-accent text-accent-foreground'
+                  ? 'bg-accent text-accent-foreground shadow-lg'
                   : 'bg-muted text-foreground hover:bg-accent/20'
               }`}
             >
-              <Bookmark className="w-4 h-4" fill={isSaved ? 'currentColor' : 'none'} />
+              <Bookmark className="w-5 h-5" fill={isSaved ? 'currentColor' : 'none'} />
               {isSaved ? 'Saved' : 'Save Article'}
             </button>
 
             <div className="relative group">
-              <button className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg font-medium hover:bg-accent/20 transition-colors">
-                <Share2 className="w-4 h-4" />
+              <button className="flex items-center gap-2 px-6 py-3 bg-muted text-foreground rounded-full font-bold hover:bg-accent/20 transition-all transform hover:scale-105">
+                <Share2 className="w-5 h-5" />
                 Share
               </button>
-              <div className="absolute left-0 mt-2 w-40 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+              <div className="absolute left-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
                 {userPreferences?.shareSettings?.twitter !== false && (
                   <button
                     onClick={() => handleShare('twitter')}
-                    className="w-full px-4 py-2 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
+                    className="w-full px-4 py-3 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
                   >
                     Share on Twitter
                   </button>
@@ -248,7 +269,7 @@ export default function ArticlePage() {
                 {userPreferences?.shareSettings?.linkedin !== false && (
                   <button
                     onClick={() => handleShare('linkedin')}
-                    className="w-full px-4 py-2 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
+                    className="w-full px-4 py-3 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
                   >
                     Share on LinkedIn
                   </button>
@@ -256,14 +277,14 @@ export default function ArticlePage() {
                 {userPreferences?.shareSettings?.whatsapp !== false && (
                   <button
                     onClick={() => handleShare('whatsapp')}
-                    className="w-full px-4 py-2 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
+                    className="w-full px-4 py-3 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
                   >
                     Share on WhatsApp
                   </button>
                 )}
                 <button
                   onClick={handleCopyLink}
-                  className="w-full px-4 py-2 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
+                  className="w-full px-4 py-3 text-sm text-foreground hover:bg-accent/20 transition-colors text-left"
                 >
                   Copy Link
                 </button>
@@ -274,32 +295,37 @@ export default function ArticlePage() {
               href={article.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-auto flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent/90 transition-colors"
+              className="ml-auto flex items-center gap-2 px-8 py-3 bg-accent text-accent-foreground rounded-full font-bold hover:bg-accent/90 transition-all transform hover:scale-105 shadow-lg"
             >
-              Read on Source
-              <ExternalLink className="w-4 h-4" />
+              Read Full Article
+              <ExternalLink className="w-5 h-5" />
             </a>
           </div>
 
           {/* Full Content Note */}
-          <div className="bg-accent/10 border border-border rounded-lg p-4">
-            <p className="text-sm text-foreground">
-              <strong>Note:</strong> The full article content is displayed above. Click "Read on Source" to view the complete article on the original website.
+          <div className="max-w-3xl mx-auto bg-accent/10 border border-accent/20 rounded-2xl p-6">
+            <p className="text-base text-foreground leading-relaxed">
+              <span className="font-bold text-accent mr-2">Note:</span>
+              The preview content is displayed above. For the complete in-depth coverage, please click the
+              <strong> "Read Full Article"</strong> button to visit the original source.
             </p>
           </div>
 
           {/* Related Articles Placeholder */}
-          <div className="mt-12 pt-8 border-t border-border">
-            <h2 className="text-2xl font-bold text-foreground mb-6">From the same source</h2>
-            <p className="text-muted-foreground">
-              Explore more articles from {article.source} on the homepage.
-            </p>
-            <Link
-              href={`/?source=${encodeURIComponent(article.source)}`}
-              className="inline-block mt-4 text-accent hover:text-accent/80 font-medium"
-            >
-              View all from {article.source}
-            </Link>
+          <div className="max-w-3xl mx-auto mt-16 pt-12 border-t border-border">
+            <h2 className="text-3xl font-bold text-foreground mb-8">From the same source</h2>
+            <div className="bg-muted/30 rounded-2xl p-8 text-center border border-border">
+              <p className="text-lg text-muted-foreground mb-6">
+                Loved this story? Explore more high-quality journalism from {article.source}.
+              </p>
+              <Link
+                href={`/?source=${encodeURIComponent(article.source)}`}
+                className="inline-flex items-center gap-2 px-8 py-3 bg-accent/20 text-accent hover:bg-accent/30 rounded-full font-bold transition-colors"
+              >
+                View all from {article.source}
+                <ArrowLeft className="w-4 h-4 rotate-180" />
+              </Link>
+            </div>
           </div>
         </article>
       </main>

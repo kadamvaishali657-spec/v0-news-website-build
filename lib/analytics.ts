@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 interface AnalyticsEvent {
   type: 'article_view' | 'article_save' | 'article_share' | 'settings_change' | 'search_query' | 'category_filter';
   data: Record<string, any>;
-  timestamp: string;
+  timestamp?: string;
 }
 
 export function logAnalytics(event: AnalyticsEvent) {
@@ -13,8 +13,8 @@ export function logAnalytics(event: AnalyticsEvent) {
     const events = localStorage.getItem('analytics-events') || '[]';
     const parsedEvents = JSON.parse(events);
     parsedEvents.push({
-      ...event,
       timestamp: new Date().toISOString(),
+      ...event,
     });
     
     // Keep only last 100 events to avoid bloating storage

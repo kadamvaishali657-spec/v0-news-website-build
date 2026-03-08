@@ -1,3 +1,6 @@
+import DOMPurify from 'isomorphic-dompurify';
+import { decode } from 'html-entities';
+
 export interface Article {
   id: string;
   title: string;
@@ -15,15 +18,58 @@ export interface RSSFeed {
   category?: string;
 }
 
+interface CacheEntry {
+  articles: Article[];
+  timestamp: number;
+}
+
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+declare global {
+  var rssCache: Record<string, CacheEntry> | undefined;
+}
+
+const cache = globalThis.rssCache || (globalThis.rssCache = {});
+
+// Background cache eviction
+if (typeof window === 'undefined') {
+  // Only run on server/background process
+  setInterval(() => {
+    const now = Date.now();
+    Object.keys(cache).forEach(key => {
+      if (now - cache[key].timestamp > CACHE_TTL) {
+        delete cache[key];
+      }
+    });
+  }, 60000); // Check every minute
+}
+
+function hashCode(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(36);
+}
+
 // Parse RSS feed using JavaScript/XML parsing
 export async function parseFeed(feedUrl: string, feedTitle: string, category?: string): Promise<Article[]> {
+  // Check cache first
+  const cacheKey = `${feedUrl}-${feedTitle}`;
+  const cached = cache[cacheKey];
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.articles;
+  }
+
   try {
     let text: string | null = null;
     let lastError: Error | null = null;
 
     // Strategy 1: Try server-side proxy first
     try {
-      const proxyResponse = await fetch(`/api/rss-proxy?url=${encodeURIComponent(feedUrl)}`, {
+      const proxyResponse = await fetch(`/api/rss-proxy?url=${encodeURIComponent(feedUrl || '')}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -33,8 +79,12 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
       if (proxyResponse.ok) {
         const data = await proxyResponse.json();
         if (data.content) {
-          text = data.content;
-          return await parseFeedContent(text, feedTitle, category);
+          text = data.content as string;
+          const articles = await parseFeedContent(text, feedTitle, category);
+          if (articles.length > 0) {
+            cache[cacheKey] = { articles, timestamp: Date.now() };
+          }
+          return articles;
         }
       }
     } catch (error) {
@@ -59,7 +109,11 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
 
       if (response.ok) {
         text = await response.text();
-        return await parseFeedContent(text, feedTitle, category);
+        const articles = await parseFeedContent(text, feedTitle, category);
+        if (articles.length > 0) {
+          cache[cacheKey] = { articles, timestamp: Date.now() };
+        }
+        return articles;
       }
     } catch (error) {
       lastError = error as Error;
@@ -80,7 +134,11 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
 
       if (response.ok) {
         text = await response.text();
-        return await parseFeedContent(text, feedTitle, category);
+        const articles = await parseFeedContent(text, feedTitle, category);
+        if (articles.length > 0) {
+          cache[cacheKey] = { articles, timestamp: Date.now() };
+        }
+        return articles;
       }
     } catch (error) {
       lastError = error as Error;
@@ -159,10 +217,10 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
         }
 
         const article: Article = {
-          id: `${feedTitle}-${index}-${Date.now()}-${Math.random()}`,
-          title: cleanText(title).substring(0, 200),
-          description: cleanText(description).substring(0, 250),
-          link: link.trim(),
+          id: `${hashCode(link || '')}-${index}`,
+          title: DOMPurify.sanitize(cleanText(title)).substring(0, 200),
+          description: DOMPurify.sanitize(cleanText(description)).substring(0, 250),
+          link: (link || '').trim(),
           pubDate: new Date(pubDateStr),
           image: image && image.trim().length > 0 ? image.trim() : undefined,
           source: feedTitle,
@@ -184,10 +242,8 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
 function cleanText(text: string): string {
   // Remove HTML tags
   let clean = text.replace(/<[^>]*>/g, '');
-  // Decode HTML entities
-  const txt = document.createElement('textarea');
-  txt.innerHTML = clean;
-  return txt.value;
+  // Decode HTML entities (works on both client and server)
+  return decode(clean);
 }
 
 export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
@@ -242,6 +298,11 @@ export const DEFAULT_FEEDS: RSSFeed[] = [
   { url: 'https://www.forbes.com/feed/', title: 'Forbes', category: 'Business & Finance' },
   { url: 'https://feeds.ft.com/home/rss', title: 'Financial Times', category: 'Business & Finance' },
   
+  // Science
+  { url: 'https://www.nasa.gov/news-release/feed/', title: 'NASA News', category: 'Science' },
+  { url: 'https://www.sciencedaily.com/rss/all.xml', title: 'ScienceDaily', category: 'Science' },
+  { url: 'https://phys.org/rss-feed/', title: 'Phys.org', category: 'Science' },
+
   // Sports
   { url: 'https://www.espn.com/espn/rss/news', title: 'ESPN Top Headlines', category: 'Sports' },
   { url: 'https://feeds.bbci.co.uk/sport/rss.xml', title: 'BBC Sport', category: 'Sports' },

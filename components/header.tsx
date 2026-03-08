@@ -29,8 +29,7 @@ export function Header() {
               <span className="text-accent-foreground font-bold text-sm">JN</span>
             </div>
             <Link href="/" className="text-2xl font-bold text-foreground hover:text-accent transition-colors">
-              JustinNews
-              <span className="text-accent">.tech</span>
+              Just in news
             </Link>
           </div>
 

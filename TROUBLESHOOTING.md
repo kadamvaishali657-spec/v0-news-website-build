@@ -1,4 +1,4 @@
-# JustinNews.tech - Troubleshooting Guide
+# Just in news - Troubleshooting Guide
 
 ## Common Issues & Solutions
 

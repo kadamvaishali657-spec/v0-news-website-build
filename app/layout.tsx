@@ -12,18 +12,18 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'JustinNews.tech - Tech News Aggregator | Latest Technology Updates',
-  description: 'Stay updated with the latest technology news from TechCrunch, The Verge, and NY Times. Real-time RSS feed aggregation with advanced filtering and search.',
-  keywords: ['tech news', 'technology', 'RSS feeds', 'TechCrunch', 'The Verge', 'news aggregator'],
-  authors: [{ name: 'JustinNews.tech' }],
+  title: 'Just in news - Global News Aggregator | Latest Updates',
+  description: 'Stay updated with the latest news from TechCrunch, BBC, NASA and more. Real-time RSS feed aggregation with advanced filtering and search.',
+  keywords: ['news', 'tech news', 'science news', 'RSS feeds', 'news aggregator', 'Just in news'],
+  authors: [{ name: 'Just in news' }],
   icons: {
     icon: '/favicon.jpg',
     shortcut: '/favicon.jpg',
     apple: '/favicon.jpg',
   },
   openGraph: {
-    title: 'JustinNews.tech - Tech News Delivered Daily',
-    description: 'Real-time technology news aggregator with AI, gadgets, startups, and cybersecurity coverage',
+    title: 'Just in news - Real-time News Aggregator',
+    description: 'Real-time news aggregator with Tech, Science, Global News, and Sports coverage',
     type: 'website',
     url: 'https://justinnews.tech',
     images: [
@@ -31,14 +31,14 @@ export const metadata: Metadata = {
         url: '/favicon.jpg',
         width: 512,
         height: 512,
-        alt: 'JustinNews.tech Logo',
+        alt: 'Just in news Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'JustinNews.tech - Tech News',
-    description: 'Latest technology news aggregated from top sources',
+    title: 'Just in news - Global News',
+    description: 'Latest news aggregated from top sources around the world',
     images: ['/favicon.jpg'],
   },
 }

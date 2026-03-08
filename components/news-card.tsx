@@ -68,7 +68,7 @@ export function NewsCard({ article }: NewsCardProps) {
   };
 
   return (
-    <article className="group h-full flex flex-col bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <article className="group h-full flex flex-col bg-card border border-border rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
       {/* Image Container */}
       {article.image && !imageError && (
         <div className="relative w-full h-48 overflow-hidden bg-muted">
