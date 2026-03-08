@@ -121,8 +121,8 @@ export function NewsCard({ article }: NewsCardProps) {
             onClick={handleSave}
             className={`p-2 rounded transition-colors ${
               isSaved 
-                ? 'bg-accent text-accent-foreground' 
-                : 'bg-muted text-muted-foreground hover:bg-accent/20'
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
             title={isSaved ? 'Remove from saved' : 'Save article'}
           >
@@ -130,31 +130,31 @@ export function NewsCard({ article }: NewsCardProps) {
           </button>
 
           <div className="relative group">
-            <button className="p-2 rounded bg-muted text-muted-foreground hover:bg-accent/20 transition-colors">
+            <button className="p-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
               <Share2 className="w-4 h-4" />
             </button>
-            <div className="absolute right-0 mt-1 w-32 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-1 z-50">
+            <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-1 z-50">
               <button
                 onClick={() => handleShare('twitter')}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
+                className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
                 Share on Twitter
               </button>
               <button
                 onClick={() => handleShare('linkedin')}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
+                className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
                 Share on LinkedIn
               </button>
               <button
                 onClick={() => handleShare('whatsapp')}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
+                className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
                 Share on WhatsApp
               </button>
               <button
                 onClick={handleCopyLink}
-                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
+                className="w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
                 Copy Link
               </button>

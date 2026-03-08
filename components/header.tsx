@@ -83,7 +83,7 @@ export function Header() {
 
             <Link 
               href="/search" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Search className="w-4 h-4" />
               Search
@@ -91,7 +91,7 @@ export function Header() {
 
             <Link 
               href="/settings" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Cog className="w-4 h-4" />
               Settings
@@ -99,7 +99,7 @@ export function Header() {
 
             <Link 
               href="/newsletter" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Mail className="w-4 h-4" />
               Newsletter
@@ -107,7 +107,7 @@ export function Header() {
 
             <Link 
               href="/publish" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1 bg-accent/20"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Edit3 className="w-4 h-4" />
               Publish
@@ -115,7 +115,7 @@ export function Header() {
 
             <Link 
               href="/support" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <HelpCircle className="w-4 h-4" />
               Support
@@ -124,7 +124,7 @@ export function Header() {
             {/* Admin Button */}
             <Link 
               href="/admin" 
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-medium ml-2"
+              className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium text-sm ml-2"
             >
               <Settings className="w-4 h-4" />
               Admin
