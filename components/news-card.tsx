@@ -111,7 +111,7 @@ export function NewsCard({ article }: NewsCardProps) {
         <div className="flex items-center gap-2 pt-5 border-t border-gray-100">
           <Link
             href={`/article/${encodeURIComponent(article.id)}`}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-semibold text-sm shadow-sm hover:shadow-md"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 font-semibold text-sm shadow-sm hover:shadow-md"
           >
             Read Article
             <ArrowUpRight className="w-4 h-4" />
@@ -119,10 +119,10 @@ export function NewsCard({ article }: NewsCardProps) {
 
           <button
             onClick={handleSave}
-            className={`p-2.5 rounded-md transition-all duration-300 ${
+            className={`p-2.5 rounded-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
               isSaved 
-                ? 'bg-red-600 text-white shadow-md' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-red-600 text-white shadow-md focus:ring-red-500' 
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 focus:ring-gray-400'
             }`}
             title={isSaved ? 'Remove from saved' : 'Save article'}
           >
@@ -130,31 +130,31 @@ export function NewsCard({ article }: NewsCardProps) {
           </button>
 
           <div className="relative group">
-            <button className="p-2.5 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors duration-300">
+            <button className="p-2.5 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2">
               <Share2 className="w-4 h-4" />
             </button>
             <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
               <button
                 onClick={() => handleShare('twitter')}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left font-medium"
+                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:bg-blue-50 focus:text-blue-700 transition-colors text-left font-medium"
               >
                 Share on Twitter
               </button>
               <button
                 onClick={() => handleShare('linkedin')}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left font-medium"
+                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:bg-blue-50 focus:text-blue-700 transition-colors text-left font-medium"
               >
                 Share on LinkedIn
               </button>
               <button
                 onClick={() => handleShare('whatsapp')}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors text-left font-medium"
+                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:bg-green-50 focus:text-green-700 transition-colors text-left font-medium"
               >
                 Share on WhatsApp
               </button>
               <button
                 onClick={handleCopyLink}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 transition-colors text-left font-medium border-t border-gray-100"
+                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors text-left font-medium border-t border-gray-100"
               >
                 Copy Link
               </button>

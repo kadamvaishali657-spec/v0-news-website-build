@@ -40,14 +40,14 @@ export function Header() {
           <nav className="hidden md:flex items-center gap-1">
             <Link 
               href="/" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium text-sm"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:underline transition-colors font-medium text-sm"
             >
               Home
             </Link>
 
             {/* Categories Dropdown */}
             <div className="relative group">
-              <button className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm group-hover:text-blue-600">
+              <button className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm group-hover:text-blue-600">
                 Categories
                 <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
               </button>
@@ -67,7 +67,7 @@ export function Header() {
             {/* Additional Links */}
             <Link 
               href="/trending" 
-              className="px-3 py-2 text-gray-700 hover:text-red-600 transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-3 py-2 text-gray-700 hover:text-red-600 focus:outline-none focus:text-red-600 focus:ring-2 focus:ring-red-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Flame className="w-4 h-4" />
               Trending
@@ -75,7 +75,7 @@ export function Header() {
 
             <Link 
               href="/saved" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Bookmark className="w-4 h-4" />
               Saved
@@ -83,7 +83,7 @@ export function Header() {
 
             <Link 
               href="/search" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Search className="w-4 h-4" />
               Search
@@ -91,7 +91,7 @@ export function Header() {
 
             <Link 
               href="/settings" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
             >
               <Cog className="w-4 h-4" />
               Settings
