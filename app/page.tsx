@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
@@ -16,7 +16,7 @@ import { Loader2 } from 'lucide-react';
 
 const ARTICLES_PER_PAGE = 12;
 
-export default function HomePage() {
+function HomePageContent() {
   const searchParams = useSearchParams();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,7 +136,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-card to-background border-b border-border py-12 md:py-16">
@@ -245,5 +244,20 @@ export default function HomePage() {
       {/* Mobile Bottom Navigation */}
       <BottomNav />
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <>
+      <Header />
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 text-accent animate-spin" />
+        </div>
+      }>
+        <HomePageContent />
+      </Suspense>
+    </>
   );
 }
