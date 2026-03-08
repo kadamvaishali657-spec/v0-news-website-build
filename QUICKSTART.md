@@ -1,8 +1,8 @@
-# JustinNews.tech - Quick Start Guide
+# Just in news - Quick Start Guide
 
 ## Overview
 
-JustinNews.tech is a fully functional, modern news website that automatically fetches and displays technology news from RSS feeds. It features a clean dark UI, responsive design, and advanced filtering capabilities.
+Just in news is a fully functional, modern news website that automatically fetches and displays technology news from RSS feeds. It features a clean dark UI, responsive design, and advanced filtering capabilities.
 
 ## Key Features Implemented
 
@@ -284,4 +284,4 @@ The app includes:
 
 ---
 
-Enjoy your JustinNews.tech experience! For more details, see README.md
+Enjoy your Just in news experience! For more details, see README.md

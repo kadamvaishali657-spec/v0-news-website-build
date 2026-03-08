@@ -2,7 +2,7 @@
 
 ## ✅ Implementation Complete
 
-The AI-powered news assistant chatbot has been successfully integrated into your JustinNews.tech website. Here's what was added:
+The AI-powered news assistant chatbot has been successfully integrated into your Just in news website. Here's what was added:
 
 ## 📁 Files Created
 

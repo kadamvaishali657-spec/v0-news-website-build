@@ -1,7 +1,7 @@
-# JustinNews.tech - Complete System Documentation
+# Just in news - Complete System Documentation
 
 ## Overview
-JustinNews.tech is a modern, feature-rich news aggregation platform with AI-powered chatbot assistance, article publishing capabilities, and comprehensive navigation. The platform aggregates content from 25+ RSS feeds across 8 categories with India news prioritized.
+Just in news is a modern, feature-rich news aggregation platform with AI-powered chatbot assistance, article publishing capabilities, and comprehensive navigation. The platform aggregates content from 25+ RSS feeds across 8 categories with India news prioritized.
 
 ---
 
@@ -445,4 +445,4 @@ GROQ_API_KEY=your_groq_api_key
 ---
 
 Generated: 2026
-Platform: JustinNews.tech
+Platform: Just in news

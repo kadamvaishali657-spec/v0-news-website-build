@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build system prompt
-    const systemPrompt = `You are a helpful news assistant chatbot for a news aggregator website called JustinNews.tech. 
+    const systemPrompt = `You are a helpful news assistant chatbot for a news aggregator website called Just in news.
 Your role is to:
 1. Answer questions about news articles and current events
 2. Provide summaries of news stories

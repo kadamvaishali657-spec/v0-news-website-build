@@ -1,4 +1,4 @@
-# Technical Fixes Summary - JustinNews.tech
+# Technical Fixes Summary - Just in news
 
 ## All Issues Fixed
 

@@ -1,4 +1,4 @@
-# JustinNews.tech - Audit Report & Bug Fixes
+# Just in news - Audit Report & Bug Fixes
 
 ## Audit Summary
 Date: February 12, 2026

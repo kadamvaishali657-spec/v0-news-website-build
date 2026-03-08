@@ -25,7 +25,7 @@ Frequency: ${frequency}
 Categories: ${categories.join(', ')}
 Timestamp: ${new Date().toISOString()}
 ---
-This is an automated notification from JustinNews.tech
+This is an automated notification from Just in news
 `;
 
     // Log to console (visible in server logs)

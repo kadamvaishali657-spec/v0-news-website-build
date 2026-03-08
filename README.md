@@ -1,4 +1,4 @@
-# JustinNews.tech - Tech News Aggregator
+# Just in news - Tech News Aggregator
 
 A modern, fully functional tech news website that automatically fetches and displays news using RSS feeds from TechCrunch, The Verge, and NY Times.
 

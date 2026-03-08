@@ -116,18 +116,21 @@ export default function HomePage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-card to-background border-b border-border py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-balance text-4xl md:text-5xl font-bold text-foreground mb-4">
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-600 via-rose-600 to-amber-500 py-20 md:py-28">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+          <h1 className="text-balance text-5xl md:text-7xl font-black text-white mb-6 tracking-tight">
             Global News Aggregator
-            <span className="text-accent"> All In One Place</span>
+            <span className="block text-amber-200"> All In One Place</span>
           </h1>
-          <p className="text-balance text-lg text-muted-foreground mb-8 max-w-2xl">
-            Discover news from 25+ trusted sources covering Technology, Global News, Business, Sports, Entertainment, Education, and more.
+          <p className="text-balance text-xl md:text-2xl text-white/90 mb-10 max-w-2xl font-medium leading-relaxed">
+            Discover breaking stories from 25+ premium sources covering Tech, Science, Business, and beyond.
           </p>
 
           {/* Search Bar */}
-          <SearchBar onSearch={handleSearch} />
+          <div className="max-w-2xl">
+            <SearchBar onSearch={handleSearch} />
+          </div>
         </div>
       </section>
 
@@ -210,8 +213,7 @@ export default function HomePage() {
       <footer className="bg-card border-t border-border mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-muted-foreground">
-            <p>&copy; 2026 JustinNews.tech - Tech news aggregator powered by RSS feeds</p>
-            <p className="text-sm mt-2">Content sourced from TechCrunch, The Verge, and NY Times</p>
+            <p>&copy; 2026 Just in news. All rights reserved.</p>
           </div>
         </div>
       </footer>
