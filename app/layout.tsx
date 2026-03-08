@@ -7,40 +7,76 @@ const _geist = Geist({ subsets: ['latin'] })
 const _geistMono = Geist_Mono({ subsets: ['latin'] })
 
 export const viewport: Viewport = {
-  themeColor: '#F59E0B',
+  themeColor: '#0066CC',
   userScalable: true,
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export const metadata: Metadata = {
-  title: 'JustinNews.tech - Tech News Aggregator | Latest Technology Updates',
-  description: 'Stay updated with the latest technology news from TechCrunch, The Verge, and NY Times. Real-time RSS feed aggregation with advanced filtering and search.',
-  keywords: ['tech news', 'technology', 'RSS feeds', 'TechCrunch', 'The Verge', 'news aggregator'],
-  authors: [{ name: 'JustinNews.tech' }],
+  title: 'JustinNews - Premium Tech News & Business Intelligence | 25+ Global Sources',
+  description: 'Curated technology, business, and global news from the world\'s most trusted publishers. Real-time updates, AI insights, startup coverage, and expert analysis. 25+ premium sources in one place.',
+  keywords: ['tech news', 'technology', 'AI', 'startups', 'business news', 'news aggregator', 'RSS feeds', 'breaking news', 'cryptocurrency', 'gadgets'],
+  authors: [{ name: 'JustinNews' }],
+  creator: 'JustinNews',
+  publisher: 'JustinNews',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   icons: {
     icon: '/favicon.jpg',
     shortcut: '/favicon.jpg',
     apple: '/favicon.jpg',
   },
   openGraph: {
-    title: 'JustinNews.tech - Tech News Delivered Daily',
-    description: 'Real-time technology news aggregator with AI, gadgets, startups, and cybersecurity coverage',
+    title: 'JustinNews - Premium Tech News Aggregator',
+    description: 'Real-time curated news from 25+ premium publishers. Technology, business, AI, startups, and more.',
     type: 'website',
-    url: 'https://justinnews.tech',
+    url: 'https://www.justinnews.tech',
+    siteName: 'JustinNews',
     images: [
       {
         url: '/favicon.jpg',
         width: 512,
         height: 512,
-        alt: 'JustinNews.tech Logo',
+        alt: 'JustinNews Logo',
+        type: 'image/jpeg',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'JustinNews.tech - Tech News',
-    description: 'Latest technology news aggregated from top sources',
+    title: 'JustinNews - Premium Tech News',
+    description: 'Curated technology and business news from 25+ trusted sources',
     images: ['/favicon.jpg'],
+    creator: '@JustinNews',
+    site: '@JustinNews',
   },
+  alternates: {
+    canonical: 'https://www.justinnews.tech',
+  },
+  appLinks: [
+    {
+      url: 'https://www.justinnews.tech',
+      app_name: 'JustinNews',
+      app_store_id: '1234567890',
+      play_app_id: 'com.justinnews.app',
+    },
+  ],
 }
 
 export default function RootLayout({

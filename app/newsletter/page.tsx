@@ -78,23 +78,25 @@ export default function NewsletterPage() {
       
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <Mail className="w-12 h-12 text-accent" />
+        <div className="text-center mb-14">
+          <div className="flex justify-center mb-6">
+            <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl">
+              <Mail className="w-8 h-8 text-blue-600" />
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-4">Stay Updated</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Subscribe to our newsletter and get personalized news delivered to your inbox. Choose your preferred topics and frequency.
+          <h1 className="text-5xl font-serif font-bold text-gray-900 mb-4">Newsletter</h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Get curated tech news from 25+ premium sources delivered to your inbox. Personalized, flexible, and easy to manage.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12">
           {/* Subscription Form */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white border border-gray-100 rounded-lg p-8 shadow-sm">
+            <form onSubmit={handleSubmit} className="space-y-7">
               {/* Email Input */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-sm font-semibold text-gray-900 mb-3">
                   Email Address
                 </label>
                 <input
@@ -102,30 +104,30 @@ export default function NewsletterPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
-                  className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent font-medium"
                 />
               </div>
 
               {/* Frequency Selection */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-3">
+                <label className="block text-sm font-semibold text-gray-900 mb-4">
                   Delivery Frequency
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {FREQUENCY_OPTIONS.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-accent/5 transition-colors">
+                    <label key={option.value} className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-all">
                       <input
                         type="radio"
                         name="frequency"
                         value={option.value}
                         checked={frequency === option.value}
                         onChange={(e) => setFrequency(e.target.value)}
-                        className="w-4 h-4 text-accent"
+                        className="w-4 h-4 text-blue-600"
                       />
                       <div className="ml-3">
-                        <p className="font-medium text-foreground">{option.label}</p>
-                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                        <p className="font-semibold text-gray-900">{option.label}</p>
+                        <p className="text-sm text-gray-600">{option.description}</p>
                       </div>
                     </label>
                   ))}
@@ -136,7 +138,7 @@ export default function NewsletterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -166,21 +168,21 @@ export default function NewsletterPage() {
           </div>
 
           {/* Topics Selection */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Choose Topics</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Select the news categories you want to receive in your newsletter.
+          <div className="bg-white border border-gray-100 rounded-lg p-8 shadow-sm">
+            <h2 className="text-2xl font-serif font-bold text-gray-900 mb-3">Choose Topics</h2>
+            <p className="text-gray-600 mb-6 font-medium">
+              Select the categories you'd like to receive in your newsletter.
             </p>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {CATEGORY_OPTIONS.map((category) => (
-                <label key={category} className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-accent/5 transition-colors">
+                <label key={category} className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition-all">
                   <input
                     type="checkbox"
                     checked={selectedCategories.includes(category)}
                     onChange={() => handleCategoryToggle(category)}
-                    className="w-4 h-4 text-accent rounded"
+                    className="w-4 h-4 text-blue-600 rounded"
                   />
-                  <span className="ml-3 text-foreground font-medium">{category}</span>
+                  <span className="ml-3 text-gray-900 font-medium">{category}</span>
                 </label>
               ))}
             </div>
@@ -193,38 +195,55 @@ export default function NewsletterPage() {
 
         {/* Benefits Section */}
         <div className="mt-16 grid md:grid-cols-3 gap-6">
-          <div className="bg-card border border-border rounded-lg p-6 text-center">
-            <h3 className="font-bold text-foreground mb-2">Personalized</h3>
-            <p className="text-sm text-muted-foreground">
-              Get news curated to your interests and preferences.
+          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-lg p-8 text-center hover:shadow-lg transition-shadow">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <h3 className="font-serif font-bold text-gray-900 mb-3 text-lg">Personalized</h3>
+            <p className="text-gray-600">
+              Curated news tailored to your interests and reading preferences.
             </p>
           </div>
-          <div className="bg-card border border-border rounded-lg p-6 text-center">
-            <h3 className="font-bold text-foreground mb-2">Flexible</h3>
-            <p className="text-sm text-muted-foreground">
-              Choose how often and what topics you want to receive.
+          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-lg p-8 text-center hover:shadow-lg transition-shadow">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <h3 className="font-serif font-bold text-gray-900 mb-3 text-lg">Flexible</h3>
+            <p className="text-gray-600">
+              Choose your delivery frequency and topics that matter to you.
             </p>
           </div>
-          <div className="bg-card border border-border rounded-lg p-6 text-center">
-            <h3 className="font-bold text-foreground mb-2">Easy to Manage</h3>
-            <p className="text-sm text-muted-foreground">
-              Update your preferences or unsubscribe anytime.
+          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-lg p-8 text-center hover:shadow-lg transition-shadow">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-blue-100 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <h3 className="font-serif font-bold text-gray-900 mb-3 text-lg">Easy to Manage</h3>
+            <p className="text-gray-600">
+              Update preferences or unsubscribe anytime, no questions asked.
             </p>
           </div>
         </div>
 
         {/* Support Section */}
-        <div className="mt-16 bg-accent/10 border border-border rounded-lg p-8">
+        <div className="mt-16 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-10">
           <div className="flex items-center gap-3 mb-4">
-            <MessageSquare className="w-6 h-6 text-accent" />
-            <h2 className="text-2xl font-bold text-foreground">Need Help?</h2>
+            <div className="p-2 bg-blue-200 rounded-lg">
+              <MessageSquare className="w-6 h-6 text-blue-700" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-gray-900">Need Help?</h2>
           </div>
-          <p className="text-muted-foreground mb-6">
-            Have questions about your subscription or need assistance? Get in touch with our support team.
+          <p className="text-gray-700 mb-6 font-medium">
+            Have questions or need support? Our team is ready to help you get the most from your newsletter.
           </p>
           <a
             href="mailto:workwithme785@gmail.com?subject=Newsletter%20Support"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent/90 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
           >
             <Mail className="w-4 h-4" />
             Contact Support

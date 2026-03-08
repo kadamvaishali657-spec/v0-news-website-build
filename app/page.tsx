@@ -12,8 +12,32 @@ import { BottomNav } from '@/components/bottom-nav';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2 } from 'lucide-react';
+import Script from 'next/script';
 
 const ARTICLES_PER_PAGE = 12;
+
+// SEO Schema Markup
+const newsAggregatorSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsMediaOrganization',
+  name: 'JustinNews',
+  description: 'Premium tech news aggregator with real-time updates from 25+ trusted sources',
+  url: 'https://www.justinnews.tech',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://www.justinnews.tech/favicon.jpg',
+    width: 512,
+    height: 512,
+  },
+  sameAs: [
+    'https://twitter.com/JustinNews',
+  ],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'Customer Support',
+    email: 'support@justinnews.tech',
+  },
+};
 
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -112,41 +136,55 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
+      <Script 
+        id="news-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(newsAggregatorSchema) }}
+        strategy="afterInteractive"
+      />
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-50 via-white to-blue-50 border-b border-gray-200 py-16 md:py-24">
+      <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 text-white py-20 md:py-32 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold mb-4">
-              🔴 LIVE • 25+ Premium News Sources
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-400/30 rounded-full text-sm font-semibold mb-6 text-red-100">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+              </span>
+              LIVE: 25+ Global News Sources
             </div>
-            <h1 className="text-balance text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6 leading-tight">
-              Global News at Your Fingertips
+            
+            <h1 className="text-balance text-5xl md:text-6xl font-serif font-bold mb-6 leading-tight">
+              Breaking News & In-Depth Analysis
             </h1>
-            <p className="text-balance text-xl text-gray-600 mb-8 leading-relaxed">
-              Real-time news aggregation from 25+ trusted publishers. Stay informed with breaking news, in-depth analysis, and expert insights across Technology, Business, Science, and more.
+            
+            <p className="text-balance text-xl text-slate-200 mb-8 leading-relaxed">
+              Curated technology, business, and global news from the world's most trusted publishers. Real-time updates, expert insights, and breaking stories delivered instantly.
             </p>
 
-            {/* Trust Badges */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                Verified Sources
+            {/* Trust Indicators */}
+            <div className="grid grid-cols-3 gap-4 mb-10">
+              <div className="flex flex-col items-start">
+                <span className="text-3xl font-bold text-blue-300">25+</span>
+                <span className="text-sm text-slate-300">Premium Sources</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                Real-time Updates
+              <div className="flex flex-col items-start">
+                <span className="text-3xl font-bold text-green-400">100%</span>
+                <span className="text-sm text-slate-300">Verified Content</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                100+ Articles Daily
+              <div className="flex flex-col items-start">
+                <span className="text-3xl font-bold text-yellow-400">1000+</span>
+                <span className="text-sm text-slate-300">Daily Articles</span>
               </div>
             </div>
 
             {/* Search Bar */}
-            <SearchBar onSearch={handleSearch} />
+            <div className="mt-10">
+              <SearchBar onSearch={handleSearch} />
+            </div>
           </div>
         </div>
       </section>

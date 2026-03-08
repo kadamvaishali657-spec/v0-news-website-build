@@ -38,58 +38,77 @@ export function NewsletterCTA() {
   };
 
   return (
-    <section className="bg-accent/10 border-y border-border py-12 my-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4 mb-6">
-          <Mail className="w-6 h-6 text-accent" />
-          <h2 className="text-2xl font-bold text-foreground">Stay Updated</h2>
-        </div>
-        
-        <p className="text-muted-foreground mb-6 max-w-2xl">
-          Get personalized news delivered to your inbox. Choose your topics and receive daily, weekly, or monthly digests.
-        </p>
+    <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-16 my-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          {/* Content */}
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-4xl font-serif font-bold text-white">Get Daily News</h2>
+            </div>
+            
+            <p className="text-blue-100 text-lg leading-relaxed mb-8">
+              Personalized tech news and breaking stories delivered straight to your inbox. Stay informed without the clutter.
+            </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 items-end">
-          <form onSubmit={handleSubmit} className="flex-1 flex gap-2">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={submitted}
-              className="flex-1 px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50"
-            />
-            <Button
-              type="submit"
-              disabled={loading || submitted}
-              className="whitespace-nowrap"
-            >
-              {submitted ? (
-                <span className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" />
-                  Subscribed!
-                </span>
-              ) : (
-                'Subscribe'
-              )}
-            </Button>
-          </form>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-blue-50">
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-medium">Curated from 25+ premium sources</span>
+              </div>
+              <div className="flex items-center gap-2 text-blue-50">
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-medium">Choose your topics and frequency</span>
+              </div>
+              <div className="flex items-center gap-2 text-blue-50">
+                <CheckCircle className="w-5 h-5" />
+                <span className="font-medium">Unsubscribe anytime</span>
+              </div>
+            </div>
+          </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/newsletter"
-              className="px-4 py-2 text-sm text-accent hover:text-accent/80 font-medium underline"
-            >
-              Customize topics
-            </Link>
-            <span className="text-muted-foreground">or</span>
-            <a
-              href="mailto:workwithme785@gmail.com?subject=Newsletter%20Support"
-              className="px-4 py-2 text-sm text-accent hover:text-accent/80 font-medium underline"
-            >
-              Get support
-            </a>
+          {/* Form */}
+          <div className="bg-white rounded-lg p-8 shadow-xl">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={submitted}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent disabled:opacity-50 font-medium"
+              />
+              <Button
+                type="submit"
+                disabled={loading || submitted}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg"
+              >
+                {submitted ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    Subscribed Successfully!
+                  </span>
+                ) : (
+                  'Subscribe for Free'
+                )}
+              </Button>
+            </form>
+            
+            <div className="pt-4 border-t border-gray-200 text-center">
+              <p className="text-sm text-gray-600 mb-3">
+                Or customize your preferences
+              </p>
+              <Link
+                href="/newsletter"
+                className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
+              >
+                Go to Newsletter Settings
+              </Link>
+            </div>
           </div>
         </div>
       </div>
