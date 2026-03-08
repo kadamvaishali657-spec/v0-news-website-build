@@ -1,75 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #f5f7fa;
-  color: #1a1f36;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-  
-  .prose-lg {
-    font-size: 1.125rem;
-    line-height: 1.75;
-  }
-  
-  .text-gradient {
-    background: linear-gradient(135deg, #0066cc 0%, #004999 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
 }
 
 @layer base {
   :root {
-    --background: 248 250 252;
-    --foreground: 15 23 42;
-    --card: 255 255 255;
-    --card-foreground: 15 23 42;
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
-    --primary: 59 130 246;
-    --primary-foreground: 255 255 255;
-    --secondary: 107 114 128;
-    --secondary-foreground: 255 255 255;
-    --muted: 148 163 184;
-    --muted-foreground: 100 116 139;
-    --accent: 239 68 68;
-    --accent-foreground: 255 255 255;
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-    --border: 226 232 240;
-    --input: 241 245 249;
-    --ring: 59 130 246;
-    --chart-1: 59 130 246;
-    --chart-2: 34 197 94;
-    --chart-3: 248 113 113;
-    --chart-4: 168 85 247;
-    --chart-5: 251 146 60;
+    --background: 12 15% 3%;
+    --foreground: 0 0% 98%;
+    --card: 12 15% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 12 15% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 12 15% 3%;
+    --secondary: 12 15% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 12 15% 25%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 42 94% 56%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 12 15% 15%;
+    --input: 12 15% 15%;
+    --ring: 42 94% 56%;
+    --chart-1: 42 94% 56%;
+    --chart-2: 14 100% 67%;
+    --chart-3: 217 91% 60%;
+    --chart-4: 281 89% 66%;
+    --chart-5: 26 90% 55%;
     --radius: 0.5rem;
-    --sidebar-background: 255 255 255;
-    --sidebar-foreground: 15 23 42;
-    --sidebar-primary: 59 130 246;
-    --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 241 245 249;
-    --sidebar-accent-foreground: 15 23 42;
-    --sidebar-border: 226 232 240;
-    --sidebar-ring: 59 130 246;
+    --sidebar-background: 12 15% 3%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 42 94% 56%;
+    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-accent: 12 15% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 12 15% 15%;
+    --sidebar-ring: 42 94% 56%;
+  }
+  .dark {
+    --background: 12 15% 3%;
+    --foreground: 0 0% 98%;
+    --card: 12 15% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 12 15% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 12 15% 3%;
+    --secondary: 12 15% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 12 15% 25%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 42 94% 56%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 12 15% 15%;
+    --input: 12 15% 15%;
+    --ring: 42 94% 56%;
+    --chart-1: 42 94% 56%;
+    --chart-2: 14 100% 67%;
+    --chart-3: 217 91% 60%;
+    --chart-4: 281 89% 66%;
+    --chart-5: 26 90% 55%;
+    --sidebar-background: 12 15% 3%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 42 94% 56%;
+    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-accent: 12 15% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 12 15% 15%;
+    --sidebar-ring: 42 94% 56%;
   }
 }
 
@@ -77,17 +88,7 @@ h1, h2, h3, h4, h5, h6 {
   * {
     @apply border-border;
   }
-  
   body {
     @apply bg-background text-foreground;
-    line-height: 1.6;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply leading-relaxed;
-  }
-  
-  p, article {
-    @apply leading-relaxed;
   }
 }

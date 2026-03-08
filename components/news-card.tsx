@@ -68,50 +68,49 @@ export function NewsCard({ article }: NewsCardProps) {
   };
 
   return (
-    <article className="group h-full flex flex-col bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-2xl transition-all duration-400 hover:border-blue-400 hover:-translate-y-1">
+    <article className="group h-full flex flex-col bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Image Container */}
       {article.image && !imageError && (
-        <div className="relative w-full h-52 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="relative w-full h-48 overflow-hidden bg-muted">
           <img
             src={article.image}
             alt={article.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={() => setImageError(true)}
             crossOrigin="anonymous"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
       )}
 
       {/* Content */}
-      <div className="flex-1 flex flex-col p-6 gap-4">
-        {/* Source Badge */}
-        <div className="flex items-start justify-between gap-3">
-          <span className="inline-block px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 text-xs font-bold rounded-md border border-blue-200">
+      <div className="flex-1 flex flex-col p-4 gap-3">
+        {/* Source & Date */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="inline-block px-2 py-1 bg-accent text-accent-foreground text-xs font-medium rounded">
             {article.source}
           </span>
-          <div className="flex items-center gap-1 text-xs text-gray-500 whitespace-nowrap font-medium">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Calendar className="w-3 h-3" />
-            <span>{formattedDate}</span>
+            {formattedDate}
           </div>
         </div>
 
-        {/* Title - Premium Typography */}
-        <h3 className="text-lg font-serif font-bold text-gray-900 line-clamp-3 group-hover:text-blue-600 transition-colors leading-tight">
+        {/* Title */}
+        <h3 className="text-lg font-bold text-foreground line-clamp-3 group-hover:text-accent transition-colors">
           {article.title}
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 line-clamp-2 flex-1 leading-relaxed prose-sm">
+        <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
           {article.description}
         </p>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-5 border-t border-gray-100">
+        <div className="flex items-center gap-2 pt-2 border-t border-border">
           <Link
             href={`/article/${encodeURIComponent(article.id)}`}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 font-semibold text-sm shadow-sm hover:shadow-md"
+            className="flex-1 flex items-center gap-2 px-3 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90 transition-colors font-medium text-sm"
           >
             Read Article
             <ArrowUpRight className="w-4 h-4" />
@@ -119,10 +118,10 @@ export function NewsCard({ article }: NewsCardProps) {
 
           <button
             onClick={handleSave}
-            className={`p-2.5 rounded-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            className={`p-2 rounded transition-colors ${
               isSaved 
-                ? 'bg-red-600 text-white shadow-md focus:ring-red-500' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 focus:ring-gray-400'
+                ? 'bg-accent text-accent-foreground' 
+                : 'bg-muted text-muted-foreground hover:bg-accent/20'
             }`}
             title={isSaved ? 'Remove from saved' : 'Save article'}
           >
@@ -130,31 +129,31 @@ export function NewsCard({ article }: NewsCardProps) {
           </button>
 
           <div className="relative group">
-            <button className="p-2.5 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2">
+            <button className="p-2 rounded bg-muted text-muted-foreground hover:bg-accent/20 transition-colors">
               <Share2 className="w-4 h-4" />
             </button>
-            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+            <div className="absolute right-0 mt-1 w-32 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-1 z-50">
               <button
                 onClick={() => handleShare('twitter')}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:bg-blue-50 focus:text-blue-700 transition-colors text-left font-medium"
+                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
               >
                 Share on Twitter
               </button>
               <button
                 onClick={() => handleShare('linkedin')}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:bg-blue-50 focus:text-blue-700 transition-colors text-left font-medium"
+                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
               >
                 Share on LinkedIn
               </button>
               <button
                 onClick={() => handleShare('whatsapp')}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:bg-green-50 focus:text-green-700 transition-colors text-left font-medium"
+                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
               >
                 Share on WhatsApp
               </button>
               <button
                 onClick={handleCopyLink}
-                className="w-full px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition-colors text-left font-medium border-t border-gray-100"
+                className="w-full px-3 py-2 text-xs text-foreground hover:bg-accent/20 transition-colors text-left"
               >
                 Copy Link
               </button>

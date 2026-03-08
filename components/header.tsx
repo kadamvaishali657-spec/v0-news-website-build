@@ -20,43 +20,41 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+    <header className="sticky top-0 z-50 bg-background border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-sm">JN</span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+              <span className="text-accent-foreground font-bold text-sm">JN</span>
             </div>
-            <div>
-              <Link href="/" className="text-xl font-serif font-bold text-gray-900 hover:text-blue-600 transition-colors block leading-tight">
-                JustinNews
-              </Link>
-              <p className="text-xs text-gray-500">.tech</p>
-            </div>
+            <Link href="/" className="text-2xl font-bold text-foreground hover:text-accent transition-colors">
+              JustinNews
+              <span className="text-accent">.tech</span>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-2">
             <Link 
               href="/" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:underline transition-colors font-medium text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium"
             >
               Home
             </Link>
 
             {/* Categories Dropdown */}
             <div className="relative group">
-              <button className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm group-hover:text-blue-600">
+              <button className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-2">
                 Categories
-                <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+              <div className="absolute left-0 mt-0 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
                 {categories.map((category) => (
                   <Link
                     key={category}
                     href={`/#category=${category}`}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors border-l-2 border-transparent hover:border-blue-600"
+                    className="block px-4 py-2 text-sm text-foreground hover:bg-accent/20 hover:text-accent transition-colors"
                   >
                     {category}
                   </Link>
@@ -67,7 +65,7 @@ export function Header() {
             {/* Additional Links */}
             <Link 
               href="/trending" 
-              className="px-3 py-2 text-gray-700 hover:text-red-600 focus:outline-none focus:text-red-600 focus:ring-2 focus:ring-red-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
               <Flame className="w-4 h-4" />
               Trending
@@ -75,7 +73,7 @@ export function Header() {
 
             <Link 
               href="/saved" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
               <Bookmark className="w-4 h-4" />
               Saved
@@ -83,7 +81,7 @@ export function Header() {
 
             <Link 
               href="/search" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
               <Search className="w-4 h-4" />
               Search
@@ -91,7 +89,7 @@ export function Header() {
 
             <Link 
               href="/settings" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600 focus:ring-2 focus:ring-blue-500 rounded transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
               <Cog className="w-4 h-4" />
               Settings
@@ -99,7 +97,7 @@ export function Header() {
 
             <Link 
               href="/newsletter" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
               <Mail className="w-4 h-4" />
               Newsletter
@@ -107,7 +105,7 @@ export function Header() {
 
             <Link 
               href="/publish" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1 bg-accent/20"
             >
               <Edit3 className="w-4 h-4" />
               Publish
@@ -115,7 +113,7 @@ export function Header() {
 
             <Link 
               href="/support" 
-              className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium flex items-center gap-1 text-sm"
+              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
             >
               <HelpCircle className="w-4 h-4" />
               Support
@@ -124,7 +122,7 @@ export function Header() {
             {/* Admin Button */}
             <Link 
               href="/admin" 
-              className="flex items-center gap-2 px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium text-sm ml-2"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-medium ml-2"
             >
               <Settings className="w-4 h-4" />
               Admin
