@@ -38,13 +38,29 @@ export default function HomePage() {
     }
   }, []);
 
-  // Fetch articles when feeds change
+  // Fetch articles when feeds change (with session caching)
   useEffect(() => {
     const loadArticles = async () => {
       setLoading(true);
       setError(null);
       try {
-        const articles = await fetchAllFeeds(feeds);
+        // Check session cache first for instant return visits
+        const cached = sessionStorage.getItem('articles-session-cache');
+        let articles: Article[] = [];
+        
+        if (cached) {
+          try {
+            articles = JSON.parse(cached);
+          } catch (e) {
+            // Invalid cache, refetch
+            articles = await fetchAllFeeds(feeds);
+            sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+          }
+        } else {
+          // No cache, fetch feeds
+          articles = await fetchAllFeeds(feeds);
+          sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+        }
         
         if (articles.length === 0) {
           setError('No articles loaded. RSS feeds may be temporarily unavailable. Try again in a moment.');

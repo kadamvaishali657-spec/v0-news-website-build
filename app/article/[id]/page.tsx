@@ -28,12 +28,29 @@ export default function ArticlePage() {
     }
   }, []);
 
-  // Fetch article
+  // Fetch article with session caching
   useEffect(() => {
     const loadArticle = async () => {
       setLoading(true);
       try {
-        const articles = await fetchAllFeeds(feeds);
+        // Check session cache first for instant return visits
+        const cached = sessionStorage.getItem('articles-session-cache');
+        let articles: Article[] = [];
+        
+        if (cached) {
+          try {
+            articles = JSON.parse(cached);
+          } catch (e) {
+            // Invalid cache, refetch
+            articles = await fetchAllFeeds(feeds);
+            sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+          }
+        } else {
+          // No cache, fetch feeds
+          articles = await fetchAllFeeds(feeds);
+          sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+        }
+        
         const found = articles.find((a) => a.id === articleId);
         
         if (found) {
@@ -123,9 +140,15 @@ export default function ArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-background">
         <Header />
-        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center py-12">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-4" />
+            <p className="text-gray-900 font-semibold text-lg">Loading article...</p>
+            <p className="text-gray-600 text-sm mt-2">Fetching content from our news sources</p>
+          </div>
+        </main>
       </div>
     );
   }
