@@ -24,16 +24,28 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
+  const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
 
   // Load feeds from localStorage
   useEffect(() => {
     const savedFeeds = localStorage.getItem('rss-feeds');
+    const savedDisabled = localStorage.getItem('disabled-feeds');
+    
     if (savedFeeds) {
       try {
         const parsed = JSON.parse(savedFeeds);
         setFeeds(parsed);
       } catch (e) {
         console.error('Error parsing saved feeds:', e);
+      }
+    }
+    
+    if (savedDisabled) {
+      try {
+        const parsed = JSON.parse(savedDisabled);
+        setDisabledFeeds(parsed);
+      } catch (e) {
+        console.error('Error parsing disabled feeds:', e);
       }
     }
   }, []);
@@ -84,6 +96,9 @@ export default function HomePage() {
   useEffect(() => {
     let result = articles;
 
+    // Filter out articles from disabled feeds
+    result = result.filter((article) => !disabledFeeds.includes(article.source));
+
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -98,6 +113,18 @@ export default function HomePage() {
     // Apply category filter
     if (selectedCategory !== 'All') {
       result = result.filter((article) => {
+        const articleCategory = article.category || article.source || '';
+        return articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+               selectedCategory.toLowerCase().includes(articleCategory.toLowerCase());
+      });
+    }
+
+    // Apply category filter
+    if (selectedCategory !== 'All') {
+      result = result.filter((article) => {
+        const articleCategory = article.category || article.source || '';
+        return articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+               selectedCategory.toLowerCase().includes(articleCategory.toLowerCase());
         // First try matching the article's category field
         if (article.category && article.category.toLowerCase() === selectedCategory.toLowerCase()) {
           return true;

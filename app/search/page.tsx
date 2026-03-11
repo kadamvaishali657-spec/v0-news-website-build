@@ -18,10 +18,27 @@ export default function SearchPage() {
   useEffect(() => {
     const loadArticles = async () => {
       try {
-        const articles = await fetchAllFeeds(DEFAULT_FEEDS);
-        setArticles(articles);
+        // Load articles from feeds
+        const feedArticles = await fetchAllFeeds(DEFAULT_FEEDS);
+        
+        // Also load saved articles
+        let allArticles = feedArticles;
+        const savedArticles = localStorage.getItem('saved-articles');
+        if (savedArticles) {
+          try {
+            const saved = JSON.parse(savedArticles);
+            // Combine and deduplicate
+            allArticles = [...feedArticles, ...saved].filter((a, i, arr) => 
+              arr.findIndex(article => article.id === a.id) === i
+            );
+          } catch (e) {
+            console.error('Error loading saved articles:', e);
+          }
+        }
+        
+        setArticles(allArticles);
         // Extract unique sources
-        const uniqueSources = [...new Set(articles.map(a => a.source))];
+        const uniqueSources = [...new Set(allArticles.map(a => a.source))];
         setSources(uniqueSources as string[]);
       } catch (error) {
         console.error('Error loading articles:', error);
