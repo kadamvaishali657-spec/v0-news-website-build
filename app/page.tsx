@@ -252,11 +252,6 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Chatbot */}
-      <ChatBot articles={articles} />
-
-      {/* Mobile Bottom Navigation */}
-      <BottomNav />
     </div>
   );
 }
