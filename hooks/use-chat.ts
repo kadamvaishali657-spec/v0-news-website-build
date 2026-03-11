@@ -83,7 +83,6 @@ export function useChat(articleContext?: any[]) {
             'Content-Type': 'application/json',
           },
           signal: controller.signal,
-          },
           body: JSON.stringify({
             messages: messagesForAPI,
             articles: articleContext || [],
