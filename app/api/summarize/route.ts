@@ -5,7 +5,8 @@ export async function POST(request: Request) {
   try {
     const { article } = await request.json();
 
-    if (!article || !article.id || !article.title || !article.description) {
+    // Validate minimum required fields
+    if (!article || !article.id || !article.title) {
       console.error('[v0] Invalid article data:', article);
       return Response.json(
         { error: 'Invalid article data' },
@@ -13,7 +14,10 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('[v0] Starting summarization for article:', article.id);
+    // Use description if available, otherwise use title
+    const contentToSummarize = article.description || article.title;
+    
+    console.log('[v0] Starting summarization for article:', article.id, 'with content length:', contentToSummarize.length);
 
     // Check if Groq API key is available
     const apiKey = process.env.GROQ_API_KEY;
@@ -30,8 +34,9 @@ export async function POST(request: Request) {
 
     console.log('[v0] Using Groq API with key:', apiKey.substring(0, 10) + '...');
 
-    // Build the prompt
-    const prompt = buildSummarizationPrompt(article);
+    // Build the prompt with available content
+    const articleWithContent = { ...article, description: contentToSummarize };
+    const prompt = buildSummarizationPrompt(articleWithContent);
 
     // Call Groq API directly
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {

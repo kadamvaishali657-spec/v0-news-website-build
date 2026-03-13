@@ -13,10 +13,12 @@ export interface SummaryResult {
  * Focuses on extracting core message and key insights
  */
 export function buildSummarizationPrompt(article: Article): string {
+  const content = article.description || article.title || 'No content available';
+  
   return `You are a professional news summarizer. Analyze this article and provide a concise summary.
 
 Article Title: "${article.title}"
-Article Content: "${article.description}"
+Article Content: "${content}"
 Source: ${article.source}
 
 Please provide:
@@ -60,15 +62,17 @@ export function parseAISummaryResponse(responseText: string): Omit<SummaryResult
  * Extracts key information from article content
  */
 export function generateFallbackSummary(article: Article): Omit<SummaryResult, 'articleId' | 'title'> {
-  const text = `${article.title} ${article.description}`;
+  // Use description if available, otherwise use title
+  const description = article.description || article.title;
+  const text = `${article.title} ${description}`;
   
   // Extract first 1-2 sentences as summary
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
-  const summary = sentences.slice(0, 2).join(' ').trim().substring(0, 200);
+  const summary = sentences.slice(0, 2).join(' ').trim().substring(0, 200) || article.title;
   
-  // Generate key points from description
-  const descSentences = (article.description || '').match(/[^.!?]+[.!?]+/g) || [];
-  const keyPoints = descSentences
+  // Generate key points from available content
+  const contentSentences = (description || '').match(/[^.!?]+[.!?]+/g) || [];
+  const keyPoints = contentSentences
     .slice(0, 3)
     .map(s => s.trim())
     .filter(s => s.length > 10);
