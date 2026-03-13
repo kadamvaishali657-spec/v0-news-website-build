@@ -8,6 +8,7 @@ import { NewsCard } from '@/components/news-card';
 import { Pagination } from '@/components/pagination';
 import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
+import { ChatBotWidget } from '@/components/chatbot-widget';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2, Sparkles } from 'lucide-react';
 
@@ -286,6 +287,9 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* AI Chatbot Widget */}
+      <ChatBotWidget articles={articles} />
 
     </div>
   );
