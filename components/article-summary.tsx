@@ -27,25 +27,19 @@ export function ArticleSummary({ article, onSummaryReady }: ArticleSummaryProps)
       setError(null);
 
       try {
-        console.log('[v0] Fetching summary for article:', article.id);
-        
         const response = await fetch('/api/summarize', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ article }),
         });
 
-        console.log('[v0] Response status:', response.status);
-
         if (!response.ok) {
           const errorData = await response.json();
           const errorMessage = errorData.error || `HTTP ${response.status}`;
-          console.error('[v0] API error:', errorMessage);
           throw new Error(errorMessage);
         }
 
         const data = await response.json();
-        console.log('[v0] Summary received:', data);
         
         if (!data.summary || !Array.isArray(data.keyPoints)) {
           throw new Error('Invalid summary response format');
@@ -61,7 +55,6 @@ export function ArticleSummary({ article, onSummaryReady }: ArticleSummaryProps)
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMsg);
-        console.error('[v0] Summary generation error:', errorMsg, err);
       } finally {
         setLoading(false);
       }
