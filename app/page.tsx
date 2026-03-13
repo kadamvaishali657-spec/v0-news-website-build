@@ -6,10 +6,10 @@ import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
 import { Pagination } from '@/components/pagination';
-
+import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 
 const ARTICLES_PER_PAGE = 12;
 
@@ -23,11 +23,13 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
   const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
+  const [showSummaries, setShowSummaries] = useState(false);
 
-  // Load feeds from localStorage
+  // Load feeds and preferences from localStorage
   useEffect(() => {
     const savedFeeds = localStorage.getItem('rss-feeds');
     const savedDisabled = localStorage.getItem('disabled-feeds');
+    const savedShowSummaries = localStorage.getItem('show-ai-summaries');
     
     if (savedFeeds) {
       try {
@@ -45,6 +47,10 @@ export default function HomePage() {
       } catch (e) {
         console.error('Error parsing disabled feeds:', e);
       }
+    }
+
+    if (savedShowSummaries) {
+      setShowSummaries(JSON.parse(savedShowSummaries));
     }
   }, []);
 
@@ -150,7 +156,14 @@ export default function HomePage() {
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
+    setCurrentPage(1);
   }, []);
+
+  const toggleSummaries = useCallback(() => {
+    const newValue = !showSummaries;
+    setShowSummaries(newValue);
+    localStorage.setItem('show-ai-summaries', JSON.stringify(newValue));
+  }, [showSummaries]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -184,9 +197,24 @@ export default function HomePage() {
           </section>
         )}
 
+        {/* AI Summary Toggle */}
+        <section className="mb-8 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Filter by category</h3>
+          <button
+            onClick={toggleSummaries}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              showSummaries
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            {showSummaries ? 'Hide Summaries' : 'Show AI Summaries'}
+          </button>
+        </section>
+
         {/* Category Filter */}
         <section className="mb-12">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Filter by category</h3>
           <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
         </section>
 
@@ -214,9 +242,16 @@ export default function HomePage() {
 
             {paginatedArticles.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div className={showSummaries ? 'space-y-8 mb-12' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12'}>
                   {paginatedArticles.map((article) => (
-                    <NewsCard key={article.id} article={article} />
+                    <div key={article.id} className={showSummaries ? 'bg-white border border-gray-200 rounded-lg overflow-hidden' : ''}>
+                      <NewsCard article={article} />
+                      {showSummaries && (
+                        <div className="px-6 pb-6 pt-2 border-t border-gray-200 bg-gray-50">
+                          <ArticleSummary article={article} />
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
 
