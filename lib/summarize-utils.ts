@@ -54,3 +54,40 @@ export function parseAISummaryResponse(responseText: string): Omit<SummaryResult
     return null;
   }
 }
+
+/**
+ * Generate a fallback summary when AI API fails
+ * Extracts key information from article content
+ */
+export function generateFallbackSummary(article: Article): Omit<SummaryResult, 'articleId' | 'title'> {
+  const text = `${article.title} ${article.description}`;
+  
+  // Extract first 1-2 sentences as summary
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+  const summary = sentences.slice(0, 2).join(' ').trim().substring(0, 200);
+  
+  // Generate key points from description
+  const descSentences = (article.description || '').match(/[^.!?]+[.!?]+/g) || [];
+  const keyPoints = descSentences
+    .slice(0, 3)
+    .map(s => s.trim())
+    .filter(s => s.length > 10);
+  
+  // Detect sentiment based on keywords
+  const positiveKeywords = ['increase', 'growth', 'boost', 'improve', 'succeed', 'gain', 'positive', 'strong', 'excellent'];
+  const negativeKeywords = ['decline', 'fall', 'loss', 'fail', 'negative', 'weak', 'poor', 'crisis', 'problem'];
+  
+  const textLower = text.toLowerCase();
+  const positiveCount = positiveKeywords.filter(k => textLower.includes(k)).length;
+  const negativeCount = negativeKeywords.filter(k => textLower.includes(k)).length;
+  
+  let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral';
+  if (positiveCount > negativeCount) sentiment = 'positive';
+  if (negativeCount > positiveCount) sentiment = 'negative';
+  
+  return {
+    summary: summary || 'Summary not available',
+    keyPoints: keyPoints.length > 0 ? keyPoints : ['Check source for full details'],
+    sentiment,
+  };
+}
