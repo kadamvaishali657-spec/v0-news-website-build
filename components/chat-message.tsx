@@ -1,6 +1,6 @@
 'use client';
 
-import { ChatMessage as ChatMessageType } from '@/hooks/use-chat';
+import { ChatMessage as ChatMessageType } from '@/lib/chat-utils';
 import { Bot, User } from 'lucide-react';
 
 interface ChatMessageProps {
@@ -15,13 +15,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
       {/* Avatar */}
       <div
         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser ? 'bg-accent' : 'bg-muted'
+          isUser ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
         }`}
       >
         {isUser ? (
-          <User className="w-4 h-4 text-accent-foreground" />
+          <User className="w-4 h-4" />
         ) : (
-          <Bot className="w-4 h-4 text-foreground" />
+          <Bot className="w-4 h-4" />
         )}
       </div>
 
@@ -29,13 +29,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
       <div
         className={`flex-1 max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
           isUser
-            ? 'bg-accent text-accent-foreground rounded-br-none'
-            : 'bg-muted text-muted-foreground rounded-bl-none'
+            ? 'bg-blue-600 text-white rounded-br-none'
+            : 'bg-gray-100 text-gray-900 rounded-bl-none'
         }`}
       >
         <p className="text-sm break-words whitespace-pre-wrap">{message.content}</p>
         <span className="text-xs opacity-70 mt-1 block">
-          {message.timestamp.toLocaleTimeString([], {
+          {new Date(message.timestamp).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
           })}

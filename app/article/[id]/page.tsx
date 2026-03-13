@@ -16,6 +16,7 @@ export default function ArticlePage() {
   
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [feeds] = useState(DEFAULT_FEEDS);
@@ -28,16 +29,34 @@ export default function ArticlePage() {
     }
   }, []);
 
-  // Fetch article
+  // Fetch article with session caching
   useEffect(() => {
     const loadArticle = async () => {
       setLoading(true);
       try {
-        const articles = await fetchAllFeeds(feeds);
+        // Check session cache first for instant return visits
+        const cached = sessionStorage.getItem('articles-session-cache');
+        let articles: Article[] = [];
+        
+        if (cached) {
+          try {
+            articles = JSON.parse(cached);
+          } catch (e) {
+            // Invalid cache, refetch
+            articles = await fetchAllFeeds(feeds);
+            sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+          }
+        } else {
+          // No cache, fetch feeds
+          articles = await fetchAllFeeds(feeds);
+          sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+        }
+        
         const found = articles.find((a) => a.id === articleId);
         
         if (found) {
           setArticle(found);
+          setNotFound(false);
           
           // Check if saved
           const savedArticles = localStorage.getItem('saved-articles');
@@ -45,9 +64,13 @@ export default function ArticlePage() {
             const parsed = JSON.parse(savedArticles);
             setIsSaved(parsed.some((a: Article) => a.id === articleId));
           }
+        } else {
+          setNotFound(true);
+          setArticle(null);
         }
       } catch (error) {
         console.error('Error loading article:', error);
+        setNotFound(true);
       } finally {
         setLoading(false);
       }
@@ -123,9 +146,48 @@ export default function ArticlePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-white">
         <Header />
-        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center py-12">
+            <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto mb-4" />
+            <p className="text-gray-900 font-semibold text-lg">Loading article...</p>
+            <p className="text-gray-600 text-sm mt-2">Fetching content from our news sources</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (notFound || !article) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center py-12">
+            <div className="mb-6">
+              <div className="inline-block p-4 bg-red-100 rounded-full mb-4">
+                <ArrowLeft className="w-8 h-8 text-red-600" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Article Not Found</h1>
+            <p className="text-gray-600 mb-6">This article is no longer available. It may have been removed or the source is temporarily unavailable.</p>
+            <div className="flex gap-4 justify-center">
+              <Link 
+                href="/" 
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Back to Home
+              </Link>
+              <Link 
+                href="/trending" 
+                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                View Trending
+              </Link>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

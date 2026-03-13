@@ -14,10 +14,32 @@ export default function TrendingPage() {
     const loadTrending = async () => {
       try {
         const articles = await fetchAllFeeds(DEFAULT_FEEDS);
-        // Sort by publication date to show most recent as trending
-        const trending = articles
-          .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
-          .slice(0, 24); // Show top 24 trending articles
+        
+        // Get saved articles to count bookmarks (proxy for engagement)
+        const savedArticlesData = localStorage.getItem('saved-articles');
+        const savedIds = savedArticlesData ? JSON.parse(savedArticlesData).map((a: any) => a.id) : [];
+        
+        // Calculate trending score based on:
+        // 1. Recent publication (within last 7 days)
+        // 2. Bookmarks/saves (engagement signal)
+        // 3. Category (popular categories)
+        
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        const scoring = articles
+          .filter(a => a.pubDate >= sevenDaysAgo) // Only recent articles
+          .map(article => ({
+            article,
+            score: 
+              (article.pubDate >= sevenDaysAgo ? 10 : 0) + // Recent boost
+              (savedIds.includes(article.id) ? 5 : 0) + // Bookmark boost
+              (article.title.length > 60 ? 2 : 0) // Detailed articles boost
+          }))
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 24);
+        
+        const trending = scoring.map(s => s.article);
         setTrendingArticles(trending);
       } catch (error) {
         console.error('Error loading trending articles:', error);

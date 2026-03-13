@@ -74,16 +74,22 @@ export function useChat(articleContext?: any[]) {
           content: userMessage,
         });
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          signal: controller.signal,
           body: JSON.stringify({
             messages: messagesForAPI,
             articles: articleContext || [],
           }),
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -106,9 +112,31 @@ export function useChat(articleContext?: any[]) {
 
         setMessages((prev) => [...prev, assistantMsg]);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-        setError(errorMessage);
-      } finally {
+        let errorMsg = 'Failed to send message';
+        
+        if (err instanceof Error) {
+          if (err.name === 'AbortError') {
+            errorMsg = 'Request timeout. Please try again.';
+          } else {
+            errorMsg = err.message;
+          }
+        }
+        
+        // Check if it's a network/API error
+        if (errorMsg.includes('Failed') || errorMsg.includes('fetch')) {
+          errorMsg = 'Chat service temporarily unavailable. Please try again later.';
+          
+          // Add a helpful assistant message
+          const assistantMsg: ChatMessage = {
+            id: `assistant-${Date.now()}`,
+            role: 'assistant',
+            content: 'I apologize, but the chat service is temporarily unavailable. Please try again in a moment. In the meantime, you can browse articles or use the search feature.',
+            timestamp: new Date(),
+          };
+          setMessages((prev) => [...prev, assistantMsg]);
+        }
+        
+        setError(errorMsg);
         setIsLoading(false);
       }
     },

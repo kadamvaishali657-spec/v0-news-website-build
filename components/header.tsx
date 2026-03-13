@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Search, Cog, Mail, HelpCircle, Edit3 } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Bookmark } from 'lucide-react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,15 +34,8 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Simplified */}
           <nav className="hidden md:flex items-center gap-2">
-            <Link 
-              href="/" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium"
-            >
-              Home
-            </Link>
-
             {/* Categories Dropdown */}
             <div className="relative group">
               <button className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-2">
@@ -62,7 +55,6 @@ export function Header() {
               </div>
             </div>
 
-            {/* Additional Links */}
             <Link 
               href="/trending" 
               className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
@@ -77,46 +69,6 @@ export function Header() {
             >
               <Bookmark className="w-4 h-4" />
               Saved
-            </Link>
-
-            <Link 
-              href="/search" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-            >
-              <Search className="w-4 h-4" />
-              Search
-            </Link>
-
-            <Link 
-              href="/settings" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-            >
-              <Cog className="w-4 h-4" />
-              Settings
-            </Link>
-
-            <Link 
-              href="/newsletter" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-            >
-              <Mail className="w-4 h-4" />
-              Newsletter
-            </Link>
-
-            <Link 
-              href="/publish" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1 bg-accent/20"
-            >
-              <Edit3 className="w-4 h-4" />
-              Publish
-            </Link>
-
-            <Link 
-              href="/support" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-            >
-              <HelpCircle className="w-4 h-4" />
-              Support
             </Link>
 
             {/* Admin Button */}
@@ -197,33 +149,6 @@ export function Header() {
             >
               <Bookmark className="w-4 h-4" />
               Saved
-            </Link>
-
-            <Link 
-              href="/search" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <Search className="w-4 h-4" />
-              Search
-            </Link>
-
-            <Link 
-              href="/settings" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <Cog className="w-4 h-4" />
-              Settings
-            </Link>
-
-            <Link 
-              href="/newsletter" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <Mail className="w-4 h-4" />
-              Newsletter
             </Link>
 
             <Link 

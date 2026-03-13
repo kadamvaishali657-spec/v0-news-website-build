@@ -3,32 +3,57 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { RSSFeed, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Trash2, Save, Eye, EyeOff, RefreshCw, X } from 'lucide-react';
 
 export default function AdminPage() {
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [newFeedTitle, setNewFeedTitle] = useState('');
+  const [newFeedCategory, setNewFeedCategory] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
 
-  // Load feeds from localStorage
+  // Load feeds and disabled feeds from localStorage
   useEffect(() => {
     const savedFeeds = localStorage.getItem('rss-feeds');
+    const savedDisabled = localStorage.getItem('disabled-feeds');
+    
     if (savedFeeds) {
       try {
         const parsed = JSON.parse(savedFeeds);
         setFeeds(parsed);
       } catch (e) {
-        // Silently ignore parse errors
+        console.error('Error loading feeds:', e);
+      }
+    }
+    
+    if (savedDisabled) {
+      try {
+        const parsed = JSON.parse(savedDisabled);
+        setDisabledFeeds(parsed);
+      } catch (e) {
+        console.error('Error loading disabled feeds:', e);
       }
     }
   }, []);
+
+  const saveFeedsToStorage = (updatedFeeds: RSSFeed[]) => {
+    localStorage.setItem('rss-feeds', JSON.stringify(updatedFeeds));
+    sessionStorage.removeItem('articles-session-cache'); // Clear cache when feeds change
+  };
+
+  const saveDisabledToStorage = (disabled: string[]) => {
+    localStorage.setItem('disabled-feeds', JSON.stringify(disabled));
+    sessionStorage.removeItem('articles-session-cache'); // Clear cache when feeds change
+  };
 
   const handleAddFeed = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!newFeedUrl.trim() || !newFeedTitle.trim()) {
-      setMessage({ type: 'error', text: 'Please fill in both URL and title' });
+      setMessage({ type: 'error', text: 'Please fill in URL and title' });
+      setTimeout(() => setMessage(null), 3000);
       return;
     }
 
@@ -37,171 +62,284 @@ export default function AdminPage() {
       new URL(newFeedUrl);
     } catch {
       setMessage({ type: 'error', text: 'Please enter a valid URL' });
+      setTimeout(() => setMessage(null), 3000);
       return;
     }
 
     // Check for duplicates
     if (feeds.some((f) => f.url === newFeedUrl)) {
       setMessage({ type: 'error', text: 'This feed URL already exists' });
+      setTimeout(() => setMessage(null), 3000);
       return;
     }
 
-    const updatedFeeds = [...feeds, { url: newFeedUrl, title: newFeedTitle }];
+    const newFeed: RSSFeed = { 
+      url: newFeedUrl, 
+      title: newFeedTitle,
+      category: newFeedCategory || undefined
+    };
+    
+    const updatedFeeds = [...feeds, newFeed];
     setFeeds(updatedFeeds);
-    localStorage.setItem('rss-feeds', JSON.stringify(updatedFeeds));
+    saveFeedsToStorage(updatedFeeds);
 
     setNewFeedUrl('');
     setNewFeedTitle('');
+    setNewFeedCategory('');
+    setShowAddForm(false);
     setMessage({ type: 'success', text: 'Feed added successfully!' });
-
-    // Refresh the page to load new articles
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
+    setTimeout(() => setMessage(null), 3000);
   };
 
   const handleRemoveFeed = (url: string) => {
     if (confirm('Are you sure you want to remove this feed?')) {
       const updatedFeeds = feeds.filter((f) => f.url !== url);
       setFeeds(updatedFeeds);
-      localStorage.setItem('rss-feeds', JSON.stringify(updatedFeeds));
+      saveFeedsToStorage(updatedFeeds);
+      
+      // Also remove from disabled list
+      const updated = disabledFeeds.filter(u => u !== url);
+      setDisabledFeeds(updated);
+      saveDisabledToStorage(updated);
+      
       setMessage({ type: 'success', text: 'Feed removed successfully!' });
-
-      // Refresh the page to update articles
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      setTimeout(() => setMessage(null), 3000);
     }
+  };
+
+  const handleToggleFeed = (url: string) => {
+    const updated = disabledFeeds.includes(url)
+      ? disabledFeeds.filter(u => u !== url)
+      : [...disabledFeeds, url];
+    
+    setDisabledFeeds(updated);
+    saveDisabledToStorage(updated);
+    
+    const isDisabling = updated.includes(url);
+    setMessage({ 
+      type: 'success', 
+      text: `Feed ${isDisabling ? 'disabled' : 'enabled'}!` 
+    });
+    setTimeout(() => setMessage(null), 3000);
   };
 
   const handleResetToDefault = () => {
-    if (confirm('Reset to default feeds? This will remove all custom feeds.')) {
+    if (confirm('Reset to default feeds? This will remove all custom feeds and enable all defaults.')) {
       setFeeds(DEFAULT_FEEDS);
-      localStorage.setItem('rss-feeds', JSON.stringify(DEFAULT_FEEDS));
+      setDisabledFeeds([]);
+      saveFeedsToStorage(DEFAULT_FEEDS);
+      saveDisabledToStorage([]);
       setMessage({ type: 'success', text: 'Reset to default feeds' });
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
+  const activeFeedsCount = feeds.length - disabledFeeds.length;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage RSS feed sources for JustinNews.tech</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Panel</h1>
+          <p className="text-gray-600">Manage RSS feeds and published content</p>
         </div>
 
         {/* Message Alert */}
         {message && (
-          <div
-            className={`mb-6 p-4 rounded-lg border ${
-              message.type === 'success'
-                ? 'bg-green-900/20 border-green-700 text-green-200'
-                : 'bg-red-900/20 border-red-700 text-red-200'
-            }`}
-          >
-            {message.text}
+          <div className={`mb-6 p-4 rounded-lg flex items-center justify-between ${
+            message.type === 'success' 
+              ? 'bg-green-50 border border-green-200' 
+              : 'bg-red-50 border border-red-200'
+          }`}>
+            <span className={message.type === 'success' ? 'text-green-800' : 'text-red-800'}>
+              {message.text}
+            </span>
+            <button onClick={() => setMessage(null)} className="text-gray-500 hover:text-gray-700">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         )}
 
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-gray-600 text-sm font-medium">Total Feeds</p>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{feeds.length}</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-gray-600 text-sm font-medium">Active Feeds</p>
+            <p className="text-3xl font-bold text-green-600 mt-2">{activeFeedsCount}</p>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <p className="text-gray-600 text-sm font-medium">Disabled Feeds</p>
+            <p className="text-3xl font-bold text-red-600 mt-2">{disabledFeeds.length}</p>
+          </div>
+        </div>
+
         {/* Add Feed Form */}
-        <section className="mb-12 bg-card border border-border rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Add New Feed</h2>
-          <form onSubmit={handleAddFeed} className="space-y-4">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-foreground mb-2">
-                Feed Title
-              </label>
-              <input
-                id="title"
-                type="text"
-                placeholder="e.g., TechCrunch, The Verge"
-                value={newFeedTitle}
-                onChange={(e) => setNewFeedTitle(e.target.value)}
-                className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="url" className="block text-sm font-medium text-foreground mb-2">
-                RSS Feed URL
-              </label>
-              <input
-                id="url"
-                type="url"
-                placeholder="https://example.com/rss.xml"
-                value={newFeedUrl}
-                onChange={(e) => setNewFeedUrl(e.target.value)}
-                className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              />
-            </div>
-
+        <div className="mb-8">
+          {!showAddForm ? (
             <button
-              type="submit"
-              className="flex items-center gap-2 px-6 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium"
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              <Plus className="w-5 h-5" />
-              Add Feed
+              <Plus className="w-4 h-4" />
+              Add New Feed
             </button>
-          </form>
-        </section>
+          ) : (
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Add New RSS Feed</h2>
+                <button onClick={() => setShowAddForm(false)} className="text-gray-500 hover:text-gray-700">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <form onSubmit={handleAddFeed} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Feed Title</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., TechCrunch, The Verge"
+                    value={newFeedTitle}
+                    onChange={(e) => setNewFeedTitle(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">RSS Feed URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/rss.xml"
+                    value={newFeedUrl}
+                    onChange={(e) => setNewFeedUrl(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category (Optional)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Technology, Business"
+                    value={newFeedCategory}
+                    onChange={(e) => setNewFeedCategory(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                  >
+                    <Save className="w-4 h-4" />
+                    Add Feed
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddForm(false)}
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
 
         {/* Feeds List */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-foreground">Current Feeds ({feeds.length})</h2>
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">RSS Feeds ({feeds.length})</h2>
             <button
               onClick={handleResetToDefault}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors underline"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
             >
+              <RefreshCw className="w-4 h-4" />
               Reset to Default
             </button>
           </div>
-
+          
           {feeds.length > 0 ? (
-            <div className="space-y-3">
-              {feeds.map((feed) => (
-                <div
-                  key={feed.url}
-                  className="bg-card border border-border rounded-lg p-4 flex items-center justify-between hover:border-accent transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-medium text-foreground">{feed.title}</h3>
-                    <p className="text-sm text-muted-foreground truncate">{feed.url}</p>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveFeed(feed.url)}
-                    className="ml-4 p-2 text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
-                    title="Remove feed"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Category</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">URL</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {feeds.map((feed, index) => {
+                    const isDisabled = disabledFeeds.includes(feed.url);
+                    return (
+                      <tr key={index} className={`border-b border-gray-200 hover:bg-gray-50 ${isDisabled ? 'opacity-60' : ''}`}>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{feed.title}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{feed.category || '-'}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title={feed.url}>{feed.url}</td>
+                        <td className="px-6 py-4 text-sm">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            isDisabled 
+                              ? 'bg-red-100 text-red-800' 
+                              : 'bg-green-100 text-green-800'
+                          }`}>
+                            {isDisabled ? 'Disabled' : 'Active'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm flex gap-2">
+                          <button
+                            onClick={() => handleToggleFeed(feed.url)}
+                            className={`p-2 rounded-lg transition-colors ${
+                              isDisabled 
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                            }`}
+                            title={isDisabled ? 'Enable feed' : 'Disable feed'}
+                          >
+                            {isDisabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </button>
+                          <button
+                            onClick={() => handleRemoveFeed(feed.url)}
+                            className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                            title="Delete feed"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No feeds added. Add one to get started!
+            <div className="text-center py-12 text-gray-600">
+              <p className="font-medium">No feeds configured</p>
+              <p className="text-sm text-gray-500 mt-1">Add a feed to get started</p>
             </div>
           )}
-        </section>
+        </div>
 
         {/* Info Box */}
-        <section className="bg-card border border-border rounded-lg p-6">
-          <h3 className="text-lg font-bold text-foreground mb-4">Tips</h3>
-          <ul className="space-y-2 text-muted-foreground text-sm">
-            <li>• Use valid RSS feed URLs (usually end with .xml or /rss)</li>
-            <li>• Feed titles help organize your news sources</li>
-            <li>• Changes are saved locally in your browser</li>
-            <li>• Articles are filtered by title and description keywords</li>
-            <li>• Some RSS feeds may have CORS restrictions</li>
+        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 className="font-semibold text-blue-900 mb-2">How to Use</h3>
+          <ul className="text-sm text-blue-800 space-y-2">
+            <li>• Click "Add New Feed" to add an RSS feed</li>
+            <li>• Toggle the eye icon to enable/disable feeds</li>
+            <li>• Delete feeds you no longer want to use</li>
+            <li>• Changes are saved to your browser automatically</li>
+            <li>• Only active feeds appear on the home page</li>
+            <li>• Use "Reset to Default" to restore original feeds</li>
           </ul>
-        </section>
+        </div>
       </main>
     </div>
   );
