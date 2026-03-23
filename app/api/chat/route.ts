@@ -59,7 +59,7 @@ Current time: ${new Date().toLocaleString()}`;
       })),
     ];
 
-    // Call Groq API directly
+    // Call Groq API with streaming enabled
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -72,7 +72,7 @@ Current time: ${new Date().toLocaleString()}`;
         temperature: 0.7,
         max_tokens: 1024,
         top_p: 1,
-        stream: false,
+        stream: true,
       }),
     });
 
@@ -85,12 +85,63 @@ Current time: ${new Date().toLocaleString()}`;
       );
     }
 
-    const groqData = await groqResponse.json();
-    const assistantMessage = groqData.choices?.[0]?.message?.content || '';
+    // Set up the readable stream for SSE
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = groqResponse.body?.getReader();
+        if (!reader) {
+          controller.close();
+          return;
+        }
 
-    return NextResponse.json({
-      success: true,
-      message: assistantMessage,
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              const trimmedLine = line.trim();
+              if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue;
+
+              const data = trimmedLine.slice(6);
+              if (data === '[DONE]') {
+                controller.close();
+                return;
+              }
+
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                if (content) {
+                  controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`));
+                }
+              } catch (e) {
+                console.error('Error parsing streaming data:', e);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Streaming error:', error);
+          controller.error(error);
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
     });
   } catch (error) {
     console.error('Chat API error:', error);

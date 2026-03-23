@@ -87,18 +87,22 @@ export async function POST(request: NextRequest) {
     // Send notification email to admin
     await sendAdminNotification(email, frequency, categories);
 
-    // Log subscription
-    console.log('[Newsletter] New subscription:', {
+    // Structured logging for subscription
+    console.log(JSON.stringify({
+      event: 'newsletter_subscription',
       email,
       frequency,
       categories,
       timestamp: new Date().toISOString(),
-    });
+      is_update: !!existingSubscriber,
+    }));
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Successfully subscribed to newsletter',
+        message: existingSubscriber
+          ? 'Subscription updated successfully'
+          : 'Successfully subscribed to newsletter',
         data: {
           email,
           frequency,
@@ -136,10 +140,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Security: Only return relevant public subscription info
   return NextResponse.json(
     {
       subscribed: true,
-      subscription: subscriber,
+      data: {
+        active: subscriber.active,
+        subscribedAt: subscriber.subscribedAt,
+      },
     },
     { status: 200 }
   );

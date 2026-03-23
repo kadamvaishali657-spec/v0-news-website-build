@@ -44,6 +44,10 @@ const VALID_FEEDS = [
   'https://www.mentalfloss.com/rss.xml',
 ];
 
+// Simple in-memory cache for RSS feeds
+const cache = new Map<string, { content: string; contentType: string; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 export async function GET(request: NextRequest) {
   const feedUrl = request.nextUrl.searchParams.get('url');
 
@@ -60,6 +64,17 @@ export async function GET(request: NextRequest) {
       { error: 'Unauthorized feed URL' },
       { status: 403 }
     );
+  }
+
+  // Check cache
+  const cached = cache.get(feedUrl);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return NextResponse.json({
+      content: cached.content,
+      contentType: cached.contentType,
+      url: feedUrl,
+      cached: true,
+    });
   }
 
   try {
@@ -97,10 +112,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Update cache
+    cache.set(feedUrl, {
+      content: text,
+      contentType,
+      timestamp: Date.now(),
+    });
+
     return NextResponse.json({
       content: text,
       contentType,
       url: feedUrl,
+      cached: false,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

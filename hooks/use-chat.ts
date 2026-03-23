@@ -86,25 +86,58 @@ export function useChat(articleContext?: any[]) {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({}));
           throw new Error(errorData.error || 'Failed to get response');
         }
 
-        const data = await response.json();
-
-        if (!data.success || !data.message) {
-          throw new Error('Invalid response format');
+        if (!response.body) {
+          throw new Error('Response body is empty');
         }
 
-        // Add assistant message to the chat
-        const assistantMsg: ChatMessage = {
-          id: `assistant-${Date.now()}`,
+        // Create initial assistant message
+        const assistantMsgId = `assistant-${Date.now()}`;
+        const initialAssistantMsg: ChatMessage = {
+          id: assistantMsgId,
           role: 'assistant',
-          content: data.message,
+          content: '',
           timestamp: new Date(),
         };
 
-        setMessages((prev) => [...prev, assistantMsg]);
+        setMessages((prev) => [...prev, initialAssistantMsg]);
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let assistantContent = '';
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue;
+
+            try {
+              const data = JSON.parse(trimmedLine.slice(6));
+              if (data.content) {
+                assistantContent += data.content;
+                // Update the assistant message content in state
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === assistantMsgId ? { ...msg, content: assistantContent } : msg
+                  )
+                );
+              }
+            } catch (e) {
+              console.error('Error parsing streaming chunk:', e);
+            }
+          }
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An error occurred';
         setError(errorMessage);
