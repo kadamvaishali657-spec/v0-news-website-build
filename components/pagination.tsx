@@ -1,6 +1,6 @@
 'use client';
 
-import { Article } from '@/lib/rss-parser';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
   currentPage: number;
@@ -10,7 +10,7 @@ interface PaginationProps {
 
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   const getPageNumbers = () => {
-    const pages = [];
+    const pages: number[] = [];
     const maxVisible = 5;
 
     if (totalPages <= maxVisible) {
@@ -37,35 +37,39 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 my-8">
+    <div className="flex items-center justify-center gap-1.5 my-8">
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className="px-4 py-2 border border-border rounded-lg text-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium border border-border/60 text-foreground hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
       >
+        <ChevronLeft className="w-4 h-4" />
         Previous
       </button>
 
-      {getPageNumbers().map((page) => (
-        <button
-          key={page}
-          onClick={() => onPageChange(page)}
-          className={`px-4 py-2 rounded-lg transition-colors ${
-            currentPage === page
-              ? 'bg-accent text-accent-foreground font-bold'
-              : 'border border-border text-foreground hover:bg-muted'
-          }`}
-        >
-          {page}
-        </button>
-      ))}
+      <div className="flex items-center gap-1 mx-1">
+        {getPageNumbers().map((page) => (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={`w-10 h-10 rounded-xl text-sm font-medium transition-all duration-200 ${
+              currentPage === page
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+      </div>
 
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className="px-4 py-2 border border-border rounded-lg text-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium border border-border/60 text-foreground hover:bg-muted/60 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
       >
         Next
+        <ChevronRight className="w-4 h-4" />
       </button>
     </div>
   );

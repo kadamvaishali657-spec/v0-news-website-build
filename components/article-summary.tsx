@@ -2,7 +2,7 @@
 
 import { Article } from '@/lib/rss-parser';
 import { useState, useEffect } from 'react';
-import { Loader2, Zap, TrendingUp, AlertCircle } from 'lucide-react';
+import { Loader2, Sparkles, TrendingUp, AlertCircle, ChevronDown } from 'lucide-react';
 
 interface ArticleSummaryProps {
   article: Article;
@@ -63,24 +63,27 @@ export function ArticleSummary({ article, onSummaryReady }: ArticleSummaryProps)
     generateSummary();
   }, [article, onSummaryReady]);
 
-  const sentimentColors = {
-    positive: 'bg-green-50 border-green-200 text-green-700',
-    neutral: 'bg-gray-50 border-gray-200 text-gray-700',
-    negative: 'bg-red-50 border-red-200 text-red-700',
-  };
-
-  const sentimentIcons = {
-    positive: '📈',
-    neutral: '📊',
-    negative: '📉',
+  const sentimentConfig = {
+    positive: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-600 dark:text-emerald-400', icon: '📈' },
+    neutral: { bg: 'bg-primary/5', border: 'border-primary/10', text: 'text-foreground', icon: '📊' },
+    negative: { bg: 'bg-red-500/10', border: 'border-red-500/20', text: 'text-red-600 dark:text-red-400', icon: '📉' },
   };
 
   if (loading) {
     return (
-      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
         <div className="flex items-center gap-3">
-          <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
-          <span className="text-sm font-medium text-blue-900">Generating AI summary...</span>
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Loader2 className="w-4 h-4 text-primary animate-spin" />
+          </div>
+          <div>
+            <span className="text-sm font-medium text-foreground">Generating AI summary</span>
+            <div className="flex gap-1 mt-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" style={{ animationDelay: '0.2s' }} />
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40 animate-pulse" style={{ animationDelay: '0.4s' }} />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -88,12 +91,14 @@ export function ArticleSummary({ article, onSummaryReady }: ArticleSummaryProps)
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/10">
         <div className="flex items-start gap-3">
-          <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-red-900">
-            <p className="font-medium">Could not generate summary</p>
-            <p className="text-xs text-red-700 mt-1">{error}</p>
+          <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center flex-shrink-0">
+            <AlertCircle className="w-4 h-4 text-destructive" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-foreground">Could not generate summary</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{error}</p>
           </div>
         </div>
       </div>
@@ -102,53 +107,47 @@ export function ArticleSummary({ article, onSummaryReady }: ArticleSummaryProps)
 
   if (!summary) return null;
 
+  const config = sentimentConfig[summary.sentiment];
+
   return (
-    <div className={`border rounded-lg transition-all duration-200 ${sentimentColors[summary.sentiment]}`}>
+    <div className={`rounded-xl border transition-all duration-200 ${config.bg} ${config.border}`}>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 text-left flex items-start justify-between hover:opacity-80 transition-opacity"
+        className="w-full p-4 text-left flex items-start justify-between hover:opacity-90 transition-opacity"
       >
         <div className="flex items-start gap-3 flex-1">
-          <Zap className="w-5 h-5 mt-0.5 flex-shrink-0" />
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-4 h-4 text-primary" />
+          </div>
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-sm mb-1 flex items-center gap-2">
+            <h4 className="font-semibold text-sm mb-1 flex items-center gap-2 text-foreground">
               AI Summary
-              <span className="text-lg">{sentimentIcons[summary.sentiment]}</span>
+              <span className="text-base">{config.icon}</span>
             </h4>
-            <p className="text-sm line-clamp-2">{summary.summary}</p>
+            <p className={`text-sm line-clamp-2 ${config.text}`}>{summary.summary}</p>
           </div>
         </div>
-        <div className="ml-2 flex-shrink-0">
-          <span className={`text-lg transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}>
-            ▼
-          </span>
-        </div>
+        <ChevronDown className={`w-4 h-4 ml-2 flex-shrink-0 text-muted-foreground transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 pt-0 border-t border-current border-opacity-20">
-          {/* Key Points */}
+        <div className="px-4 pb-4 pt-0 border-t border-border/20 mx-4 mb-0">
           {summary.keyPoints.length > 0 && (
-            <div className="mb-3">
-              <h5 className="font-semibold text-xs uppercase opacity-75 mb-2 flex items-center gap-2">
+            <div className="mt-3 mb-3">
+              <h5 className="font-semibold text-xs uppercase text-muted-foreground mb-2 flex items-center gap-2">
                 <TrendingUp className="w-3 h-3" />
                 Key Points
               </h5>
-              <ul className="space-y-1">
+              <ul className="space-y-1.5">
                 {summary.keyPoints.map((point, idx) => (
-                  <li key={idx} className="text-sm flex gap-2">
-                    <span className="opacity-50 flex-shrink-0">•</span>
+                  <li key={idx} className="text-sm flex gap-2 text-foreground/80">
+                    <span className="text-primary flex-shrink-0">•</span>
                     <span>{point}</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
-
-          {/* Full Summary */}
-          <div className="text-sm opacity-90">
-            <p>{summary.summary}</p>
-          </div>
         </div>
       )}
     </div>
