@@ -10,7 +10,8 @@ import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { ChatBotWidget } from '@/components/chatbot-widget';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 const ARTICLES_PER_PAGE = 12;
 
@@ -61,7 +62,6 @@ export default function HomePage() {
       setLoading(true);
       setError(null);
       try {
-        // Check session cache first for instant return visits
         const cached = sessionStorage.getItem('articles-session-cache');
         let articles: Article[] = [];
         
@@ -69,12 +69,10 @@ export default function HomePage() {
           try {
             articles = JSON.parse(cached);
           } catch (e) {
-            // Invalid cache, refetch
             articles = await fetchAllFeeds(feeds);
             sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
           }
         } else {
-          // No cache, fetch feeds
           articles = await fetchAllFeeds(feeds);
           sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
         }
@@ -101,10 +99,8 @@ export default function HomePage() {
   useEffect(() => {
     let result = articles;
 
-    // Filter out articles from disabled feeds
     result = result.filter((article) => !disabledFeeds.includes(article.source));
 
-    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -115,45 +111,24 @@ export default function HomePage() {
       );
     }
 
-    // Apply category filter
     if (selectedCategory !== 'All') {
       result = result.filter((article) => {
         const articleCategory = article.category || article.source || '';
         return articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
                selectedCategory.toLowerCase().includes(articleCategory.toLowerCase());
-      });
-    }
-
-    // Apply category filter
-    if (selectedCategory !== 'All') {
-      result = result.filter((article) => {
-        const articleCategory = article.category || article.source || '';
-        return articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-               selectedCategory.toLowerCase().includes(articleCategory.toLowerCase());
-        // First try matching the article's category field
-        if (article.category && article.category.toLowerCase() === selectedCategory.toLowerCase()) {
-          return true;
-        }
-        // Fallback to text search in title and description
-        const title = article.title.toLowerCase();
-        const desc = article.description.toLowerCase();
-        const categoryLower = selectedCategory.toLowerCase();
-        return title.includes(categoryLower) || desc.includes(categoryLower);
       });
     }
 
     setFilteredArticles(result);
     setCurrentPage(1);
-  }, [articles, searchQuery, selectedCategory]);
+  }, [articles, searchQuery, selectedCategory, disabledFeeds]);
 
-  // Paginate articles
   const startIdx = (currentPage - 1) * ARTICLES_PER_PAGE;
   const endIdx = startIdx + ARTICLES_PER_PAGE;
   const paginatedArticles = filteredArticles.slice(startIdx, endIdx);
   const totalPages = Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE);
 
-  // Get featured articles (top 5)
-  const featuredArticles = articles.slice(0, 5);
+  const featuredArticles = articles.slice(0, 4);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
@@ -166,31 +141,84 @@ export default function HomePage() {
     localStorage.setItem('show-ai-summaries', JSON.stringify(newValue));
   }, [showSummaries]);
 
+  const stats = [
+    { icon: Newspaper, label: 'Articles', value: articles.length.toString() },
+    { icon: Globe, label: 'Sources', value: `${feeds.length}+` },
+    { icon: TrendingUp, label: 'Categories', value: '8' },
+    { icon: Zap, label: 'AI Powered', value: 'Yes' },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-white border-b border-gray-200 py-16 md:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-balance text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Global News Aggregator
-          </h1>
-          <p className="text-balance text-lg text-gray-600 mb-10 max-w-2xl">
-            Curated news from 25+ trusted sources.
-          </p>
+      <section className="relative overflow-hidden border-b border-border/40">
+        {/* Background Mesh */}
+        <div className="absolute inset-0 mesh-gradient" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-radial from-purple-500/10 via-transparent to-transparent" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="max-w-3xl">
+            {/* Live Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 fade-in-up">
+              <span className="relative flex h-2 w-2">
+                <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              Live updates from {feeds.length}+ sources
+            </div>
 
-          {/* Search Bar */}
-          <SearchBar onSearch={handleSearch} />
+            <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 fade-in-up" style={{ animationDelay: '0.1s' }}>
+              Your{' '}
+              <span className="gradient-text">Global News</span>
+              <br />
+              Command Center
+            </h1>
+            
+            <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up" style={{ animationDelay: '0.2s' }}>
+              Curated intelligence from the world&apos;s most trusted newsrooms, powered by AI summarization.
+            </p>
+
+            {/* Search Bar */}
+            <div className="fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <SearchBar onSearch={handleSearch} />
+            </div>
+
+            {/* Stats Row */}
+            <div className="flex flex-wrap gap-6 mt-10 fade-in-up" style={{ animationDelay: '0.4s' }}>
+              {stats.map(({ icon: Icon, label, value }) => (
+                <div key={label} className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-foreground">{value}</div>
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Featured Section */}
         {!loading && featuredArticles.length > 0 && (
-          <section className="mb-20 pb-8 border-b border-border">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">Featured Stories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <section className="mb-16 fade-in-up">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Featured Stories</h2>
+                <p className="text-muted-foreground text-sm mt-1">Top picks from our editors</p>
+              </div>
+              <Link href="/trending" className="group flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+                View all
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
               {featuredArticles.map((article) => (
                 <NewsCard key={article.id} article={article} />
               ))}
@@ -198,57 +226,68 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* AI Summary Toggle */}
-        <section className="mb-8 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Filter by category</h3>
-          <button
-            onClick={toggleSummaries}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-              showSummaries
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            <Sparkles className="w-4 h-4" />
-            {showSummaries ? 'Hide Summaries' : 'Show AI Summaries'}
-          </button>
-        </section>
+        {/* Category & Controls Section */}
+        <section className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Browse by Category</h3>
+            <button
+              onClick={toggleSummaries}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
+                showSummaries
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
+                  : 'bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/30'
+              }`}
+            >
+              <Sparkles className={`w-4 h-4 ${showSummaries ? 'text-white/90' : 'text-primary/50'}`} />
+              {showSummaries ? 'Hide AI Summaries' : 'Show AI Summaries'}
+            </button>
+          </div>
 
-        {/* Category Filter */}
-        <section className="mb-12">
           <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
         </section>
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 text-red-200 mb-8">
-            {error}
+          <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-5 text-destructive mb-8 flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-xs font-bold">!</span>
+            </div>
+            <div>
+              <p className="font-medium">Something went wrong</p>
+              <p className="text-sm text-destructive/80 mt-1">{error}</p>
+            </div>
           </div>
         )}
 
         {/* Loading State */}
         {loading && (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 text-accent animate-spin" />
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+              <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-b-purple-500/50 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+            </div>
+            <p className="text-sm text-muted-foreground animate-pulse">Loading latest news...</p>
           </div>
         )}
 
         {/* Articles Grid */}
         {!loading && (
           <>
-            <div className="mb-4 text-sm text-muted-foreground">
-              Showing {filteredArticles.length === 0 ? '0' : startIdx + 1}-{Math.min(endIdx, filteredArticles.length)} of{' '}
-              {filteredArticles.length} articles
+            <div className="flex items-center justify-between mb-6 mt-8">
+              <p className="text-sm text-muted-foreground">
+                Showing <span className="font-medium text-foreground">{filteredArticles.length === 0 ? '0' : startIdx + 1}-{Math.min(endIdx, filteredArticles.length)}</span> of{' '}
+                <span className="font-medium text-foreground">{filteredArticles.length}</span> articles
+              </p>
             </div>
 
             {paginatedArticles.length > 0 ? (
               <>
-                <div className={showSummaries ? 'space-y-8 mb-12' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12'}>
+                <div className={showSummaries ? 'space-y-6 mb-12' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 stagger-children'}>
                   {paginatedArticles.map((article) => (
-                    <div key={article.id} className={showSummaries ? 'bg-white border border-gray-200 rounded-lg overflow-hidden' : ''}>
+                    <div key={article.id} className={showSummaries ? 'bg-card border border-border/40 rounded-2xl overflow-hidden shadow-card card-hover' : ''}>
                       <NewsCard article={article} />
                       {showSummaries && (
-                        <div className="px-6 pb-6 pt-2 border-t border-gray-200 bg-gray-50">
+                        <div className="px-5 pb-5 pt-3 border-t border-border/30 bg-muted/30">
                           <ArticleSummary article={article} />
                         </div>
                       )}
@@ -267,8 +306,12 @@ export default function HomePage() {
                 )}
               </>
             ) : (
-              <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">No articles found. Try adjusting your filters.</p>
+              <div className="text-center py-24">
+                <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
+                  <Newspaper className="w-8 h-8 text-muted-foreground/50" />
+                </div>
+                <p className="text-foreground font-medium mb-1">No articles found</p>
+                <p className="text-muted-foreground text-sm">Try adjusting your search or category filters.</p>
               </div>
             )}
           </>
@@ -279,18 +322,28 @@ export default function HomePage() {
       <NewsletterCTA />
 
       {/* Footer */}
-      <footer className="bg-card border-t border-border mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-muted-foreground">
-            <p>&copy; 2026 JustinNews.tech - Tech news aggregator powered by RSS feeds</p>
-            <p className="text-sm mt-2">Content sourced from TechCrunch, The Verge, and NY Times</p>
+      <footer className="border-t border-border/40 mt-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <span className="text-white font-bold text-xs">JN</span>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                &copy; 2026 JustinNews.tech
+              </span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <span>Powered by RSS &middot; AI Summaries</span>
+              <span className="hidden sm:inline">&middot;</span>
+              <span className="hidden sm:inline">TechCrunch &middot; The Verge &middot; NY Times &middot; 20+ more</span>
+            </div>
           </div>
         </div>
       </footer>
 
       {/* AI Chatbot Widget */}
       <ChatBotWidget articles={articles} />
-
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, MessageCircle, Trash2 } from 'lucide-react';
+import { X, MessageCircle, Trash2, Sparkles } from 'lucide-react';
 import { ChatMessage } from './chat-message';
 import { ChatInput } from './chat-input';
 import { useChatAssistant } from '@/hooks/use-chat-assistant';
@@ -17,7 +17,6 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
     useChatAssistant(articles);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -37,42 +36,56 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 z-40 flex items-center justify-center"
+        className={`fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl shadow-xl transition-all duration-300 ${
+          isOpen
+            ? 'bg-card border border-border/60 text-foreground hover:bg-muted/60 rotate-0'
+            : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 hover:shadow-2xl hover:shadow-indigo-500/30 hover:scale-105'
+        }`}
         aria-label="Toggle chat"
       >
         {isOpen ? (
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         ) : (
-          <MessageCircle className="w-6 h-6" />
+          <MessageCircle className="w-5 h-5" />
         )}
       </button>
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-96 bg-white rounded-lg shadow-2xl flex flex-col z-40 border border-gray-200">
+        <div className="fixed bottom-24 right-6 w-[380px] max-w-[calc(100vw-2rem)] h-[480px] bg-card rounded-2xl shadow-2xl shadow-black/[0.12] flex flex-col z-40 border border-border/40 overflow-hidden animate-scale-in">
           {/* Header */}
-          <div className="bg-blue-600 text-white px-4 py-4 rounded-t-lg flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold">News Assistant</h3>
-              <p className="text-xs opacity-90">Ask me about the news</p>
+          <div className="relative bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm">News Assistant</h3>
+                <p className="text-xs text-white/70">AI-powered news chat</p>
+              </div>
             </div>
             <button
               onClick={handleClear}
-              className="p-1 hover:bg-blue-700 rounded transition-colors"
+              className="p-2 hover:bg-white/10 rounded-xl transition-colors"
               title="Clear history"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4 text-white/70 hover:text-white" />
             </button>
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
             {messages.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-center">
+              <div className="h-full flex items-center justify-center text-center px-4">
                 <div>
-                  <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">
-                    Start a conversation about the news
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                    <MessageCircle className="w-7 h-7 text-primary/40" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground mb-1">
+                    How can I help?
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Ask me about articles, get summaries, or find news on topics you&apos;re interested in.
                   </p>
                 </div>
               </div>
@@ -87,7 +100,7 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-gray-200 bg-white p-4 rounded-b-lg">
+          <div className="border-t border-border/40 bg-card p-3">
             <ChatInput
               onSendMessage={handleSendMessage}
               isLoading={isLoading}
