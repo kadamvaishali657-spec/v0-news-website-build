@@ -10,7 +10,7 @@ import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { ChatBotWidget } from '@/components/chatbot-widget';
 import { Article, RSSFeed, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2, Sparkles, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
+import { Sparkles, Newspaper, TrendingUp, Globe, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const ARTICLES_PER_PAGE = 12;
@@ -158,11 +158,12 @@ export default function HomePage() {
     localStorage.setItem('show-ai-summaries', JSON.stringify(newValue));
   }, [showSummaries]);
 
+  const uniqueSources = new Set(articles.map(a => a.source)).size;
+
   const stats = [
-    { icon: Newspaper, label: 'Articles', value: articles.length.toString() },
-    { icon: Globe, label: 'Sources', value: `${feeds.length}+` },
-    { icon: TrendingUp, label: 'Categories', value: '8' },
-    { icon: Zap, label: 'AI Powered', value: 'Yes' },
+    { icon: Newspaper, label: 'Articles', value: articles.length > 0 ? articles.length.toString() : '...' },
+    { icon: Globe, label: 'Sources', value: uniqueSources > 0 ? uniqueSources.toString() : `${feeds.length}` },
+    { icon: TrendingUp, label: 'Live RSS', value: 'Real-time' },
   ];
 
   return (
@@ -188,14 +189,13 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 fade-in-up" style={{ animationDelay: '0.1s' }}>
-              Your{' '}
-              <span className="gradient-text">Global News</span>
+              <span className="gradient-text">News</span> from
               <br />
-              Command Center
+              Around the Web
             </h1>
             
             <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up" style={{ animationDelay: '0.2s' }}>
-              Curated intelligence from the world&apos;s most trusted newsrooms, powered by AI summarization.
+              Aggregated from RSS feeds across TechCrunch, The Verge, NY Times, and more.
             </p>
 
             {/* Search Bar */}
@@ -227,8 +227,8 @@ export default function HomePage() {
           <section className="mb-16 fade-in-up">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Featured Stories</h2>
-                <p className="text-muted-foreground text-sm mt-1">Top picks from our editors</p>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Latest Stories</h2>
+                <p className="text-muted-foreground text-sm mt-1">Most recent articles from all sources</p>
               </div>
               <Link href="/trending" className="group flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
                 View all
@@ -353,7 +353,7 @@ export default function HomePage() {
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <span>Powered by RSS &middot; AI Summaries</span>
               <span className="hidden sm:inline">&middot;</span>
-              <span className="hidden sm:inline">TechCrunch &middot; The Verge &middot; NY Times &middot; 20+ more</span>
+              <span className="hidden sm:inline">TechCrunch &middot; The Verge &middot; NY Times &middot; more</span>
             </div>
           </div>
         </div>

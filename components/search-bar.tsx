@@ -8,7 +8,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-export function SearchBar({ onSearch, placeholder = 'Search thousands of articles...' }: SearchBarProps) {
+export function SearchBar({ onSearch, placeholder = 'Search articles by title, source, or topic...' }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Zap, Globe, Cpu, TrendingUp, Gamepad2, GraduationCap, MessageSquare, Sparkles } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Zap, Globe, Cpu, TrendingUp, Gamepad2, GraduationCap, MessageSquare, Sparkles, Sun, Moon } from 'lucide-react';
 
 const categoryIcons: Record<string, typeof Globe> = {
   'Global News': Globe,
@@ -19,6 +19,38 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Initialize dark mode from localStorage or system preference
+  useEffect(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    } else if (saved === 'light') {
+      setDarkMode(false);
+      document.documentElement.classList.remove('dark');
+    } else {
+      // Check system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setDarkMode(prefersDark);
+      if (prefersDark) {
+        document.documentElement.classList.add('dark');
+      }
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -98,10 +130,19 @@ export function Header() {
               Saved
             </Link>
 
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200"
+              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+
             {/* Admin Button */}
             <Link 
               href="/admin" 
-              className="ml-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 font-medium text-sm shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30"
+              className="ml-1 flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 font-medium text-sm shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30"
             >
               <Settings className="w-3.5 h-3.5" />
               Admin
@@ -181,6 +222,15 @@ export function Header() {
               <Bookmark className="w-4 h-4" />
               Saved
             </Link>
+
+            {/* Dark Mode Toggle (Mobile) */}
+            <button
+              onClick={() => { toggleDarkMode(); setMobileMenuOpen(false); }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
+            >
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {darkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
 
             <Link 
               href="/admin" 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Mail, CheckCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export function NewsletterCTA() {
@@ -45,14 +45,14 @@ export function NewsletterCTA() {
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            Never miss a story
+            <Mail className="w-3.5 h-3.5" />
+            Newsletter
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-            Stay <span className="gradient-text">Ahead</span> of the News
+            Stay <span className="gradient-text">Updated</span>
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            Get personalized news digests delivered to your inbox. Choose your topics and frequency.
+            Subscribe to receive news updates. Choose your preferred topics and frequency.
           </p>
         </div>
 
