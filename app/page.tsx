@@ -9,7 +9,7 @@ import { Pagination } from '@/components/pagination';
 import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { ChatBotWidget } from '@/components/chatbot-widget';
-import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
+import { Article, RSSFeed, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2, Sparkles, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -56,32 +56,51 @@ export default function HomePage() {
     }
   }, []);
 
-  // Fetch articles when feeds change (with session caching)
+  // Fetch articles from server-side API (with session caching)
   useEffect(() => {
     const loadArticles = async () => {
       setLoading(true);
       setError(null);
       try {
         const cached = sessionStorage.getItem('articles-session-cache');
-        let articles: Article[] = [];
-        
-        if (cached) {
+        const cacheTime = sessionStorage.getItem('articles-cache-time');
+        const cacheAge = cacheTime ? Date.now() - parseInt(cacheTime) : Infinity;
+        let loadedArticles: Article[] = [];
+
+        // Use cache if less than 3 minutes old
+        if (cached && cacheAge < 3 * 60 * 1000) {
           try {
-            articles = JSON.parse(cached);
-          } catch (e) {
-            articles = await fetchAllFeeds(feeds);
-            sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+            loadedArticles = JSON.parse(cached);
+          } catch {
+            loadedArticles = [];
           }
-        } else {
-          articles = await fetchAllFeeds(feeds);
-          sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
         }
-        
-        if (articles.length === 0) {
+
+        // Fetch from server API if no valid cache
+        if (loadedArticles.length === 0) {
+          const response = await fetch('/api/articles?mode=all');
+          if (response.ok) {
+            const data = await response.json();
+            loadedArticles = (data.articles || []).map((a: Record<string, unknown>) => ({
+              id: a.id as string,
+              title: a.title as string,
+              description: a.description as string,
+              link: a.link as string,
+              pubDate: new Date(a.pubDate as string),
+              image: a.image as string | undefined,
+              source: a.source as string,
+              category: a.category as string | undefined,
+            }));
+            sessionStorage.setItem('articles-session-cache', JSON.stringify(loadedArticles));
+            sessionStorage.setItem('articles-cache-time', Date.now().toString());
+          }
+        }
+
+        if (loadedArticles.length === 0) {
           setError('No articles loaded. RSS feeds may be temporarily unavailable. Try again in a moment.');
         }
-        
-        setArticles(articles);
+
+        setArticles(loadedArticles);
         setCurrentPage(1);
       } catch (err) {
         setError('Failed to load news. Please try again later.');
@@ -90,10 +109,8 @@ export default function HomePage() {
       }
     };
 
-    if (feeds.length > 0) {
-      loadArticles();
-    }
-  }, [feeds]);
+    loadArticles();
+  }, []);
 
   // Filter and search articles
   useEffect(() => {
