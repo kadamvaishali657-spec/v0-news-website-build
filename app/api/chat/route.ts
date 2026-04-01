@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { chatRateLimiter, getRateLimitId, rateLimitHeaders } from '@/lib/server/rate-limiter';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -6,6 +7,16 @@ interface ChatMessage {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const clientId = getRateLimitId(request);
+  const rateCheck = chatRateLimiter.check(clientId);
+  if (!rateCheck.allowed) {
+    return NextResponse.json(
+      { error: 'Too many chat requests. Please wait a moment.' },
+      { status: 429, headers: rateLimitHeaders(rateCheck.remaining, rateCheck.resetMs) }
+    );
+  }
+
   try {
     const { messages, articles } = await request.json();
 
@@ -28,7 +39,8 @@ export async function POST(request: NextRequest) {
     let articleContext = '';
     if (articles && Array.isArray(articles) && articles.length > 0) {
       articleContext = '\n\nCurrent articles available on the news feed:\n';
-      articles.slice(0, 10).forEach((article: any, index: number) => {
+      interface ArticleInput { title: string; source: string; description: string }
+      articles.slice(0, 10).forEach((article: ArticleInput, index: number) => {
         articleContext += `${index + 1}. "${article.title}" from ${article.source}\n   ${article.description.substring(0, 100)}...\n`;
       });
     }

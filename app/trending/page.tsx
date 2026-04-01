@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { NewsCard } from '@/components/news-card';
 import { Flame, TrendingUp } from 'lucide-react';
-import { Article, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
+import { Article } from '@/lib/rss-parser';
 
 export default function TrendingPage() {
   const [trendingArticles, setTrendingArticles] = useState<Article[]>([]);
@@ -13,28 +13,21 @@ export default function TrendingPage() {
   useEffect(() => {
     const loadTrending = async () => {
       try {
-        const articles = await fetchAllFeeds(DEFAULT_FEEDS);
-        
-        const savedArticlesData = localStorage.getItem('saved-articles');
-        const savedIds = savedArticlesData ? JSON.parse(savedArticlesData).map((a: Article) => a.id) : [];
-        
-        const now = new Date();
-        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        
-        const scoring = articles
-          .filter(a => a.pubDate >= sevenDaysAgo)
-          .map(article => ({
-            article,
-            score: 
-              (article.pubDate >= sevenDaysAgo ? 10 : 0) +
-              (savedIds.includes(article.id) ? 5 : 0) +
-              (article.title.length > 60 ? 2 : 0)
-          }))
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 24);
-        
-        const trending = scoring.map(s => s.article);
-        setTrendingArticles(trending);
+        const response = await fetch('/api/articles?mode=trending&limit=24');
+        if (response.ok) {
+          const data = await response.json();
+          const trending: Article[] = (data.articles || []).map((a: Record<string, unknown>) => ({
+            id: a.id as string,
+            title: a.title as string,
+            description: a.description as string,
+            link: a.link as string,
+            pubDate: new Date(a.pubDate as string),
+            image: a.image as string | undefined,
+            source: a.source as string,
+            category: a.category as string | undefined,
+          }));
+          setTrendingArticles(trending);
+        }
       } catch (error) {
         console.error('Error loading trending articles:', error);
       } finally {

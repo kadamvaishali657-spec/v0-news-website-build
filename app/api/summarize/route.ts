@@ -1,9 +1,19 @@
 import { buildSummarizationPrompt, parseAISummaryResponse, generateFallbackSummary } from '@/lib/summarize-utils';
 import { Article } from '@/lib/rss-parser';
+import { summarizeRateLimiter, getRateLimitId, rateLimitHeaders } from '@/lib/server/rate-limiter';
 
 export async function POST(request: Request) {
+  // Rate limiting
+  const clientId = getRateLimitId(request);
+  const rateCheck = summarizeRateLimiter.check(clientId);
+  if (!rateCheck.allowed) {
+    return Response.json(
+      { error: 'Too many summarization requests. Please wait a moment.' },
+      { status: 429, headers: rateLimitHeaders(rateCheck.remaining, rateCheck.resetMs) }
+    );
+  }
   try {
-    const { article } = await request.json();
+    const { article } = await request.json() as { article: Article };
 
     // Validate minimum required fields
     if (!article || !article.id || !article.title) {
