@@ -31,6 +31,13 @@ export function Header() {
           {/* Desktop Navigation - Minimal */}
           <nav className="hidden md:flex items-center gap-8">
             <Link 
+              href="/explore" 
+              className="text-foreground hover:text-accent transition-colors font-display text-sm uppercase tracking-wider"
+            >
+              Explore
+            </Link>
+
+            <Link 
               href="/trending" 
               className="text-foreground hover:text-accent transition-colors font-display text-sm uppercase tracking-wider"
             >
@@ -64,6 +71,14 @@ export function Header() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <nav className="md:hidden mt-6 space-y-4 pb-4 border-t border-border pt-4">
+            <Link 
+              href="/explore" 
+              className="block text-foreground hover:text-accent transition-colors font-display uppercase tracking-wider text-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Explore
+            </Link>
+
             <Link 
               href="/trending" 
               className="block text-foreground hover:text-accent transition-colors font-display uppercase tracking-wider text-sm"

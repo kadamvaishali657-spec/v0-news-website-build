@@ -170,6 +170,15 @@ body {
   }
 }
 
+@keyframes rotate-slow {
+  from {
+    transform: rotateZ(0deg);
+  }
+  to {
+    transform: rotateZ(360deg);
+  }
+}
+
 @layer utilities {
   .animate-float {
     animation: float 6s ease-in-out infinite;
@@ -189,5 +198,9 @@ body {
   
   .slide-in-from-bottom-8 {
     animation: slide-in-from-bottom-8 0.7s ease-out forwards;
+  }
+  
+  .animate-rotate-slow {
+    animation: rotate-slow 30s linear infinite;
   }
 }

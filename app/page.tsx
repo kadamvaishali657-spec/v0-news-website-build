@@ -8,7 +8,8 @@ import { TimelineSection } from '@/components/timeline-section';
 import { SearchBar } from '@/components/search-bar';
 import { ChatBotWidget } from '@/components/chatbot-widget';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Globe } from 'lucide-react';
+import Link from 'next/link';
 
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -64,11 +65,19 @@ export default function HomePage() {
       {/* Masonry Grid Section */}
       <section className="py-24 px-6 bg-background">
         <div className="max-w-7xl mx-auto">
-          {/* Section Header with Search */}
+          {/* Section Header with Search and Explore Button */}
           <div className="mb-16">
-            <h2 className="section-heading text-foreground mb-12">
-              Breaking <span className="text-accent">Stories</span>
-            </h2>
+            <div className="flex items-end justify-between mb-12 gap-6">
+              <h2 className="section-heading text-foreground">
+                Breaking <span className="text-accent">Stories</span>
+              </h2>
+              <Link href="/explore">
+                <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-foreground font-display uppercase text-sm font-bold tracking-wider hover:shadow-lg transition-all duration-300 hover:scale-105">
+                  <Globe className="w-4 h-4" />
+                  Explore by Region
+                </button>
+              </Link>
+            </div>
 
             {/* Interactive Search */}
             <div className="relative max-w-2xl">
