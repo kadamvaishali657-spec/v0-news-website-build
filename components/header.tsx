@@ -20,161 +20,71 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-background border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <span className="text-accent-foreground font-bold text-sm">JN</span>
-            </div>
-            <Link href="/" className="text-2xl font-bold text-foreground hover:text-accent transition-colors">
-              JustinNews
-              <span className="text-accent">.tech</span>
-            </Link>
-          </div>
+          {/* Logo - Minimalist */}
+          <Link href="/" className="font-display text-2xl text-foreground hover:text-accent transition-colors duration-300 tracking-tight">
+            INFORMED
+          </Link>
 
-          {/* Desktop Navigation - Simplified */}
-          <nav className="hidden md:flex items-center gap-2">
-            {/* Categories Dropdown */}
-            <div className="relative group">
-              <button className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-2">
-                Categories
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              <div className="absolute left-0 mt-0 w-48 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
-                {categories.map((category) => (
-                  <Link
-                    key={category}
-                    href={`/#category=${category}`}
-                    className="block px-4 py-2 text-sm text-foreground hover:bg-accent/20 hover:text-accent transition-colors"
-                  >
-                    {category}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
+          {/* Desktop Navigation - Minimal */}
+          <nav className="hidden md:flex items-center gap-8">
             <Link 
               href="/trending" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="text-foreground hover:text-accent transition-colors font-display text-sm uppercase tracking-wider"
             >
-              <Flame className="w-4 h-4" />
               Trending
             </Link>
 
             <Link 
               href="/saved" 
-              className="px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="text-foreground hover:text-accent transition-colors font-display text-sm uppercase tracking-wider"
             >
-              <Bookmark className="w-4 h-4" />
               Saved
             </Link>
 
-            {/* Admin Button */}
             <Link 
               href="/admin" 
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-medium ml-2"
+              className="text-foreground hover:text-accent transition-colors font-display text-sm uppercase tracking-wider"
             >
-              <Settings className="w-4 h-4" />
               Admin
             </Link>
           </nav>
 
           {/* Mobile Menu Button */}
-          <button
+          <button 
+            className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-accent/10 transition-colors"
           >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6 text-foreground" />
-            ) : (
-              <Menu className="w-6 h-6 text-foreground" />
-            )}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <nav className="md:hidden mt-4 pb-4 space-y-2 border-t border-border pt-4">
-            <Link 
-              href="/" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-
-            {/* Mobile Categories */}
-            <div>
-              <button 
-                onClick={() => setCategoriesOpen(!categoriesOpen)}
-                className="w-full text-left px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center justify-between"
-              >
-                Categories
-                <ChevronDown className={`w-4 h-4 transition-transform ${categoriesOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {categoriesOpen && (
-                <div className="ml-4 mt-2 space-y-1 border-l border-border pl-4">
-                  {categories.map((category) => (
-                    <Link
-                      key={category}
-                      href={`/#category=${category}`}
-                      className="block px-4 py-2 text-sm text-foreground hover:text-accent transition-colors"
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setCategoriesOpen(false);
-                      }}
-                    >
-                      {category}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
+          <nav className="md:hidden mt-6 space-y-4 pb-4 border-t border-border pt-4">
             <Link 
               href="/trending" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="block text-foreground hover:text-accent transition-colors font-display uppercase tracking-wider text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Flame className="w-4 h-4" />
               Trending
             </Link>
 
             <Link 
               href="/saved" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
+              className="block text-foreground hover:text-accent transition-colors font-display uppercase tracking-wider text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Bookmark className="w-4 h-4" />
               Saved
             </Link>
 
             <Link 
-              href="/publish" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1 bg-accent/20"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <Edit3 className="w-4 h-4" />
-              Publish
-            </Link>
-
-            <Link 
-              href="/support" 
-              className="block px-4 py-2 rounded-lg text-foreground hover:bg-accent/10 hover:text-accent transition-colors font-medium flex items-center gap-1"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <HelpCircle className="w-4 h-4" />
-              Support
-            </Link>
-
-            <Link 
               href="/admin" 
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground hover:bg-accent/90 transition-colors font-medium mt-4"
+              className="block text-foreground hover:text-accent transition-colors font-display uppercase tracking-wider text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Settings className="w-4 h-4" />
               Admin
             </Link>
           </nav>
