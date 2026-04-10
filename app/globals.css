@@ -115,7 +115,7 @@ body {
   }
   
   .article-hover {
-    @apply cursor-pointer group transition-all duration-500;
+    @apply cursor-pointer transition-all duration-500;
   }
   
   .article-hover:hover {
