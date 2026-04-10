@@ -20,64 +20,75 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
     : 'col-span-1 row-span-1';
 
   return (
-    <Link href={`/article/${article.id}`}>
+    <a 
+      href={article.link || `#`}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => {
+        if (!article.link) {
+          e.preventDefault();
+          window.location.href = '/';
+        }
+      }}
+    >
       <div
-        className={`${cardClass} article-hover relative overflow-hidden bg-gradient-to-br from-card to-card/50 border border-border h-80 md:h-96 ${featured ? 'md:h-full' : ''}`}
+        className={`${cardClass} article-hover relative overflow-hidden bg-gradient-to-br from-card to-card/50 border border-border h-80 md:h-96 ${featured ? 'md:h-full' : ''} shadow-lg hover:shadow-2xl`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Article Image/Placeholder Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/30 via-accent/10 to-transparent">
+        <div className="absolute inset-0">
           {article.image && !imageError ? (
             <img 
               src={article.image} 
               alt={article.title}
               onError={() => setImageError(true)}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out"
+              style={{ transform: isHovered ? 'scale(1.1)' : 'scale(1)' }}
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent/40 via-accent/20 to-foreground/10">
               <div className="text-center">
-                <div className="text-6xl mb-2">📰</div>
-                <p className="text-foreground/40 text-sm">Featured Story</p>
+                <div className="text-6xl mb-3 opacity-60">📰</div>
+                <p className="text-foreground/50 text-sm font-medium">News Story</p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Overlay Gradient - Enhanced */}
-        <div className={`overlay-gradient transition-all duration-500 ${isHovered ? 'opacity-90' : 'opacity-75'}`} />
+        {/* Dark Overlay Gradient - Improved readability */}
+        <div className={`absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/30 transition-opacity duration-500 ${isHovered ? 'opacity-95' : 'opacity-80'}`} />
 
         {/* Content Container */}
-        <div className="absolute inset-0 flex flex-col justify-between p-6 text-background z-10">
-          {/* Category & Source - Animated */}
-          <div className="transform transition-all duration-500" style={{ opacity: isHovered ? 1 : 0.8 }}>
-            <span className="inline-block text-xs font-display tracking-widest uppercase mb-4 px-3 py-1 bg-accent/90 text-foreground rounded transition-all duration-300">
+        <div className="absolute inset-0 flex flex-col justify-between p-5 md:p-6 z-10">
+          {/* Category & Source Badge - Fixed position */}
+          <div>
+            <span className="inline-block text-xs font-display tracking-widest uppercase px-3 py-1 bg-accent text-foreground font-bold rounded-full">
               {article.category || article.source}
             </span>
           </div>
 
-          {/* Article Title & Description - Enhanced */}
-          <div className="group/content">
-            <h3 className={`font-display text-2xl md:text-3xl leading-tight mb-3 transition-all duration-500 ${isHovered ? 'text-white' : 'text-background'}`}>
+          {/* Article Title & Description - Improved spacing */}
+          <div className="flex-1 flex flex-col justify-end">
+            <h3 className="font-display text-xl md:text-2xl lg:text-3xl leading-tight mb-3 text-white font-bold line-clamp-3">
               {article.title}
             </h3>
-            <p className={`text-sm transition-all duration-500 line-clamp-3 ${isHovered ? 'opacity-100 text-background/95' : 'opacity-0 text-background/90'}`}>
-              {article.description || 'Read the full story'}
+            <p className={`text-xs md:text-sm font-light text-background/90 line-clamp-2 transition-all duration-300 ${isHovered ? 'opacity-100 line-clamp-3' : 'opacity-75'}`}>
+              {article.description || 'Click to read the full story'}
             </p>
           </div>
 
-          {/* Footer Info - Floating Effects */}
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-background/90">
-              <p className="font-medium">{new Date(article.pubDate).toLocaleDateString()}</p>
-              <p className="text-background/75 text-xs">{article.source}</p>
+          {/* Footer Info */}
+          <div className="flex items-center justify-between pt-3 border-t border-background/20">
+            <div className="text-xs text-background/85 font-medium">
+              <p>{new Date(article.pubDate).toLocaleDateString()}</p>
+              <p className="text-background/70 text-[10px]">{article.source}</p>
             </div>
-            <ArrowRight className={`w-5 h-5 text-accent transition-all duration-300 ${isHovered ? 'translate-x-2 scale-125' : 'translate-x-0'}`} />
+            <ArrowRight className={`w-5 h-5 text-accent transition-all duration-300 ${isHovered ? 'translate-x-2' : 'translate-x-0'}`} />
           </div>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }
