@@ -34,60 +34,74 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Premium Animation */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 z-40 flex items-center justify-center"
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-accent to-accent/80 hover:from-accent hover:to-accent text-foreground rounded-full p-4 shadow-2xl hover:shadow-3xl transition-all duration-500 z-40 flex items-center justify-center transform hover:scale-110 active:scale-95"
         aria-label="Toggle chat"
       >
-        {isOpen ? (
-          <X className="w-6 h-6" />
-        ) : (
-          <MessageCircle className="w-6 h-6" />
-        )}
+        <div className="relative">
+          {isOpen ? (
+            <X className="w-6 h-6 rotate-180 transition-transform duration-300" />
+          ) : (
+            <>
+              <MessageCircle className="w-6 h-6 transition-all duration-300" />
+              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">!</span>
+            </>
+          )}
+        </div>
       </button>
 
-      {/* Chat Window */}
+      {/* Chat Window - Enhanced with animations */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 w-96 max-w-[calc(100vw-2rem)] h-96 bg-white rounded-lg shadow-2xl flex flex-col z-40 border border-gray-200">
-          {/* Header */}
-          <div className="bg-blue-600 text-white px-4 py-4 rounded-t-lg flex items-center justify-between">
+        <div className="fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] h-[500px] bg-card rounded-2xl shadow-2xl flex flex-col z-40 border border-border animate-in fade-in slide-in-from-bottom-4 duration-300">
+          {/* Header - Gradient */}
+          <div className="bg-gradient-to-r from-accent to-accent/70 text-foreground px-6 py-5 rounded-t-2xl flex items-center justify-between">
             <div>
-              <h3 className="font-semibold">News Assistant</h3>
-              <p className="text-xs opacity-90">Ask me about the news</p>
+              <h3 className="font-display font-bold text-lg">INFORMED Assistant</h3>
+              <p className="text-xs opacity-90 font-medium">Powered by AI • Ask about news</p>
             </div>
             <button
               onClick={handleClear}
-              className="p-1 hover:bg-blue-700 rounded transition-colors"
+              className="p-2 hover:bg-accent/20 rounded-lg transition-all duration-300 hover:scale-110"
               title="Clear history"
             >
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+          {/* Messages Container - Smooth scroll */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-background/50">
             {messages.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-center">
-                <div>
-                  <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">
-                    Start a conversation about the news
-                  </p>
+              <div className="h-full flex flex-col items-center justify-center text-center py-8">
+                <div className="text-5xl mb-4 animate-bounce">💬</div>
+                <h4 className="font-display text-foreground mb-2 font-semibold">Start a Conversation</h4>
+                <p className="text-sm text-foreground/60">
+                  Ask me about breaking news, summaries, or recent trends
+                </p>
+                <div className="mt-6 text-xs text-foreground/50 space-y-2">
+                  <p>Try: "What's trending today?"</p>
+                  <p>Or: "Summarize recent tech news"</p>
                 </div>
               </div>
             ) : (
               <>
-                {messages.map((message) => (
-                  <ChatMessage key={message.id} message={message} />
+                {messages.map((message, idx) => (
+                  <div 
+                    key={message.id} 
+                    className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                  >
+                    <ChatMessage message={message} />
+                  </div>
                 ))}
                 <div ref={messagesEndRef} />
               </>
             )}
           </div>
 
-          {/* Input Area */}
-          <div className="border-t border-gray-200 bg-white p-4 rounded-b-lg">
+          {/* Input Area - Premium */}
+          <div className="border-t border-border bg-card p-4 rounded-b-2xl">
             <ChatInput
               onSendMessage={handleSendMessage}
               isLoading={isLoading}

@@ -126,3 +126,68 @@ body {
     @apply absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/40 to-transparent;
   }
 }
+
+/* Advanced Animation Keyframes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-bottom-8 {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-bottom-4 {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-in {
+    animation: fade-in 0.5s ease-out;
+  }
+  
+  .fade-in {
+    animation: fade-in 0.7s ease-out forwards;
+  }
+  
+  .slide-in-from-bottom-4 {
+    animation: slide-in-from-bottom-4 0.5s ease-out forwards;
+  }
+  
+  .slide-in-from-bottom-8 {
+    animation: slide-in-from-bottom-8 0.7s ease-out forwards;
+  }
+}

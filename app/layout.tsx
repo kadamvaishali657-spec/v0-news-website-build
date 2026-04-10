@@ -12,32 +12,32 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'JustinNews.tech - Tech News Aggregator | Latest Technology Updates',
-  description: 'Stay updated with the latest technology news from TechCrunch, The Verge, and NY Times. Real-time RSS feed aggregation with advanced filtering and search.',
-  keywords: ['tech news', 'technology', 'RSS feeds', 'TechCrunch', 'The Verge', 'news aggregator'],
-  authors: [{ name: 'JustinNews.tech' }],
+  title: 'INFORMED - Reimagined News Experience',
+  description: 'Experience revolutionary news aggregation with AI insights, immersive visuals, and interactive storytelling. Breaking stories from 25+ trusted sources.',
+  keywords: ['news', 'technology', 'RSS feeds', 'news aggregator', 'AI insights', 'breaking news'],
+  authors: [{ name: 'INFORMED' }],
   icons: {
-    icon: '/favicon.jpg',
-    shortcut: '/favicon.jpg',
-    apple: '/favicon.jpg',
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
   },
   openGraph: {
-    title: 'JustinNews.tech - Tech News Delivered Daily',
-    description: 'Real-time technology news aggregator with AI, gadgets, startups, and cybersecurity coverage',
+    title: 'INFORMED - Revolutionary News Experience',
+    description: 'AI-powered news aggregation with immersive visuals and interactive storytelling',
     type: 'website',
-    url: 'https://justinnews.tech',
+    url: 'https://informed-news.vercel.app',
     images: [
       {
-        url: '/favicon.jpg',
+        url: '/favicon.png',
         width: 512,
         height: 512,
-        alt: 'JustinNews.tech Logo',
+        alt: 'INFORMED Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'JustinNews.tech - Tech News',
+    title: 'INFORMED - News Reimagined',
     description: 'Latest technology news aggregated from top sources',
     images: ['/favicon.jpg'],
   },
