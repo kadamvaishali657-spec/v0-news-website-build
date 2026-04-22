@@ -32,7 +32,7 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
       }}
     >
       <div
-        className={`${cardClass} article-hover relative overflow-hidden bg-gradient-to-br from-card to-card/50 border border-border h-80 md:h-96 ${featured ? 'md:h-full' : ''} shadow-lg hover:shadow-2xl`}
+        className={`${cardClass} article-hover relative overflow-hidden bg-gradient-to-br from-card to-card/50 border border-border/60 h-80 md:h-96 ${featured ? 'md:h-full' : ''} shadow-lg hover:shadow-3xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -57,14 +57,19 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
           )}
         </div>
 
-        {/* Dark Overlay Gradient - Improved readability */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/30 transition-opacity duration-500 ${isHovered ? 'opacity-95' : 'opacity-80'}`} />
+        {/* Dark Overlay Gradient - Premium Layered */}
+        <div className={`absolute inset-0 bg-gradient-to-t from-foreground/97 via-foreground/75 to-transparent transition-all duration-500 ${isHovered ? 'opacity-100 via-foreground/80' : 'opacity-80'}`} />
+        
+        {/* Accent glow on hover */}
+        {isHovered && (
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-50 transition-opacity duration-500" />
+        )}
 
         {/* Content Container */}
         <div className="absolute inset-0 flex flex-col justify-between p-5 md:p-6 z-10">
-          {/* Category & Source Badge - Fixed position */}
-          <div>
-            <span className="inline-block text-xs font-display tracking-widest uppercase px-3 py-1 bg-accent text-foreground font-bold rounded-full">
+          {/* Category & Source Badge - Premium */}
+          <div className="transform transition-all duration-300" style={{ transform: isHovered ? 'translateY(-4px)' : 'translateY(0)' }}>
+            <span className="inline-block text-xs font-display tracking-widest uppercase px-4 py-1.5 bg-gradient-to-r from-accent to-accent/80 text-foreground font-bold rounded-full shadow-lg shadow-accent/50 group-hover:shadow-2xl group-hover:shadow-accent/70 transition-all duration-300">
               {article.category || article.source}
             </span>
           </div>

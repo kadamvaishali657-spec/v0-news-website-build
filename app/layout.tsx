@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { ParticleBackground } from '@/components/particle-background'
 
 import './globals.css'
 
@@ -49,8 +50,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="font-sans antialiased">{children}</body>
+    <html lang="en" className="scroll-smooth bg-background">
+      <body className="font-sans antialiased bg-background min-h-screen relative">
+        <ParticleBackground />
+        {children}
+      </body>
     </html>
   )
 }

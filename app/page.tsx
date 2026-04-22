@@ -7,6 +7,7 @@ import { MasonryCard } from '@/components/masonry-card';
 import { TimelineSection } from '@/components/timeline-section';
 import { SearchBar } from '@/components/search-bar';
 import { ChatBotWidget } from '@/components/chatbot-widget';
+import { ImmersiveLoader } from '@/components/immersive-loader';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2, Search, Globe } from 'lucide-react';
 import Link from 'next/link';
@@ -54,6 +55,10 @@ export default function HomePage() {
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
   }, []);
+
+  if (loading) {
+    return <ImmersiveLoader />;
+  }
 
   return (
     <div className="min-h-screen bg-background">

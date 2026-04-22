@@ -60,30 +60,54 @@ export function ImmersiveHero() {
           className="immersive-transition max-w-5xl"
           style={{ transform: `translateY(${scrollY * 0.4}px)`, opacity: Math.max(0, 1 - scrollY / 600) }}
         >
-          {/* Animated Badge */}
-          <div className="inline-flex items-center justify-center mb-8 px-4 py-2 border border-accent/50 rounded-full text-sm font-display text-accent tracking-widest uppercase bg-accent/5 backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
-            ✨ Next Generation News
+          {/* Animated Badge - Premium */}
+          <div className="inline-flex items-center justify-center mb-8 px-4 py-2.5 border border-accent/50 rounded-full text-xs font-display text-accent tracking-widest uppercase bg-gradient-to-r from-accent/10 to-accent/5 backdrop-blur-md hover:border-accent/80 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-lg shadow-accent/10">
+            <span className="w-2 h-2 bg-accent rounded-full animate-pulse mr-2" />
+            Next Generation Intelligence
           </div>
 
-          {/* Main Heading - Staggered */}
-          <h1 className="hero-text text-foreground mb-8 leading-[1.1]">
-            <span className="block animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: '0.1s' }}>Breaking</span>
-            <span className="block relative inline-block animate-in fade-in slide-in-from-bottom-8 duration-700" style={{ animationDelay: '0.2s' }}>
-              <span className="text-accent">Stories</span>
-              <span className="absolute -bottom-3 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-accent to-transparent blur-sm rounded-full" />
+          {/* Main Heading - Advanced Animation */}
+          <h1 className="hero-text text-foreground mb-8 leading-[1.1] text-6xl md:text-8xl font-display font-bold">
+            <span className="block animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100" style={{ animationDelay: '0.1s' }}>Global</span>
+            <span className="block relative inline-block animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200" style={{ animationDelay: '0.2s' }}>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent/80 to-accent/60 animate-pulse-subtle">Intelligence</span>
+              <span className="absolute -bottom-4 left-0 w-full h-2 bg-gradient-to-r from-transparent via-accent/80 to-transparent blur-lg rounded-full animate-glow" />
             </span>
           </h1>
           
-          {/* Subheading */}
-          <p className="text-lg md:text-xl text-foreground/70 mb-12 max-w-3xl mx-auto font-light tracking-wide animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '0.3s' }}>
-            Experience news redefined with AI insights, immersive visuals, and interactive storytelling
+          {/* Subheading - Enhanced Typography */}
+          <p className="text-lg md:text-2xl text-foreground/70 mb-12 max-w-3xl mx-auto font-light tracking-wide leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '0.3s' }}>
+            Immersive news experience with AI insights, real-time updates, and interactive storytelling
           </p>
 
-          {/* CTA Button - Premium */}
-          <button className="group relative inline-flex items-center justify-center px-10 py-4 bg-gradient-to-r from-accent to-accent/80 text-foreground font-display text-sm font-bold tracking-widest uppercase hover:shadow-2xl transition-all duration-300 transform hover:scale-110 active:scale-95 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '0.4s' }}>
-            <span className="relative z-10">Explore Stories</span>
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
-          </button>
+          {/* Stats Section - New */}
+          <div className="flex flex-wrap items-center justify-center gap-8 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '0.35s' }}>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-accent">24/7</div>
+              <p className="text-xs text-foreground/60 uppercase tracking-wider">Live Updates</p>
+            </div>
+            <div className="w-px h-8 bg-gradient-to-b from-accent/50 to-transparent" />
+            <div className="text-center">
+              <div className="text-3xl font-bold text-accent">1000+</div>
+              <p className="text-xs text-foreground/60 uppercase tracking-wider">Global Sources</p>
+            </div>
+            <div className="w-px h-8 bg-gradient-to-b from-accent/50 to-transparent" />
+            <div className="text-center">
+              <div className="text-3xl font-bold text-accent">AI</div>
+              <p className="text-xs text-foreground/60 uppercase tracking-wider">Powered</p>
+            </div>
+          </div>
+
+          {/* CTA Buttons - Premium Design */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '0.4s' }}>
+            <button className="group relative inline-flex items-center justify-center px-10 py-4 bg-gradient-to-r from-accent to-accent/80 text-foreground font-display text-sm font-bold tracking-widest uppercase hover:shadow-2xl shadow-lg shadow-accent/30 transition-all duration-300 transform hover:scale-110 active:scale-95 overflow-hidden">
+              <span className="relative z-10">Explore Now</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+            </button>
+            <button className="group relative inline-flex items-center justify-center px-10 py-4 border-2 border-accent/50 text-accent font-display text-sm font-bold tracking-widest uppercase hover:bg-accent/10 hover:border-accent transition-all duration-300 transform hover:scale-110 active:scale-95">
+              <span>Watch Demo</span>
+            </button>
+          </div>
         </div>
 
         {/* Scroll Indicator - Animated */}
