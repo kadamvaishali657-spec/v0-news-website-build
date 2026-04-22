@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/header';
 import { ImmersiveHero } from '@/components/immersive-hero';
-import { MasonryCard } from '@/components/masonry-card';
+import { ScaryMasonryCard } from '@/components/scary-masonry-card';
 import { TimelineSection } from '@/components/timeline-section';
 import { SearchBar } from '@/components/search-bar';
 import { ChatBotWidget } from '@/components/chatbot-widget';
@@ -111,12 +111,12 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Masonry Grid */}
+          {/* Masonry Grid - Spine-Chilling */}
           {!loading && filteredArticles.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-max">
               {filteredArticles.slice(0, 12).map((article, idx) => (
                 <div key={article.id} className={idx === 0 ? 'md:col-span-2 md:row-span-2' : ''}>
-                  <MasonryCard article={article} featured={idx === 0} />
+                  <ScaryMasonryCard article={article} featured={idx === 0} index={idx} />
                 </div>
               ))}
             </div>

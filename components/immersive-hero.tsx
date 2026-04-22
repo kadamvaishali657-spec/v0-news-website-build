@@ -22,29 +22,29 @@ export function ImmersiveHero() {
   }, []);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-background via-background to-background flex items-center justify-center">
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-foreground/2 via-accent/5 to-foreground/2" />
+    <section className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-black flex items-center justify-center">
+      {/* Dark Ominous Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950/80 via-red-950/30 to-slate-950" />
       
-      {/* Animated Grid Pattern with Parallax */}
-      <div className="absolute inset-0 opacity-30">
+      {/* Animated Grid Pattern with Red Tint */}
+      <div className="absolute inset-0 opacity-20">
         <svg className="w-full h-full absolute inset-0" style={{ transform: `translateY(${scrollY * 0.3}px)` }}>
           <defs>
             <pattern id="grid-pattern" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-accent/20" />
+              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-red-600/40" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid-pattern)" />
         </svg>
       </div>
 
-      {/* Floating Accent Orbs */}
+      {/* Eerie Red Glow Orbs */}
       <div 
-        className="absolute top-20 right-1/4 w-96 h-96 bg-accent/15 rounded-full blur-3xl pointer-events-none"
+        className="absolute top-20 right-1/4 w-96 h-96 bg-red-900/25 rounded-full blur-3xl pointer-events-none"
         style={{ transform: `translate(${mousePos.x}px, ${mousePos.y * 0.5}px)` }}
       />
       <div 
-        className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl pointer-events-none animate-pulse"
+        className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-red-900/20 rounded-full blur-3xl pointer-events-none animate-pulse-scary"
         style={{ transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y}px)` }}
       />
 
@@ -60,24 +60,24 @@ export function ImmersiveHero() {
           className="immersive-transition max-w-5xl"
           style={{ transform: `translateY(${scrollY * 0.4}px)`, opacity: Math.max(0, 1 - scrollY / 600) }}
         >
-          {/* Animated Badge - Premium */}
-          <div className="inline-flex items-center justify-center mb-8 px-4 py-2.5 border border-accent/50 rounded-full text-xs font-display text-accent tracking-widest uppercase bg-gradient-to-r from-accent/10 to-accent/5 backdrop-blur-md hover:border-accent/80 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-lg shadow-accent/10">
-            <span className="w-2 h-2 bg-accent rounded-full animate-pulse mr-2" />
-            Next Generation Intelligence
+          {/* Animated Badge - Eerie Red */}
+          <div className="inline-flex items-center justify-center mb-8 px-4 py-2.5 border border-red-600/70 rounded-full text-xs font-display text-red-300 tracking-widest uppercase bg-gradient-to-r from-red-950/30 to-red-900/20 backdrop-blur-md hover:border-red-500 transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700 shadow-lg shadow-red-600/20 glow-red">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2" />
+            Breaking Reality
           </div>
 
-          {/* Main Heading - Advanced Animation */}
-          <h1 className="hero-text text-foreground mb-8 leading-[1.1] text-6xl md:text-8xl font-display font-bold">
-            <span className="block animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100" style={{ animationDelay: '0.1s' }}>Global</span>
+          {/* Main Heading - Dark & Scary */}
+          <h1 className="hero-text text-white mb-8 leading-[1.1] text-6xl md:text-8xl font-display font-black">
+            <span className="block animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100" style={{ animationDelay: '0.1s' }}>Unfiltered</span>
             <span className="block relative inline-block animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200" style={{ animationDelay: '0.2s' }}>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent/80 to-accent/60 animate-pulse-subtle">Intelligence</span>
-              <span className="absolute -bottom-4 left-0 w-full h-2 bg-gradient-to-r from-transparent via-accent/80 to-transparent blur-lg rounded-full animate-glow" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-600 to-red-700 animate-pulse-scary">Reality</span>
+              <span className="absolute -bottom-4 left-0 w-full h-2 bg-gradient-to-r from-transparent via-red-600 to-transparent blur-lg rounded-full" style={{animation: 'creeping-shadow 4s ease-in-out infinite'}} />
             </span>
           </h1>
           
-          {/* Subheading - Enhanced Typography */}
-          <p className="text-lg md:text-2xl text-foreground/70 mb-12 max-w-3xl mx-auto font-light tracking-wide leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '0.3s' }}>
-            Immersive news experience with AI insights, real-time updates, and interactive storytelling
+          {/* Subheading - Eerie Messaging */}
+          <p className="text-lg md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto font-light tracking-wide leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: '0.3s' }}>
+            The truth waits beneath the surface. Scroll to uncover what they don&apos;t want you to see.
           </p>
 
           {/* Stats Section - New */}
