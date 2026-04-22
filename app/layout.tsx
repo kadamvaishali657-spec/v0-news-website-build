@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { ParticleBackground } from '@/components/particle-background'
-import { ScaryHeroOverlay } from '@/components/scary-hero-overlay'
 
 import './globals.css'
 
@@ -53,7 +52,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth bg-background">
       <body className="font-sans antialiased bg-background min-h-screen relative">
-        <ScaryHeroOverlay />
         <ParticleBackground />
         {children}
       </body>

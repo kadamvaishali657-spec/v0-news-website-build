@@ -284,77 +284,33 @@ body {
     }
   }
 
-  /* Scary/Eerie Animations */
-  .animate-pulse-scary {
-    animation: pulse-scary 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* Smooth, Engaging Animations */
+  .animate-float-gentle {
+    animation: float-gentle 6s ease-in-out infinite;
   }
 
-  .glow-red {
-    filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.6)) drop-shadow(0 0 4px rgba(220, 38, 38, 0.8));
-  }
-
-  @keyframes pulse-scary {
+  @keyframes float-gentle {
     0%, 100% {
-      opacity: 0.3;
+      transform: translateY(0px);
     }
     50% {
-      opacity: 0.8;
+      transform: translateY(-8px);
     }
   }
 
-  @keyframes scary-glitch {
-    0% {
-      transform: translate(0);
+  /* Warm accent glow for inviting feel */
+  .glow-warm {
+    filter: drop-shadow(0 0 12px rgba(255, 127, 64, 0.4)) drop-shadow(0 0 6px rgba(255, 127, 64, 0.6));
+  }
+
+  /* Smooth fade animations */
+  @keyframes smooth-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
       opacity: 1;
     }
-    20% {
-      transform: translate(3px, -2px);
-      opacity: 0.95;
-    }
-    40% {
-      transform: translate(-2px, 2px);
-      opacity: 0.9;
-    }
-    60% {
-      transform: translate(2px, -3px);
-      opacity: 0.85;
-    }
-    80% {
-      transform: translate(-3px, 1px);
-      opacity: 0.9;
-    }
-    100% {
-      transform: translate(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes red-flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-      text-shadow: 0 0 10px #dc2626, 0 0 20px #991b1b;
-      color: #fca5a5;
-    }
-    20%, 24%, 55% {
-      text-shadow: none;
-      color: #7f1d1d;
-    }
-  }
-
-  @keyframes creeping-shadow {
-    0% {
-      box-shadow: inset 0 0 0 rgba(127, 29, 29, 0), 0 0 0 rgba(220, 38, 38, 0);
-    }
-    50% {
-      box-shadow: inset -50px -50px 30px rgba(127, 29, 29, 0.1), 0 10px 30px rgba(220, 38, 38, 0.3);
-    }
-    100% {
-      box-shadow: inset -100px -100px 50px rgba(127, 29, 29, 0.2), 0 20px 50px rgba(220, 38, 38, 0.5);
-    }
-  }
-
-  /* Dark mode optimized for scary effect */
-  .bg-radial-red-glow {
-    background: radial-gradient(circle at center, rgba(220, 38, 38, 0.3) 0%, rgba(127, 29, 29, 0.1) 70%, transparent 100%);
   }
 
   /* Smooth transitions */

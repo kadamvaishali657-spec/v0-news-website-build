@@ -225,46 +225,71 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
 }
 
 export const DEFAULT_FEEDS: RSSFeed[] = [
-  // Global News
+  // Global News - Primary Sources
   { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', title: 'BBC World News', category: 'Global News' },
   { url: 'https://www.aljazeera.com/xml/rss/all.xml', title: 'Al Jazeera English', category: 'Global News' },
   { url: 'https://feeds.bloomberg.com/markets/news.rss', title: 'Bloomberg News', category: 'Global News' },
   { url: 'https://feeds.reuters.com/news/artsculture', title: 'Reuters News', category: 'Global News' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', title: 'NY Times World', category: 'Global News' },
+  { url: 'https://feeds.theguardian.com/theguardian/world/rss', title: 'The Guardian World', category: 'Global News' },
   
   // Tech & Innovation
   { url: 'http://feeds.feedburner.com/TechCrunch/', title: 'TechCrunch', category: 'Tech & Innovation' },
   { url: 'https://www.theverge.com/rss/index.xml', title: 'The Verge', category: 'Tech & Innovation' },
   { url: 'https://www.wired.com/feed/rss', title: 'Wired', category: 'Tech & Innovation' },
   { url: 'https://news.ycombinator.com/rss', title: 'Hacker News', category: 'Tech & Innovation' },
+  { url: 'https://feeds.arstechnica.com/arstechnica/index', title: 'Ars Technica', category: 'Tech & Innovation' },
+  { url: 'https://www.engadget.com/rss.xml', title: 'Engadget', category: 'Tech & Innovation' },
   
   // Business & Finance
   { url: 'https://feeds.bloomberg.com/technology/news.rss', title: 'Bloomberg Tech', category: 'Business & Finance' },
   { url: 'https://www.forbes.com/feed/', title: 'Forbes', category: 'Business & Finance' },
   { url: 'https://feeds.ft.com/home/rss', title: 'Financial Times', category: 'Business & Finance' },
+  { url: 'https://feeds.bloomberg.com/markets/sentiment.rss', title: 'Bloomberg Markets', category: 'Business & Finance' },
+  
+  // Science & Health
+  { url: 'https://feeds.nature.com/nature/rss/current', title: 'Nature', category: 'Science & Health' },
+  { url: 'https://feeds.sciencedaily.com/sciencedaily.rss', title: 'Science Daily', category: 'Science & Health' },
+  { url: 'https://www.medicalnewstoday.com/rss.xml', title: 'Medical News Today', category: 'Science & Health' },
   
   // Sports
   { url: 'https://www.espn.com/espn/rss/news', title: 'ESPN Top Headlines', category: 'Sports' },
   { url: 'https://feeds.bbci.co.uk/sport/rss.xml', title: 'BBC Sport', category: 'Sports' },
+  { url: 'https://www.reddit.com/r/sports/.rss', title: 'Reddit r/sports', category: 'Sports' },
   
   // Entertainment & Culture
   { url: 'https://www.rollingstone.com/feed/', title: 'Rolling Stone', category: 'Entertainment & Culture' },
   { url: 'https://variety.com/feed/', title: 'Variety', category: 'Entertainment & Culture' },
+  { url: 'https://feeds.theguardian.com/theguardian/film/rss', title: 'The Guardian Film', category: 'Entertainment & Culture' },
+  { url: 'https://www.hollywoodreporter.com/feed/rss.xml', title: 'Hollywood Reporter', category: 'Entertainment & Culture' },
   
   // Learning & Education
   { url: 'https://feeds.feedburner.com/tedtalks_video', title: 'TED Talks', category: 'Learning & Education' },
   { url: 'https://www.khanacademy.org/about/blog/rss.xml', title: 'Khan Academy Blog', category: 'Learning & Education' },
+  { url: 'https://www.edx.org/blog/feed', title: 'edX Blog', category: 'Learning & Education' },
+  
+  // Lifestyle & Wellness
+  { url: 'https://www.boredpanda.com/feed/', title: 'Bored Panda', category: 'Lifestyle & Wellness' },
+  { url: 'https://www.mentalfloss.com/rss.xml', title: 'Mental Floss', category: 'Lifestyle & Wellness' },
+  { url: 'https://www.reddit.com/r/lifeprotips/.rss', title: 'Reddit r/lifeprotips', category: 'Lifestyle & Wellness' },
+  
+  // Politics & Government
+  { url: 'https://feeds.theguardian.com/theguardian/politics/rss', title: 'The Guardian Politics', category: 'Politics & Government' },
+  { url: 'https://feeds.politico.com/playbook.rss', title: 'Politico Playbook', category: 'Politics & Government' },
+  
+  // Environment & Sustainability
+  { url: 'https://feeds.theguardian.com/theguardian/environment/rss', title: 'The Guardian Environment', category: 'Environment' },
+  { url: 'https://www.mongabay.com/feed/', title: 'Mongabay', category: 'Environment' },
   
   // Social Media Digest
-  { url: 'https://www.reddit.com/r/worldnews/.rss', title: 'Reddit r/worldnews', category: 'Social Media Digest' },
-  
-  // Random Interesting Content
-  { url: 'https://www.boredpanda.com/feed/', title: 'Bored Panda', category: 'Random Interesting' },
-  { url: 'https://www.mentalfloss.com/rss.xml', title: 'Mental Floss', category: 'Random Interesting' },
+  { url: 'https://www.reddit.com/r/worldnews/.rss', title: 'Reddit r/worldnews', category: 'Social Digest' },
+  { url: 'https://www.reddit.com/r/technology/.rss', title: 'Reddit r/technology', category: 'Tech & Innovation' },
   
   // India-specific
   { url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms', title: 'Times of India', category: 'Global News' },
   { url: 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en', title: 'Google News India', category: 'Global News' },
   { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml', title: 'NY Times Technology', category: 'Tech & Innovation' },
+  { url: 'https://www.thehindu.com/news/?service=rss', title: 'The Hindu', category: 'Global News' },
 ];
 
 // Fallback sample data for development/testing when feeds are unavailable
