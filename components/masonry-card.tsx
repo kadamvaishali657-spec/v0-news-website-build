@@ -19,17 +19,19 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
     ? 'col-span-1 md:col-span-2 row-span-2'
     : 'col-span-1 row-span-1';
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!article.link) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <a 
-      href={article.link || `#`}
+      href={article.link || 'javascript:void(0)'}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={(e) => {
-        if (!article.link) {
-          e.preventDefault();
-          window.location.href = '/';
-        }
-      }}
+      className="block h-full"
+      onClick={handleClick}
     >
       <div
         className={`${cardClass} article-hover relative overflow-hidden bg-gradient-to-br from-card to-card/50 border border-border/60 h-80 md:h-96 ${featured ? 'md:h-full' : ''} shadow-lg hover:shadow-3xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group`}

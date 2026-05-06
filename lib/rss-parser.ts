@@ -117,12 +117,24 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
     items.forEach((item, index) => {
       try {
         const title = item.querySelector('title')?.textContent || 'No title';
-        const link = item.querySelector('link')?.textContent || '';
+        let link = item.querySelector('link')?.textContent || '';
         const description = item.querySelector('description')?.textContent || '';
         const pubDateStr = item.querySelector('pubDate')?.textContent || new Date().toISOString();
 
+        // Validate and normalize link
+        link = link.trim();
+        
+        // Skip if link is missing, empty, or invalid
         if (!link || !title.trim()) {
           return; // Skip items without essential data
+        }
+
+        // Validate URL format
+        try {
+          new URL(link);
+        } catch {
+          console.log('[v0] Invalid URL skipped:', link);
+          return; // Skip items with invalid URLs
         }
 
         // Extract image from various possible locations in RSS
@@ -162,7 +174,7 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
           id: `${feedTitle}-${index}-${Date.now()}-${Math.random()}`,
           title: cleanText(title).substring(0, 200),
           description: cleanText(description).substring(0, 250),
-          link: link.trim(),
+          link: link, // Already validated above
           pubDate: new Date(pubDateStr),
           image: image && image.trim().length > 0 ? image.trim() : undefined,
           source: feedTitle,
@@ -312,27 +324,50 @@ export const FALLBACK_ARTICLES: Article[] = [
     id: 'fallback-1',
     title: 'Artificial Intelligence Breakthroughs Reshape Technology Industry in 2026',
     description: 'Latest developments in AI technology continue to transform how companies approach product development and customer service.',
-    link: 'https://example.com',
+    link: 'https://techcrunch.com/2026/02/11/ai-breakthroughs/',
     pubDate: new Date('2026-02-11'),
     image: undefined,
     source: 'TechCrunch',
+    category: 'Tech & Innovation',
   },
   {
     id: 'fallback-2',
     title: 'Global Tech Stocks Rally on Strong Quarterly Earnings Reports',
     description: 'Major technology companies report better-than-expected earnings, driving investor confidence across the sector.',
-    link: 'https://example.com',
+    link: 'https://www.nytimes.com/2026/02/11/business/tech-stocks-earnings.html',
     pubDate: new Date('2026-02-11'),
     image: undefined,
     source: 'NY Times Technology',
+    category: 'Business & Finance',
   },
   {
     id: 'fallback-3',
     title: 'New Smartphone Features Focus on Battery Life and Sustainability',
     description: 'Manufacturers prioritize environmental concerns as consumers demand longer-lasting devices with reduced carbon footprint.',
-    link: 'https://example.com',
+    link: 'https://www.theverge.com/2026/2/11/smartphone-battery-sustainability',
     pubDate: new Date('2026-02-11'),
     image: undefined,
     source: 'The Verge',
+    category: 'Tech & Innovation',
+  },
+  {
+    id: 'fallback-4',
+    title: 'Renewable Energy Production Reaches New Records Globally',
+    description: 'Clean energy initiatives across continents show unprecedented growth, signaling shift toward sustainable power systems.',
+    link: 'https://www.bbc.com/news/science_and_environment',
+    pubDate: new Date('2026-02-10'),
+    image: undefined,
+    source: 'BBC News',
+    category: 'Environment',
+  },
+  {
+    id: 'fallback-5',
+    title: 'Major Science Discovery in Medical Research Could Transform Treatment Options',
+    description: 'Researchers announce breakthrough findings that could revolutionize how doctors treat chronic diseases.',
+    link: 'https://www.sciencedaily.com',
+    pubDate: new Date('2026-02-10'),
+    image: undefined,
+    source: 'Science Daily',
+    category: 'Science & Health',
   },
 ];
