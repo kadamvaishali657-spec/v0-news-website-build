@@ -55,13 +55,13 @@ export function ChatInput({
         onKeyDown={handleKeyDown}
         placeholder="Ask about news... (Shift+Enter for new line)"
         disabled={isLoading || disabled}
-        className="flex-1 resize-none rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed max-h-32"
+        className="flex-1 resize-none rounded-lg border border-border bg-input text-foreground px-4 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed max-h-32 transition-colors"
         rows={1}
       />
       <button
         type="submit"
         disabled={isLoading || disabled || !input.trim()}
-        className="flex-shrink-0 bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex-shrink-0 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg p-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-lg"
       >
         {isLoading ? (
           <Loader2 className="w-5 h-5 animate-spin" />

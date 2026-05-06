@@ -31,13 +31,13 @@ export function ImmersiveLoader() {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-background/95 flex items-center justify-center z-50 overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-background via-background to-background/98 flex items-center justify-center z-50 overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Gradient Orbs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/30 rounded-full blur-3xl animate-pulse opacity-60" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse opacity-40" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 right-1/3 w-80 h-80 bg-accent/15 rounded-full blur-3xl animate-pulse opacity-30" style={{ animationDelay: '2s' }} />
+        {/* Gradient Orbs - Theme aware */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/25 rounded-full blur-3xl animate-pulse opacity-50" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse opacity-35" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 right-1/3 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse opacity-25" style={{ animationDelay: '2s' }} />
       </div>
 
       {/* Content */}
@@ -88,9 +88,9 @@ export function ImmersiveLoader() {
         {/* Progress Section */}
         <div className="space-y-4">
           {/* Progress Bar */}
-          <div className="relative h-1.5 bg-foreground/10 rounded-full overflow-hidden backdrop-blur-sm">
+          <div className="relative h-2 bg-foreground/15 rounded-full overflow-hidden backdrop-blur-sm border border-foreground/10">
             <div
-              className="h-full bg-gradient-to-r from-accent via-accent/80 to-accent rounded-full transition-all duration-300 ease-out shadow-lg shadow-accent/50"
+              className="h-full bg-gradient-to-r from-accent via-accent/90 to-accent rounded-full transition-all duration-300 ease-out shadow-lg shadow-accent/60"
               style={{ width: `${progress}%` }}
             />
           </div>

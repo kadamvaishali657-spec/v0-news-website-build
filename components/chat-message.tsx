@@ -15,7 +15,9 @@ export function ChatMessage({ message }: ChatMessageProps) {
       {/* Avatar */}
       <div
         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+          isUser 
+            ? 'bg-accent text-accent-foreground' 
+            : 'bg-secondary text-secondary-foreground'
         }`}
       >
         {isUser ? (
@@ -27,14 +29,14 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
       {/* Message Bubble */}
       <div
-        className={`flex-1 max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+        className={`flex-1 max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
           isUser
-            ? 'bg-blue-600 text-white rounded-br-none'
-            : 'bg-gray-100 text-gray-900 rounded-bl-none'
+            ? 'bg-accent text-accent-foreground rounded-br-none shadow-md'
+            : 'bg-card text-card-foreground border border-border rounded-bl-none'
         }`}
       >
-        <p className="text-sm break-words whitespace-pre-wrap">{message.content}</p>
-        <span className="text-xs opacity-70 mt-1 block">
+        <p className="text-sm break-words whitespace-pre-wrap leading-relaxed">{message.content}</p>
+        <span className={`text-xs opacity-70 mt-2 block ${isUser ? 'text-accent-foreground' : 'text-muted-foreground'}`}>
           {new Date(message.timestamp).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
