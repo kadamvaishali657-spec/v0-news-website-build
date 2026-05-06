@@ -2,21 +2,24 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/providers/theme-provider';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const categories = [
     'Global News',
-    'Tech & Innovation',
-    'Business & Finance',
+    'Technology',
+    'Business',
+    'Science',
     'Sports',
-    'Entertainment & Culture',
-    'Learning & Education',
-    'Social Media Digest',
-    'Random Interesting',
+    'Entertainment',
+    'Education',
+    'Lifestyle',
+    'Politics',
+    'Environment',
   ];
 
   return (
@@ -57,6 +60,20 @@ export function Header() {
             >
               Admin
             </Link>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-accent/10 hover:bg-accent/20 transition-colors duration-300"
+              aria-label="Toggle dark mode"
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? (
+                <Moon className="w-5 h-5 text-accent" />
+              ) : (
+                <Sun className="w-5 h-5 text-accent" />
+              )}
+            </button>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -102,6 +119,25 @@ export function Header() {
             >
               Admin
             </Link>
+
+            {/* Dark Mode Toggle Mobile */}
+            <div className="flex items-center justify-between pt-4 border-t border-border">
+              <span className="text-foreground font-display text-sm uppercase tracking-wider">Theme</span>
+              <button
+                onClick={() => {
+                  toggleTheme();
+                  setMobileMenuOpen(false);
+                }}
+                className="p-2 rounded-lg bg-accent/10 hover:bg-accent/20 transition-colors duration-300"
+                aria-label="Toggle dark mode"
+              >
+                {theme === 'light' ? (
+                  <Moon className="w-5 h-5 text-accent" />
+                ) : (
+                  <Sun className="w-5 h-5 text-accent" />
+                )}
+              </button>
+            </div>
           </nav>
         )}
       </div>

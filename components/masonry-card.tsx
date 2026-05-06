@@ -14,6 +14,7 @@ interface MasonryCardProps {
 export function MasonryCard({ article, featured = false }: MasonryCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const cardClass = featured 
     ? 'col-span-1 md:col-span-2 row-span-2'
@@ -24,6 +25,19 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
       e.preventDefault();
     }
   };
+
+  // Validate and sanitize image URL
+  const isValidImageUrl = (url?: string): boolean => {
+    if (!url) return false;
+    try {
+      const urlObj = new URL(url);
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
+  const validImageUrl = isValidImageUrl(article.image) ? article.image : null;
 
   return (
     <a 
@@ -40,15 +54,27 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
       >
         {/* Article Image/Placeholder Background */}
         <div className="absolute inset-0">
-          {article.image && !imageError ? (
-            <img 
-              src={article.image} 
-              alt={article.title}
-              onError={() => setImageError(true)}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out"
-              style={{ transform: isHovered ? 'scale(1.1)' : 'scale(1)' }}
-              loading="lazy"
-            />
+          {validImageUrl && !imageError ? (
+            <>
+              {imageLoading && (
+                <div className="absolute inset-0 bg-gradient-to-br from-accent/40 via-accent/20 to-foreground/10 flex items-center justify-center z-10">
+                  <div className="w-8 h-8 border-3 border-accent/30 border-t-accent rounded-full animate-spin" />
+                </div>
+              )}
+              <img 
+                src={validImageUrl} 
+                alt={article.title}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
+                onLoad={() => setImageLoading(false)}
+                className="w-full h-full object-cover transition-transform duration-700 ease-out"
+                style={{ transform: isHovered ? 'scale(1.1)' : 'scale(1)' }}
+                loading="lazy"
+                decoding="async"
+              />
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-accent/40 via-accent/20 to-foreground/10">
               <div className="text-center">

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { ParticleBackground } from '@/components/particle-background'
+import { ThemeProvider } from '@/providers/theme-provider'
 
 import './globals.css'
 
@@ -52,8 +53,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth bg-background">
       <body className="font-sans antialiased bg-background min-h-screen relative">
-        <ParticleBackground />
-        {children}
+        <ThemeProvider>
+          <ParticleBackground />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )
