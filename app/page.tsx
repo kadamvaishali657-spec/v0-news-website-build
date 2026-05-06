@@ -32,6 +32,11 @@ export default function HomePage() {
           setError('No articles loaded. RSS feeds may be temporarily unavailable.');
         }
         setArticles(articles);
+        
+        // Store articles in sessionStorage for article page access
+        if (typeof window !== 'undefined' && articles.length > 0) {
+          sessionStorage.setItem('current-articles', JSON.stringify(articles));
+        }
       } catch (err) {
         setError('Failed to load news. Please try again later.');
       } finally {

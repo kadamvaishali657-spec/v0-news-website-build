@@ -41,10 +41,10 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
 
   return (
     <a 
-      href={article.link || 'javascript:void(0)'}
+      href={article.link || '#'}
       target="_blank"
       rel="noopener noreferrer"
-      className="block h-full"
+      className="block h-full cursor-pointer"
       onClick={handleClick}
     >
       <div

@@ -1,32 +1,48 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Loader2 } from 'lucide-react';
 
 export default function ArticlePage() {
   const params = useParams();
-  const [redirecting, setRedirecting] = useState(true);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     try {
-      // Get article ID from params
-      const articleId = params.id as string;
+      // Get link from query parameters (most reliable method)
+      const linkFromQuery = searchParams.get('link');
       
-      // Try to get from saved articles first
-      const savedArticlesData = localStorage.getItem('saved-articles');
-      let article = null;
-      
-      if (savedArticlesData) {
-        const savedArticles = JSON.parse(savedArticlesData);
-        article = savedArticles.find((a: any) => a.id === articleId);
+      if (linkFromQuery) {
+        try {
+          const decodedLink = decodeURIComponent(linkFromQuery);
+          // Validate URL format
+          new URL(decodedLink);
+          // Redirect immediately
+          window.location.href = decodedLink;
+          return;
+        } catch (e) {
+          console.log('[v0] Invalid link parameter');
+        }
       }
 
-      // If article found and has a link, redirect to it
-      if (article && article.link) {
-        window.location.href = article.link;
-        return;
+      // Try to get from sessionStorage (articles from current session)
+      const sessionArticlesData = sessionStorage.getItem('current-articles');
+      if (sessionArticlesData) {
+        try {
+          const sessionArticles = JSON.parse(sessionArticlesData);
+          const articleId = params.id as string;
+          const article = sessionArticles.find((a: any) => a.id === articleId);
+          
+          if (article && article.link) {
+            new URL(article.link);
+            window.location.href = article.link;
+            return;
+          }
+        } catch (e) {
+          console.log('[v0] Error parsing session articles');
+        }
       }
 
       // Fallback: redirect to home after 2 seconds
@@ -36,13 +52,12 @@ export default function ArticlePage() {
 
       return () => clearTimeout(timer);
     } catch (error) {
-      console.error('[v0] Error retrieving article:', error);
-      // Redirect to home on error
+      console.error('[v0] Error in article page:', error);
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
     }
-  }, [params]);
+  }, [params, searchParams]);
 
   return (
     <>

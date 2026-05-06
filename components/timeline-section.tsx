@@ -2,7 +2,7 @@
 
 import { Article } from '@/lib/rss-parser';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TimelineSectionProps {
   articles: Article[];
@@ -10,6 +10,13 @@ interface TimelineSectionProps {
 
 export function TimelineSection({ articles }: TimelineSectionProps) {
   const [activeCategory, setActiveCategory] = useState('All');
+
+  // Store articles in sessionStorage for article page access
+  useEffect(() => {
+    if (typeof window !== 'undefined' && articles.length > 0) {
+      sessionStorage.setItem('current-articles', JSON.stringify(articles));
+    }
+  }, [articles]);
 
   const categories = ['All', ...new Set(articles.map(a => a.category || a.source))];
   
@@ -49,7 +56,7 @@ export function TimelineSection({ articles }: TimelineSectionProps) {
           {filtered.map((article, idx) => (
             <Link 
               key={article.id}
-              href={`/article/${article.id}`}
+              href={`/article/${article.id}?link=${encodeURIComponent(article.link)}`}
               className="group block"
             >
               <div className="flex gap-8 items-start pb-8 relative">
