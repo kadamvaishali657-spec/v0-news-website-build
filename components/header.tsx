@@ -7,7 +7,18 @@ import { useTheme } from '@/providers/theme-provider';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  
+  // Safely use theme hook with fallback for SSR/pre-rendering
+  let theme: 'light' | 'dark' = 'light';
+  let toggleTheme = () => {};
+  
+  try {
+    const themeContext = useTheme();
+    theme = themeContext.theme;
+    toggleTheme = themeContext.toggleTheme;
+  } catch {
+    // Theme provider not available during SSR/pre-rendering, use default
+  }
 
   const categories = [
     'Global News',

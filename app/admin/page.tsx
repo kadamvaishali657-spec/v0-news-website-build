@@ -137,27 +137,27 @@ export default function AdminPage() {
   const activeFeedsCount = feeds.length - disabledFeeds.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Panel</h1>
-          <p className="text-gray-600">Manage RSS feeds and published content</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Admin Panel</h1>
+          <p className="text-muted-foreground">Manage RSS feeds and published content</p>
         </div>
 
         {/* Message Alert */}
         {message && (
           <div className={`mb-6 p-4 rounded-lg flex items-center justify-between ${
             message.type === 'success' 
-              ? 'bg-green-50 border border-green-200' 
-              : 'bg-red-50 border border-red-200'
+              ? 'bg-green-100/20 border border-green-500/30 dark:bg-green-900/20 dark:border-green-700/50' 
+              : 'bg-red-100/20 border border-red-500/30 dark:bg-red-900/20 dark:border-red-700/50'
           }`}>
-            <span className={message.type === 'success' ? 'text-green-800' : 'text-red-800'}>
+            <span className={message.type === 'success' ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}>
               {message.text}
             </span>
-            <button onClick={() => setMessage(null)} className="text-gray-500 hover:text-gray-700">
+            <button onClick={() => setMessage(null)} className="text-muted-foreground hover:text-foreground">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -165,17 +165,17 @@ export default function AdminPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm font-medium">Total Feeds</p>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{feeds.length}</p>
+          <div className="bg-card rounded-lg border border-border p-6">
+            <p className="text-muted-foreground text-sm font-medium">Total Feeds</p>
+            <p className="text-3xl font-bold text-foreground mt-2">{feeds.length}</p>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm font-medium">Active Feeds</p>
-            <p className="text-3xl font-bold text-green-600 mt-2">{activeFeedsCount}</p>
+          <div className="bg-card rounded-lg border border-border p-6">
+            <p className="text-muted-foreground text-sm font-medium">Active Feeds</p>
+            <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">{activeFeedsCount}</p>
           </div>
-          <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm font-medium">Disabled Feeds</p>
-            <p className="text-3xl font-bold text-red-600 mt-2">{disabledFeeds.length}</p>
+          <div className="bg-card rounded-lg border border-border p-6">
+            <p className="text-muted-foreground text-sm font-medium">Disabled Feeds</p>
+            <p className="text-3xl font-bold text-red-600 dark:text-red-400 mt-2">{disabledFeeds.length}</p>
           </div>
         </div>
 
@@ -184,57 +184,57 @@ export default function AdminPage() {
           {!showAddForm ? (
             <button
               onClick={() => setShowAddForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium"
             >
               <Plus className="w-4 h-4" />
               Add New Feed
             </button>
           ) : (
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
+            <div className="bg-card rounded-lg border border-border p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Add New RSS Feed</h2>
-                <button onClick={() => setShowAddForm(false)} className="text-gray-500 hover:text-gray-700">
+                <h2 className="text-lg font-semibold text-foreground">Add New RSS Feed</h2>
+                <button onClick={() => setShowAddForm(false)} className="text-muted-foreground hover:text-foreground">
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <form onSubmit={handleAddFeed} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Feed Title</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Feed Title</label>
                   <input
                     type="text"
                     placeholder="e.g., TechCrunch, The Verge"
                     value={newFeedTitle}
                     onChange={(e) => setNewFeedTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border bg-input text-foreground rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-muted-foreground"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">RSS Feed URL</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">RSS Feed URL</label>
                   <input
                     type="url"
                     placeholder="https://example.com/rss.xml"
                     value={newFeedUrl}
                     onChange={(e) => setNewFeedUrl(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border bg-input text-foreground rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-muted-foreground"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category (Optional)</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Category (Optional)</label>
                   <input
                     type="text"
                     placeholder="e.g., Technology, Business"
                     value={newFeedCategory}
                     onChange={(e) => setNewFeedCategory(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-border bg-input text-foreground rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-muted-foreground"
                   />
                 </div>
 
                 <div className="flex gap-3 pt-4">
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white rounded-lg transition-colors font-medium"
                   >
                     <Save className="w-4 h-4" />
                     Add Feed
@@ -242,7 +242,7 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setShowAddForm(false)}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                    className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors font-medium"
                   >
                     Cancel
                   </button>
@@ -253,12 +253,12 @@ export default function AdminPage() {
         </div>
 
         {/* Feeds List */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">RSS Feeds ({feeds.length})</h2>
+        <div className="bg-card rounded-lg border border-border overflow-hidden">
+          <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-foreground">RSS Feeds ({feeds.length})</h2>
             <button
               onClick={handleResetToDefault}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+              className="text-sm text-accent hover:text-accent/80 font-medium flex items-center gap-1"
             >
               <RefreshCw className="w-4 h-4" />
               Reset to Default
@@ -268,28 +268,28 @@ export default function AdminPage() {
           {feeds.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-secondary border-b border-border">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">URL</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Category</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">URL</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {feeds.map((feed, index) => {
                     const isDisabled = disabledFeeds.includes(feed.url);
                     return (
-                      <tr key={index} className={`border-b border-gray-200 hover:bg-gray-50 ${isDisabled ? 'opacity-60' : ''}`}>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{feed.title}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{feed.category || '-'}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title={feed.url}>{feed.url}</td>
+                      <tr key={index} className={`border-b border-border hover:bg-secondary/30 ${isDisabled ? 'opacity-60' : ''}`}>
+                        <td className="px-6 py-4 text-sm font-medium text-foreground">{feed.title}</td>
+                        <td className="px-6 py-4 text-sm text-muted-foreground">{feed.category || '-'}</td>
+                        <td className="px-6 py-4 text-sm text-muted-foreground max-w-xs truncate" title={feed.url}>{feed.url}</td>
                         <td className="px-6 py-4 text-sm">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                             isDisabled 
-                              ? 'bg-red-100 text-red-800' 
-                              : 'bg-green-100 text-green-800'
+                              ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300' 
+                              : 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300'
                           }`}>
                             {isDisabled ? 'Disabled' : 'Active'}
                           </span>
@@ -299,8 +299,8 @@ export default function AdminPage() {
                             onClick={() => handleToggleFeed(feed.url)}
                             className={`p-2 rounded-lg transition-colors ${
                               isDisabled 
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                                ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/60' 
+                                : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/60'
                             }`}
                             title={isDisabled ? 'Enable feed' : 'Disable feed'}
                           >
@@ -308,7 +308,7 @@ export default function AdminPage() {
                           </button>
                           <button
                             onClick={() => handleRemoveFeed(feed.url)}
-                            className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+                            className="p-2 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors"
                             title="Delete feed"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -321,17 +321,17 @@ export default function AdminPage() {
               </table>
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-600">
+            <div className="text-center py-12 text-muted-foreground">
               <p className="font-medium">No feeds configured</p>
-              <p className="text-sm text-gray-500 mt-1">Add a feed to get started</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">Add a feed to get started</p>
             </div>
           )}
         </div>
 
         {/* Info Box */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="font-semibold text-blue-900 mb-2">How to Use</h3>
-          <ul className="text-sm text-blue-800 space-y-2">
+        <div className="mt-8 bg-accent/10 border border-accent/30 rounded-lg p-6">
+          <h3 className="font-semibold text-foreground mb-2">How to Use</h3>
+          <ul className="text-sm text-muted-foreground space-y-2">
             <li>• Click "Add New Feed" to add an RSS feed</li>
             <li>• Toggle the eye icon to enable/disable feeds</li>
             <li>• Delete feeds you no longer want to use</li>
