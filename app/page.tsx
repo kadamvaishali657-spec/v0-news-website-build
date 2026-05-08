@@ -8,6 +8,7 @@ import { TimelineSection } from '@/components/timeline-section';
 import { SearchBar } from '@/components/search-bar';
 import { ChatBotWidget } from '@/components/chatbot-widget';
 import { ImmersiveLoader } from '@/components/immersive-loader';
+import { AppPromotionSection } from '@/components/app-promotion-section';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Loader2, Search, Globe } from 'lucide-react';
 import Link from 'next/link';
@@ -135,6 +136,9 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      {/* App Promotion Section */}
+      <AppPromotionSection />
 
       {/* Timeline Section */}
       {!loading && articles.length > 0 && (
