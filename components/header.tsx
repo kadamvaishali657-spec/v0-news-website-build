@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Sun, Moon } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Sun, Moon, Download } from 'lucide-react';
 import { useTheme } from '@/providers/theme-provider';
 
 export function Header() {
@@ -72,6 +72,18 @@ export function Header() {
               Admin
             </Link>
 
+            {/* App Download Button */}
+            <a
+              href="https://play.google.com/store/apps/details?id=com.pranav.punecityguide&hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-all duration-300 font-display text-sm uppercase tracking-wider font-semibold hover:shadow-lg hover:scale-105"
+              title="Download INFORMED on Google Play"
+            >
+              <Download className="w-4 h-4" />
+              Download App
+            </a>
+
             {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
@@ -130,6 +142,18 @@ export function Header() {
             >
               Admin
             </Link>
+
+            {/* App Download Button Mobile */}
+            <a
+              href="https://play.google.com/store/apps/details?id=com.pranav.punecityguide&hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-display uppercase tracking-wider text-sm font-semibold"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Download className="w-4 h-4" />
+              Download App
+            </a>
 
             {/* Dark Mode Toggle Mobile */}
             <div className="flex items-center justify-between pt-4 border-t border-border">
