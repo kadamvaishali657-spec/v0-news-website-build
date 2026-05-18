@@ -3,47 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
-const VALID_FEEDS = [
-  // Global News
-  'https://feeds.bbci.co.uk/news/world/rss.xml',
-  'https://www.aljazeera.com/xml/rss/all.xml',
-  'https://feeds.bloomberg.com/markets/news.rss',
-  'https://feeds.reuters.com/news/artsculture',
-  'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms',
-  'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en',
-  
-  // Tech & Innovation
-  'http://feeds.feedburner.com/TechCrunch/',
-  'https://www.theverge.com/rss/index.xml',
-  'https://www.wired.com/feed/rss',
-  'https://news.ycombinator.com/rss',
-  'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',
-  'https://feeds.bloomberg.com/technology/news.rss',
-  
-  // Business & Finance
-  'https://www.forbes.com/feed/',
-  'https://feeds.ft.com/home/rss',
-  
-  // Sports
-  'https://www.espn.com/espn/rss/news',
-  'https://feeds.bbci.co.uk/sport/rss.xml',
-  
-  // Entertainment & Culture
-  'https://www.rollingstone.com/feed/',
-  'https://variety.com/feed/',
-  
-  // Learning & Education
-  'https://feeds.feedburner.com/tedtalks_video',
-  'https://www.khanacademy.org/about/blog/rss.xml',
-  
-  // Social Media Digest
-  'https://www.reddit.com/r/worldnews/.rss',
-  
-  // Random Interesting Content
-  'https://www.boredpanda.com/feed/',
-  'https://www.mentalfloss.com/rss.xml',
-];
-
 export async function GET(request: NextRequest) {
   const feedUrl = request.nextUrl.searchParams.get('url');
 
@@ -54,10 +13,44 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Security: Only allow configured feeds
-  if (!VALID_FEEDS.includes(decodeURIComponent(feedUrl))) {
+  // Security Validation: Ensure URL is valid, external, and not an SSRF target
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(decodeURIComponent(feedUrl));
+  } catch (e) {
+    try {
+      parsedUrl = new URL(feedUrl);
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid URL parameter format' },
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce HTTP/HTTPS protocols only
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
     return NextResponse.json(
-      { error: 'Unauthorized feed URL' },
+      { error: 'Only HTTP and HTTPS protocols are authorized' },
+      { status: 403 }
+    );
+  }
+
+  const hostname = parsedUrl.hostname.toLowerCase();
+
+  // Block local loopbacks and private networks to prevent SSRF
+  const isLocalOrPrivate = 
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0' ||
+    hostname === '169.254.169.254' || // AWS metadata endpoint
+    hostname.startsWith('10.') ||
+    hostname.startsWith('192.168.') ||
+    !!hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./); // Private IP Class B
+
+  if (isLocalOrPrivate) {
+    return NextResponse.json(
+      { error: 'Access to local or private network feeds is unauthorized' },
       { status: 403 }
     );
   }
