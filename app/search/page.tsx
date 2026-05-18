@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
 import { AdUnit } from '@/components/ad-unit';
 import { Search, Filter, ShieldAlert } from 'lucide-react';
@@ -193,7 +192,13 @@ export default function SearchPage() {
         <AdUnit />
       </div>
 
-      <Footer />
+      {/* Footer */}
+      <footer className="bg-card border-t border-border py-16 px-6 mt-24">
+        <div className="max-w-7xl mx-auto text-center text-foreground/60 text-sm">
+          <p>&copy; 2026 INFORMED - Reimagined news experience</p>
+          <p className="mt-2">Sourced from global RSS feeds • Powered by AI insights</p>
+        </div>
+      </footer>
     </div>
   );
 }
