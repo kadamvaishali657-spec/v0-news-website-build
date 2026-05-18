@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, MessageCircle, Trash2 } from 'lucide-react';
+import { X, MessageCircle, Trash2, Sparkles } from 'lucide-react';
 import { ChatMessage } from './chat-message';
 import { ChatInput } from './chat-input';
 import { useChatAssistant } from '@/hooks/use-chat-assistant';
@@ -17,7 +17,6 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
     useChatAssistant(articles);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -34,61 +33,67 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
 
   return (
     <>
-      {/* Floating Button - Premium Animation */}
+      {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-accent to-accent/80 hover:from-accent hover:to-accent text-foreground rounded-full p-4 shadow-2xl hover:shadow-3xl transition-all duration-500 z-40 flex items-center justify-center transform hover:scale-110 active:scale-95"
+        className={`fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl shadow-xl transition-all duration-300 ${
+          isOpen
+            ? 'bg-card border border-border/60 text-foreground hover:bg-muted/60 rotate-0'
+            : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 hover:shadow-2xl hover:shadow-indigo-500/30 hover:scale-105'
+        }`}
         aria-label="Toggle chat"
       >
-        <div className="relative">
-          {isOpen ? (
-            <X className="w-6 h-6 rotate-180 transition-transform duration-300" />
-          ) : (
-            <>
-              <MessageCircle className="w-6 h-6 transition-all duration-300" />
-              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">!</span>
-            </>
-          )}
-        </div>
+        {isOpen ? (
+          <X className="w-5 h-5" />
+        ) : (
+          <MessageCircle className="w-5 h-5" />
+        )}
       </button>
 
-      {/* Chat Window - Enhanced with animations */}
+      {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] h-[500px] bg-card rounded-2xl shadow-2xl flex flex-col z-40 border border-border animate-in fade-in slide-in-from-bottom-4 duration-300">
-          {/* Header - Gradient */}
-          <div className="bg-gradient-to-r from-accent to-accent/70 text-foreground px-6 py-5 rounded-t-2xl flex items-center justify-between">
-            <div>
-              <h3 className="font-display font-bold text-lg">INFORMED Assistant</h3>
-              <p className="text-xs opacity-90 font-medium">Powered by AI • Ask about news</p>
+        <div className="fixed bottom-24 right-6 w-[380px] max-w-[calc(100vw-2rem)] h-[480px] bg-card rounded-2xl shadow-2xl shadow-black/[0.12] flex flex-col z-40 border border-border/40 overflow-hidden animate-scale-in">
+          {/* Header */}
+          <div className="relative bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-sm">News Assistant</h3>
+                <p className="text-xs text-white/70">AI-powered news chat</p>
+              </div>
             </div>
             <button
               onClick={handleClear}
-              className="p-2 hover:bg-accent/20 rounded-lg transition-all duration-300 hover:scale-110"
+              className="p-2 hover:bg-white/10 rounded-xl transition-colors"
               title="Clear history"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-4 h-4 text-white/70 hover:text-white" />
             </button>
           </div>
 
-          {/* Messages Container - Smooth scroll */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-background/50">
+          {/* Messages Container */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
             {messages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center py-8">
-                <div className="text-5xl mb-4 animate-bounce">💬</div>
-                <h4 className="font-display text-foreground mb-2 font-semibold">Start a Conversation</h4>
-                <p className="text-sm text-foreground/60">
-                  Ask me about breaking news, summaries, or recent trends
-                </p>
-                <div className="mt-6 text-xs text-foreground/50 space-y-2">
-                  <p>Try: "What's trending today?"</p>
-                  <p>Or: "Summarize recent tech news"</p>
+              <div className="h-full flex items-center justify-center text-center px-4">
+                <div>
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                    <MessageCircle className="w-7 h-7 text-primary/40" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground mb-1">
+                    How can I help?
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Ask me about articles, get summaries, or find news on topics you&apos;re interested in.
+                  </p>
                 </div>
               </div>
             ) : (
               <>
                 {messages.map((message, idx) => (
-                  <div 
-                    key={message.id} 
+                  <div
+                    key={message.id}
                     className="animate-in fade-in slide-in-from-bottom-2 duration-300"
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
@@ -100,8 +105,8 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
             )}
           </div>
 
-          {/* Input Area - Premium */}
-          <div className="border-t border-border bg-card p-4 rounded-b-2xl">
+          {/* Input Area */}
+          <div className="border-t border-border/40 bg-card p-3">
             <ChatInput
               onSendMessage={handleSendMessage}
               isLoading={isLoading}

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { chatRateLimiter, getRateLimitId, rateLimitHeaders } from '@/lib/server/rate-limiter';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -13,6 +14,16 @@ interface ChatMessage {
  * - Returns formatted response
  */
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const clientId = getRateLimitId(request);
+  const rateCheck = chatRateLimiter.check(clientId);
+  if (!rateCheck.allowed) {
+    return NextResponse.json(
+      { error: 'Too many chat requests. Please wait a moment.' },
+      { status: 429, headers: rateLimitHeaders(rateCheck.remaining, rateCheck.resetMs) }
+    );
+  }
+
   try {
     // [1] PARSE REQUEST BODY
     let requestBody: any;
@@ -72,11 +83,11 @@ export async function POST(request: NextRequest) {
     let articleContext = '';
     if (articles && Array.isArray(articles) && articles.length > 0) {
       try {
-        articleContext = '\n\nCurrent articles in the feed:\n';
-        articles.slice(0, 8).forEach((article: any, index: number) => {
+articleContext = '\n\nCurrent articles available on the news feed:\n';
+        articles.slice(0, 10).forEach((article: any, index: number) => {
           const title = article.title || 'Untitled';
           const source = article.source || 'Unknown Source';
-          const desc = (article.description || '').substring(0, 80);
+          const desc = (article.description || '').substring(0, 100);
           articleContext += `${index + 1}. "${title}" from ${source}\n`;
           if (desc) articleContext += `   ${desc}...\n`;
         });
@@ -85,28 +96,22 @@ export async function POST(request: NextRequest) {
         // Continue without article context if it fails
       }
     }
-
     // [6] BUILD SYSTEM PROMPT
-    const systemPrompt = `You are INFORMED Assistant - a knowledgeable news chatbot for the INFORMED news aggregator.
-
+    const systemPrompt = `You are INFORMED Assistant - a highly knowledgeable and professional news assistant chatbot for the INFORMED news aggregator.
 Your responsibilities:
-- Answer questions about news, current events, and world affairs
-- Summarize and explain news stories in simple terms
-- Help users find articles on specific topics
-- Provide context and background on news events
-- Maintain a professional, friendly, and informative tone
-- Keep responses concise but comprehensive (2-3 sentences for quick questions, up to 1 paragraph for detailed requests)
-- Always cite article sources when referencing specific stories
-
-Available articles${articleContext}
-
+1. Answer questions about news, current events, and world affairs accurately and objectively.
+2. Provide concise and clear summaries of news stories in simple terms.
+3. Help users search for specific topics, news stories, or articles.
+4. Recommend relevant articles based on user interests.
+5. Provide context and background on major news events.
+6. Engage in helpful, professional, and friendly conversation about news and world events.
+Available articles:${articleContext}
 Guidelines:
-- Be accurate and avoid speculation
-- If you don't know something, say so
-- Help users understand complex news topics
-- Stay focused on news and current events
+- Keep responses concise but comprehensive (2-3 sentences for quick questions, up to 1 paragraph for detailed requests).
+- Be accurate, objective, and avoid speculation.
+- If you don't know the answer, say so honestly.
+- Always cite article titles and sources when referencing specific stories.
 - Current time: ${new Date().toLocaleString()}`;
-
     // [7] PREPARE MESSAGES
     const groqMessages = [
       {

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
-import { Flame } from 'lucide-react';
-import { Article, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
+import { Flame, TrendingUp } from 'lucide-react';
+import { Article } from '@/lib/rss-parser';
 
 export default function TrendingPage() {
   const [trendingArticles, setTrendingArticles] = useState<Article[]>([]);
@@ -13,34 +14,21 @@ export default function TrendingPage() {
   useEffect(() => {
     const loadTrending = async () => {
       try {
-        const articles = await fetchAllFeeds(DEFAULT_FEEDS);
-        
-        // Get saved articles to count bookmarks (proxy for engagement)
-        const savedArticlesData = localStorage.getItem('saved-articles');
-        const savedIds = savedArticlesData ? JSON.parse(savedArticlesData).map((a: any) => a.id) : [];
-        
-        // Calculate trending score based on:
-        // 1. Recent publication (within last 7 days)
-        // 2. Bookmarks/saves (engagement signal)
-        // 3. Category (popular categories)
-        
-        const now = new Date();
-        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        
-        const scoring = articles
-          .filter(a => a.pubDate >= sevenDaysAgo) // Only recent articles
-          .map(article => ({
-            article,
-            score: 
-              (article.pubDate >= sevenDaysAgo ? 10 : 0) + // Recent boost
-              (savedIds.includes(article.id) ? 5 : 0) + // Bookmark boost
-              (article.title.length > 60 ? 2 : 0) // Detailed articles boost
-          }))
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 24);
-        
-        const trending = scoring.map(s => s.article);
-        setTrendingArticles(trending);
+        const response = await fetch('/api/articles?mode=trending&limit=24');
+        if (response.ok) {
+          const data = await response.json();
+          const trending: Article[] = (data.articles || []).map((a: Record<string, unknown>) => ({
+            id: a.id as string,
+            title: a.title as string,
+            description: a.description as string,
+            link: a.link as string,
+            pubDate: new Date(a.pubDate as string),
+            image: a.image as string | undefined,
+            source: a.source as string,
+            category: a.category as string | undefined,
+          }));
+          setTrendingArticles(trending);
+        }
       } catch (error) {
         console.error('Error loading trending articles:', error);
       } finally {
@@ -52,39 +40,68 @@ export default function TrendingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Flame className="w-8 h-8 text-accent" />
-            <h1 className="text-4xl font-bold text-foreground">Trending Now</h1>
-          </div>
-          <p className="text-muted-foreground">The hottest news stories right now</p>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading trending articles...</p>
-          </div>
-        ) : trendingArticles.length === 0 ? (
-          <div className="text-center py-12 bg-card rounded-lg border border-border">
-            <p className="text-muted-foreground">No trending articles available</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingArticles.map((article, index) => (
-              <div key={article.id} className="relative">
-                <div className="absolute -top-3 -left-3 bg-accent text-accent-foreground rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                  {index + 1}
-                </div>
-                <NewsCard article={article} />
+    <div className="min-h-screen bg-background flex flex-col justify-between">
+      <div>
+        <Header />
+        
+        {/* Hero Header */}
+        <section className="relative overflow-hidden border-b border-border/40">
+          <div className="absolute inset-0 mesh-gradient" />
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 shadow-lg shadow-orange-500/20 animate-pulse">
+                <Flame className="w-7 h-7 text-white" />
               </div>
-            ))}
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
+              Trending <span className="gradient-text">Now</span>
+            </h1>
+            
+            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+              The most read, shared, and highly active news articles parsed across our publication network.
+            </p>
           </div>
-        )}
-      </main>
+        </section>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-4">
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full border-2 border-orange-500/20 border-t-orange-500 animate-spin" />
+              </div>
+              <p className="text-sm text-muted-foreground animate-pulse">Loading trending articles...</p>
+            </div>
+          ) : trendingArticles.length === 0 ? (
+            <div className="text-center py-20 bg-card/40 backdrop-blur-md border border-border/60 rounded-3xl p-8 max-w-xl mx-auto shadow-xl">
+              <TrendingUp className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 animate-pulse" />
+              <p className="text-foreground font-semibold mb-2">No Trending Articles Available</p>
+              <p className="text-sm text-muted-foreground">Check back shortly as live publications refresh.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
+              {trendingArticles.map((article, index) => (
+                <div key={article.id} className="relative group">
+                  {/* Ranking Badge */}
+                  <div className={`absolute -top-2.5 -left-2.5 z-30 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold shadow-lg transition-transform duration-300 group-hover:scale-110 ${
+                    index === 0 ? 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white shadow-amber-500/30' :
+                    index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-white shadow-gray-400/30' :
+                    index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-orange-500/30' :
+                    'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-indigo-500/20'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <NewsCard article={article} />
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+
+      <Footer />
     </div>
   );
 }

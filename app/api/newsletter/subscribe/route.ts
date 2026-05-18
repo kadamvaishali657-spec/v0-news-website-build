@@ -1,112 +1,76 @@
+/**
+ * Enhanced newsletter subscription API with file-based persistence and rate limiting.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
-
-interface SubscriptionData {
-  email: string;
-  frequency: string;
-  categories: string[];
-  subscribedAt: string;
-  active: boolean;
-}
-
-// In production, this would store in a database
-// For now, we'll use localStorage-like approach and log to console
-const subscribers: SubscriptionData[] = [];
-
-// Function to send notification email to admin
-async function sendAdminNotification(email: string, frequency: string, categories: string[]) {
-  try {
-    // Using mailto protocol for client-side email generation
-    const subject = `New Newsletter Subscription - ${email}`;
-    const body = `
-New Newsletter Subscription Received:
-
-Email: ${email}
-Frequency: ${frequency}
-Categories: ${categories.join(', ')}
-Timestamp: ${new Date().toISOString()}
----
-This is an automated notification from JustinNews.tech
-`;
-
-    // Log to console (visible in server logs)
-    console.log('[Newsletter Notification]');
-    console.log('To: workwithme785@gmail.com');
-    console.log(`Subject: ${subject}`);
-    console.log(body);
-
-    // In production, integrate with email service (SendGrid, Mailgun, AWS SES, etc.)
-    // For now, we'll return success and let the admin check the logs
-    return { success: true };
-  } catch (error) {
-    console.error('Failed to send notification:', error);
-    return { success: false, error };
-  }
-}
+import { addSubscriber, unsubscribe, getSubscriptionStatus, getNewsletterStats } from '@/lib/server/newsletter-store';
+import { apiRateLimiter, getRateLimitId, rateLimitHeaders } from '@/lib/server/rate-limiter';
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const clientId = getRateLimitId(request);
+  const rateCheck = apiRateLimiter.check(clientId);
+  if (!rateCheck.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: rateLimitHeaders(rateCheck.remaining, rateCheck.resetMs) }
+    );
+  }
+
   try {
     const body = await request.json();
-    const { email, frequency, categories } = body;
+    const { email, frequency = 'weekly', categories = ['Global News', 'Tech & Innovation'], action } = body;
+
+    // Handle unsubscribe
+    if (action === 'unsubscribe') {
+      if (!email) {
+        return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+      }
+      const success = await unsubscribe(email);
+      return NextResponse.json({
+        success,
+        message: success ? 'Successfully unsubscribed' : 'Email not found or already unsubscribed',
+      });
+    }
 
     // Validation
-    if (!email || !frequency || !categories || categories.length === 0) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    if (!email) {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
-    // Check if already subscribed
-    const existingSubscriber = subscribers.find((s) => s.email === email);
-    if (existingSubscriber) {
-      // Update existing subscription
-      existingSubscriber.frequency = frequency;
-      existingSubscriber.categories = categories;
-      existingSubscriber.active = true;
-    } else {
-      // Add new subscriber
-      const subscription: SubscriptionData = {
-        email,
-        frequency,
-        categories,
-        subscribedAt: new Date().toISOString(),
-        active: true,
-      };
-      subscribers.push(subscription);
+    if (!['daily', 'weekly', 'monthly'].includes(frequency)) {
+      return NextResponse.json({ error: 'Invalid frequency. Use daily, weekly, or monthly.' }, { status: 400 });
     }
 
-    // Send notification email to admin
-    await sendAdminNotification(email, frequency, categories);
+    if (!Array.isArray(categories) || categories.length === 0) {
+      return NextResponse.json({ error: 'At least one category is required' }, { status: 400 });
+    }
 
-    // Log subscription
-    console.log('[Newsletter] New subscription:', {
-      email,
-      frequency,
-      categories,
+    // Add subscriber (persisted to file)
+    const { isNew, subscriber } = await addSubscriber(email, frequency, categories);
+
+    console.log('[Newsletter]', isNew ? 'New subscription' : 'Updated subscription', {
+      email: subscriber.email,
+      frequency: subscriber.frequency,
+      categories: subscriber.categories,
       timestamp: new Date().toISOString(),
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: 'Successfully subscribed to newsletter',
-        data: {
-          email,
-          frequency,
-          categories,
-        },
+    return NextResponse.json({
+      success: true,
+      message: isNew ? 'Successfully subscribed to newsletter' : 'Subscription preferences updated',
+      data: {
+        email: subscriber.email,
+        frequency: subscriber.frequency,
+        categories: subscriber.categories,
+        subscribedAt: subscriber.subscribedAt,
       },
-      { status: 200 }
-    );
+    });
   } catch (error) {
     console.error('Newsletter subscription error:', error);
     return NextResponse.json(
@@ -117,30 +81,42 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  // Get subscription status
   const email = request.nextUrl.searchParams.get('email');
+  const stats = request.nextUrl.searchParams.get('stats');
+
+  // Return newsletter stats if requested
+  if (stats === 'true') {
+    try {
+      const newsletterStats = await getNewsletterStats();
+      return NextResponse.json(newsletterStats);
+    } catch (error) {
+      console.error('Newsletter stats error:', error);
+      return NextResponse.json({ error: 'Failed to get stats' }, { status: 500 });
+    }
+  }
 
   if (!email) {
-    return NextResponse.json(
-      { error: 'Email parameter required' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Email parameter required' }, { status: 400 });
   }
 
-  const subscriber = subscribers.find((s) => s.email === email);
+  try {
+    const subscriber = await getSubscriptionStatus(email);
 
-  if (!subscriber) {
-    return NextResponse.json(
-      { subscribed: false },
-      { status: 200 }
-    );
+    if (!subscriber) {
+      return NextResponse.json({ subscribed: false });
+    }
+
+    return NextResponse.json({
+      subscribed: subscriber.active,
+      subscription: {
+        email: subscriber.email,
+        frequency: subscriber.frequency,
+        categories: subscriber.categories,
+        subscribedAt: subscriber.subscribedAt,
+      },
+    });
+  } catch (error) {
+    console.error('Newsletter status error:', error);
+    return NextResponse.json({ error: 'Failed to check status' }, { status: 500 });
   }
-
-  return NextResponse.json(
-    {
-      subscribed: true,
-      subscription: subscriber,
-    },
-    { status: 200 }
-  );
 }

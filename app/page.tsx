@@ -2,42 +2,134 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/header';
-import { ImmersiveHero } from '@/components/immersive-hero';
-import { MasonryCard } from '@/components/masonry-card';
-import { TimelineSection } from '@/components/timeline-section';
+import { Footer } from '@/components/footer';
 import { SearchBar } from '@/components/search-bar';
+import { CategoryFilter } from '@/components/category-filter';
+import { NewsCard } from '@/components/news-card';
+import { Pagination } from '@/components/pagination';
+import { NewsletterCTA } from '@/components/newsletter-cta';
+import { TimelineSection } from '@/components/timeline-section';
 import { ChatBotWidget } from '@/components/chatbot-widget';
-import { ImmersiveLoader } from '@/components/immersive-loader';
 import { AppPromotionSection } from '@/components/app-promotion-section';
-import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2, Search, Globe } from 'lucide-react';
+import { Article, RSSFeed, DEFAULT_FEEDS, parseFeed } from '@/lib/rss-parser';
+import { Loader2, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+
+const ARTICLES_PER_PAGE = 12;
 
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [feeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
+  const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
 
+  // Load feeds and preferences from localStorage
+  useEffect(() => {
+    const savedFeeds = localStorage.getItem('rss-feeds');
+    const savedDisabled = localStorage.getItem('disabled-feeds');
 
+    if (savedFeeds) {
+      try {
+        const parsed = JSON.parse(savedFeeds);
+        setFeeds(parsed);
+      } catch (e) {
+        console.error('Error parsing saved feeds:', e);
+      }
+    }
 
-  // Fetch articles on mount
+    if (savedDisabled) {
+      try {
+        const parsed = JSON.parse(savedDisabled);
+        setDisabledFeeds(parsed);
+      } catch (e) {
+        console.error('Error parsing disabled feeds:', e);
+      }
+    }
+  }, []);
+
+  // Fetch articles from server-side API (with session caching)
   useEffect(() => {
     const loadArticles = async () => {
       setLoading(true);
       setError(null);
       try {
-        const articles = await fetchAllFeeds(feeds);
-        if (articles.length === 0) {
-          setError('No articles loaded. RSS feeds may be temporarily unavailable.');
+        const cached = sessionStorage.getItem('articles-session-cache');
+        const cacheTime = sessionStorage.getItem('articles-cache-time');
+        const cacheAge = cacheTime ? Date.now() - parseInt(cacheTime) : Infinity;
+        let loadedArticles: Article[] = [];
+
+        // Use cache if less than 3 minutes old
+        if (cached && cacheAge < 3 * 60 * 1000) {
+          try {
+            loadedArticles = JSON.parse(cached);
+          } catch {
+            loadedArticles = [];
+          }
         }
-        setArticles(articles);
-        
-        // Store articles in sessionStorage for article page access
-        if (typeof window !== 'undefined' && articles.length > 0) {
-          sessionStorage.setItem('current-articles', JSON.stringify(articles));
+
+        // Fetch from server API if no valid cache
+        if (loadedArticles.length === 0) {
+          const response = await fetch('/api/articles?mode=all');
+          if (response.ok) {
+            const data = await response.json();
+            loadedArticles = (data.articles || []).map((a: Record<string, unknown>) => ({
+              id: a.id as string,
+              title: a.title as string,
+              description: a.description as string,
+              link: a.link as string,
+              pubDate: new Date(a.pubDate as string),
+              image: a.image as string | undefined,
+              source: a.source as string,
+              category: a.category as string | undefined,
+            }));
+            sessionStorage.setItem('articles-session-cache', JSON.stringify(loadedArticles));
+            sessionStorage.setItem('articles-cache-time', Date.now().toString());
+          }
         }
+
+        // Hybrid Loading of Custom Client Feeds
+        const savedFeedsStr = localStorage.getItem('rss-feeds');
+        let currentFeeds = DEFAULT_FEEDS;
+        if (savedFeedsStr) {
+          try {
+            currentFeeds = JSON.parse(savedFeedsStr);
+          } catch {}
+        }
+
+        const customFeeds = currentFeeds.filter(
+          (f) => !DEFAULT_FEEDS.some((df) => df.url === f.url)
+        );
+
+        if (customFeeds.length > 0) {
+          try {
+            const customArticlesPromises = customFeeds.map((feed) =>
+              parseFeed(feed.url, feed.title, feed.category)
+            );
+            const customArticlesResults = await Promise.all(customArticlesPromises);
+            const customArticles = customArticlesResults.flat();
+
+            if (customArticles.length > 0) {
+              loadedArticles = [...customArticles, ...loadedArticles].filter(
+                (a, i, arr) => arr.findIndex((article) => article.link === a.link) === i
+              );
+              loadedArticles.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+            }
+          } catch (e) {
+            console.error('Error loading custom client feeds:', e);
+          }
+        }
+
+        if (loadedArticles.length === 0) {
+          setError('No articles loaded. RSS feeds may be temporarily unavailable. Try again in a moment.');
+        }
+
+        setArticles(loadedArticles);
+        setCurrentPage(1);
       } catch (err) {
         setError('Failed to load news. Please try again later.');
       } finally {
@@ -45,116 +137,124 @@ export default function HomePage() {
       }
     };
 
-    if (feeds.length > 0) {
-      loadArticles();
-    }
-  }, [feeds]);
+    loadArticles();
+  }, []);
 
-  // Filter articles by search query
-  const filteredArticles = searchQuery.trim() 
-    ? articles.filter(a => 
-        a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.description.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : articles;
+  // Filter and search articles
+  useEffect(() => {
+    let result = articles;
+
+    result = result.filter((article) => !disabledFeeds.includes(article.source));
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (article) =>
+          article.title.toLowerCase().includes(query) ||
+          article.description.toLowerCase().includes(query) ||
+          article.source.toLowerCase().includes(query)
+      );
+    }
+
+    if (selectedCategory !== 'All') {
+      result = result.filter((article) => {
+        const articleCategory = article.category || article.source || '';
+        return (
+          articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+          selectedCategory.toLowerCase().includes(articleCategory.toLowerCase())
+        );
+      });
+    }
+
+    setFilteredArticles(result);
+    setCurrentPage(1);
+  }, [articles, searchQuery, selectedCategory, disabledFeeds]);
+
+  const startIdx = (currentPage - 1) * ARTICLES_PER_PAGE;
+  const endIdx = startIdx + ARTICLES_PER_PAGE;
+  const paginatedArticles = filteredArticles.slice(startIdx, endIdx);
+  const totalPages = Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE);
+
+  const featuredArticles = articles.slice(0, 4);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
   }, []);
 
-  if (loading) {
-    return <ImmersiveLoader />;
-  }
+  const stats = [
+    { icon: Newspaper, label: 'Articles', value: articles.length.toString() },
+    { icon: Globe, label: 'Sources', value: `${feeds.length}+` },
+    { icon: TrendingUp, label: 'Categories', value: '8' },
+    { icon: Zap, label: 'Real-time', value: 'Yes' },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Immersive Hero */}
-      <ImmersiveHero />
+      {/* Hero Section */}
+      <section className="relative overflow-hidden border-b border-border/40">
+        <div className="absolute inset-0 mesh-gradient" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-radial from-purple-500/10 via-transparent to-transparent" />
 
-      {/* Masonry Grid Section */}
-      <section className="py-24 px-6 bg-background">
-        <div className="max-w-7xl mx-auto">
-          {/* Section Header with Search and Explore Button */}
-          <div className="mb-16">
-            <div className="flex items-end justify-between mb-12 gap-6">
-              <h2 className="section-heading text-foreground">
-                Breaking <span className="text-accent">Stories</span>
-              </h2>
-              <Link href="/explore">
-                <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-foreground font-display uppercase text-sm font-bold tracking-wider hover:shadow-lg transition-all duration-300 hover:scale-105">
-                  <Globe className="w-4 h-4" />
-                  Explore by Region
-                </button>
-              </Link>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 fade-in-up">
+              <span className="relative flex h-2 w-2">
+                <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              Live updates from {feeds.length}+ sources
             </div>
 
-            {/* Interactive Search */}
-            <div className="relative max-w-2xl">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-                placeholder="Search articles..."
-                className="w-full px-6 py-4 bg-card border border-border text-foreground placeholder:text-foreground/50 font-display text-lg focus:outline-none focus:border-accent transition-colors duration-300"
-              />
-              <Search className="absolute right-6 top-1/2 transform -translate-y-1/2 text-accent w-5 h-5" />
-            </div>
-          </div>
+            <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 fade-in-up" style={{ animationDelay: '0.1s' }}>
+              Your{' '}
+              <span className="gradient-text">Global News</span>
+              <br />
+              Command Center
+            </h1>
 
-          {/* Loading State */}
-          {loading && (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-accent animate-spin" />
-            </div>
-          )}
+            <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up" style={{ animationDelay: '0.2s' }}>
+              Curated technology and global intelligence, aggregated directly from the world&apos;s most trusted tech newsrooms.
+            </p>
 
-          {/* Error State */}
-          {error && (
-            <div className="border-2 border-red-500/50 bg-red-500/10 p-6 text-foreground mb-12">
-              <p className="font-display text-lg">{error}</p>
+            <div className="fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <SearchBar onSearch={handleSearch} />
             </div>
-          )}
 
-          {/* Masonry Grid - Engaging & Inviting */}
-          {!loading && filteredArticles.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 auto-rows-max">
-              {filteredArticles.slice(0, 16).map((article, idx) => (
-                <div key={article.id} className={idx === 0 ? 'md:col-span-2 md:row-span-2' : ''}>
-                  <MasonryCard article={article} featured={idx === 0} />
+            <div className="flex flex-wrap gap-6 mt-10 fade-in-up" style={{ animationDelay: '0.4s' }}>
+              {stats.map(({ icon: Icon, label, value }) => (
+                <div key={label} className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-foreground">{value}</div>
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                  </div>
                 </div>
               ))}
             </div>
-          )}
-
-          {/* No Results */}
-          {!loading && filteredArticles.length === 0 && (
-            <div className="text-center py-20">
-              <p className="text-foreground/60 text-lg">No articles match your search. Try different keywords.</p>
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
-      {/* App Promotion Section */}
-      <AppPromotionSection />
-
-      {/* Timeline Section */}
-      {!loading && articles.length > 0 && (
-        <TimelineSection articles={articles} />
-      )}
-
-      {/* Footer */}
-      <footer className="bg-card border-t border-border py-16 px-6 mt-24">
-        <div className="max-w-7xl mx-auto text-center text-foreground/60 text-sm">
-          <p>&copy; 2026 INFORMED - Reimagined news experience</p>
-          <p className="mt-2">Sourced from global RSS feeds • Powered by AI insights</p>
-        </div>
-      </footer>
-
-      {/* AI Chatbot Widget */}
-      <ChatBotWidget articles={articles} />
-    </div>
-  );
-}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Featured Section */}
+        {!loading && featuredArticles.length > 0 && (
+          <section className="mb-16 fade-in-up">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Featured Stories</h2>
+                <p className="text-muted-foreground text-sm mt-1">Top picks from our editors</p>
+              </div>
+              <Link href="/trending" className="group flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+                View all
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
+              {featuredArticles.map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
