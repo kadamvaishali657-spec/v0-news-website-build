@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Settings, Menu, X, ChevronDown, Flame, Bookmark, Zap, Globe, Cpu, TrendingUp, Gamepad2, GraduationCap, MessageSquare, Sparkles } from 'lucide-react';
+import { Settings, Menu, X, ChevronDown, Flame, Globe, Cpu, TrendingUp, Gamepad2, GraduationCap, MessageSquare, Sparkles, Zap } from 'lucide-react';
 
 const categoryIcons: Record<string, typeof Globe> = {
   'Global News': Globe,
@@ -28,19 +28,21 @@ export function Header() {
 
   const categories = [
     'Global News',
-    'Tech & Innovation',
-    'Business & Finance',
+    'Technology',
+    'Business',
+    'Science',
     'Sports',
-    'Entertainment & Culture',
-    'Learning & Education',
-    'Social Media Digest',
-    'Random Interesting',
+    'Entertainment',
+    'Education',
+    'Lifestyle',
+    'Politics',
+    'Environment',
   ];
 
   return (
     <header className={`sticky top-0 z-50 transition-all duration-300 ${
-      scrolled 
-        ? 'glass border-b border-border/50 shadow-lg shadow-black/[0.03]' 
+      scrolled
+        ? 'glass border-b border-border/50 shadow-lg shadow-black/[0.03]'
         : 'bg-background/80 backdrop-blur-sm border-b border-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -81,25 +83,23 @@ export function Header() {
               </div>
             </div>
 
-            <Link 
-              href="/trending" 
+            <Link
+              href="/trending"
               className="px-3.5 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 font-medium flex items-center gap-1.5"
             >
               <Flame className="w-4 h-4 text-orange-500" />
               Trending
             </Link>
 
-            <Link 
-              href="/saved" 
+            <Link
+              href="/saved"
               className="px-3.5 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 font-medium flex items-center gap-1.5"
             >
-              <Bookmark className="w-4 h-4" />
               Saved
             </Link>
 
-            {/* Admin Button */}
-            <Link 
-              href="/admin" 
+            <Link
+              href="/admin"
               className="ml-2 flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 font-medium text-sm shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30"
             >
               <Settings className="w-3.5 h-3.5" />
@@ -120,20 +120,20 @@ export function Header() {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <nav className="md:hidden pb-4 space-y-1 border-t border-border/50 pt-4 animate-slide-down">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="block px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Home
+              Explore
             </Link>
 
             {/* Mobile Categories */}
             <div>
-              <button 
+              <button
                 onClick={() => setCategoriesOpen(!categoriesOpen)}
                 className="w-full text-left px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium flex items-center justify-between text-sm"
               >
@@ -163,8 +163,8 @@ export function Header() {
               )}
             </div>
 
-            <Link 
-              href="/trending" 
+            <Link
+              href="/trending"
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -172,33 +172,32 @@ export function Header() {
               Trending
             </Link>
 
-            <Link 
-              href="/saved" 
+            <Link
+              href="/saved"
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Bookmark className="w-4 h-4" />
               Saved
             </Link>
 
-            <Link 
-              href="/about" 
+            <Link
+              href="/about"
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
               About Us
             </Link>
 
-            <Link 
-              href="/contact" 
+            <Link
+              href="/contact"
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact Us
             </Link>
 
-            <Link 
-              href="/admin" 
+            <Link
+              href="/admin"
               className="flex items-center gap-2 mx-2 mt-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-sm shadow-md shadow-indigo-500/20"
               onClick={() => setMobileMenuOpen(false)}
             >

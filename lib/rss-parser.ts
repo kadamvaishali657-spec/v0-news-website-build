@@ -117,12 +117,24 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
     items.forEach((item, index) => {
       try {
         const title = item.querySelector('title')?.textContent || 'No title';
-        const link = item.querySelector('link')?.textContent || '';
+        let link = item.querySelector('link')?.textContent || '';
         const description = item.querySelector('description')?.textContent || '';
         const pubDateStr = item.querySelector('pubDate')?.textContent || new Date().toISOString();
 
+        // Validate and normalize link
+        link = link.trim();
+        
+        // Skip if link is missing, empty, or invalid
         if (!link || !title.trim()) {
           return; // Skip items without essential data
+        }
+
+        // Validate URL format
+        try {
+          new URL(link);
+        } catch {
+          console.log('[v0] Invalid URL skipped:', link);
+          return; // Skip items with invalid URLs
         }
 
         // Extract image from various possible locations in RSS
@@ -162,7 +174,7 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
           id: `${feedTitle}-${index}-${Date.now()}-${Math.random()}`,
           title: cleanText(title).substring(0, 200),
           description: cleanText(description).substring(0, 250),
-          link: link.trim(),
+          link: link, // Already validated above
           pubDate: new Date(pubDateStr),
           image: image && image.trim().length > 0 ? image.trim() : undefined,
           source: feedTitle,
@@ -225,46 +237,71 @@ export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
 }
 
 export const DEFAULT_FEEDS: RSSFeed[] = [
-  // Global News
-  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', title: 'BBC World News', category: 'Global News' },
+  // Global News - Premium Sources
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml', title: 'New York Times', category: 'Global News' },
+  { url: 'http://feeds.bbci.co.uk/news/world/rss.xml', title: 'BBC World News', category: 'Global News' },
+  { url: 'https://feeds.reuters.com/reuters/topNews', title: 'Reuters Top News', category: 'Global News' },
+  { url: 'https://www.theguardian.com/world/rss', title: 'The Guardian World', category: 'Global News' },
+  { url: 'https://feeds.npr.org/1001/rss.xml', title: 'NPR News', category: 'Global News' },
   { url: 'https://www.aljazeera.com/xml/rss/all.xml', title: 'Al Jazeera English', category: 'Global News' },
-  { url: 'https://feeds.bloomberg.com/markets/news.rss', title: 'Bloomberg News', category: 'Global News' },
-  { url: 'https://feeds.reuters.com/news/artsculture', title: 'Reuters News', category: 'Global News' },
+  { url: 'https://www.reddit.com/r/worldnews/.rss', title: 'Reddit r/worldnews', category: 'Global News' },
   
-  // Tech & Innovation
-  { url: 'http://feeds.feedburner.com/TechCrunch/', title: 'TechCrunch', category: 'Tech & Innovation' },
-  { url: 'https://www.theverge.com/rss/index.xml', title: 'The Verge', category: 'Tech & Innovation' },
-  { url: 'https://www.wired.com/feed/rss', title: 'Wired', category: 'Tech & Innovation' },
-  { url: 'https://news.ycombinator.com/rss', title: 'Hacker News', category: 'Tech & Innovation' },
+  // Technology
+  { url: 'https://techcrunch.com/feed/', title: 'TechCrunch', category: 'Technology' },
+  { url: 'https://www.theverge.com/rss/index.xml', title: 'The Verge', category: 'Technology' },
+  { url: 'https://www.wired.com/feed/rss', title: 'WIRED', category: 'Technology' },
+  { url: 'http://feeds.arstechnica.com/arstechnica/index', title: 'Ars Technica', category: 'Technology' },
+  { url: 'https://venturebeat.com/feed/', title: 'VentureBeat', category: 'Technology' },
+  { url: 'https://news.ycombinator.com/rss', title: 'Hacker News', category: 'Technology' },
+  { url: 'https://www.engadget.com/rss.xml', title: 'Engadget', category: 'Technology' },
+  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml', title: 'NY Times Technology', category: 'Technology' },
+  { url: 'https://www.reddit.com/r/technology/.rss', title: 'Reddit r/technology', category: 'Technology' },
   
   // Business & Finance
-  { url: 'https://feeds.bloomberg.com/technology/news.rss', title: 'Bloomberg Tech', category: 'Business & Finance' },
-  { url: 'https://www.forbes.com/feed/', title: 'Forbes', category: 'Business & Finance' },
-  { url: 'https://feeds.ft.com/home/rss', title: 'Financial Times', category: 'Business & Finance' },
+  { url: 'https://feeds.bloomberg.com/markets/news.rss', title: 'Bloomberg Markets', category: 'Business' },
+  { url: 'https://www.entrepreneur.com/latest.rss', title: 'Entrepreneur', category: 'Business' },
+  { url: 'https://www.fastcompany.com/rss', title: 'Fast Company', category: 'Business' },
+  { url: 'https://www.forbes.com/feed/', title: 'Forbes', category: 'Business' },
+  { url: 'https://feeds.ft.com/home/rss', title: 'Financial Times', category: 'Business' },
+  
+  // Science & Health
+  { url: 'https://feeds.nature.com/nature/rss/current', title: 'Nature', category: 'Science' },
+  { url: 'https://feeds.sciencedaily.com/sciencedaily.rss', title: 'Science Daily', category: 'Science' },
+  { url: 'https://www.medicalnewstoday.com/rss.xml', title: 'Medical News Today', category: 'Science' },
   
   // Sports
   { url: 'https://www.espn.com/espn/rss/news', title: 'ESPN Top Headlines', category: 'Sports' },
   { url: 'https://feeds.bbci.co.uk/sport/rss.xml', title: 'BBC Sport', category: 'Sports' },
+  { url: 'https://www.reddit.com/r/sports/.rss', title: 'Reddit r/sports', category: 'Sports' },
   
-  // Entertainment & Culture
-  { url: 'https://www.rollingstone.com/feed/', title: 'Rolling Stone', category: 'Entertainment & Culture' },
-  { url: 'https://variety.com/feed/', title: 'Variety', category: 'Entertainment & Culture' },
+  // Entertainment
+  { url: 'https://www.rollingstone.com/feed/', title: 'Rolling Stone', category: 'Entertainment' },
+  { url: 'https://variety.com/feed/', title: 'Variety', category: 'Entertainment' },
+  { url: 'https://feeds.theguardian.com/theguardian/film/rss', title: 'The Guardian Film', category: 'Entertainment' },
+  { url: 'https://www.hollywoodreporter.com/feed/rss.xml', title: 'Hollywood Reporter', category: 'Entertainment' },
   
-  // Learning & Education
-  { url: 'https://feeds.feedburner.com/tedtalks_video', title: 'TED Talks', category: 'Learning & Education' },
-  { url: 'https://www.khanacademy.org/about/blog/rss.xml', title: 'Khan Academy Blog', category: 'Learning & Education' },
+  // Education & Learning
+  { url: 'https://feeds.feedburner.com/tedtalks_video', title: 'TED Talks', category: 'Education' },
+  { url: 'https://www.khanacademy.org/about/blog/rss.xml', title: 'Khan Academy', category: 'Education' },
+  { url: 'https://seths.blog/feed', title: 'Seth Godin', category: 'Education' },
+  { url: 'https://tim.blog/feed/', title: 'Tim Ferriss Blog', category: 'Education' },
   
-  // Social Media Digest
-  { url: 'https://www.reddit.com/r/worldnews/.rss', title: 'Reddit r/worldnews', category: 'Social Media Digest' },
+  // Lifestyle
+  { url: 'https://www.boredpanda.com/feed/', title: 'Bored Panda', category: 'Lifestyle' },
+  { url: 'https://www.mentalfloss.com/rss.xml', title: 'Mental Floss', category: 'Lifestyle' },
+  { url: 'https://www.reddit.com/r/lifeprotips/.rss', title: 'Reddit r/lifeprotips', category: 'Lifestyle' },
   
-  // Random Interesting Content
-  { url: 'https://www.boredpanda.com/feed/', title: 'Bored Panda', category: 'Random Interesting' },
-  { url: 'https://www.mentalfloss.com/rss.xml', title: 'Mental Floss', category: 'Random Interesting' },
+  // Politics
+  { url: 'https://feeds.theguardian.com/theguardian/politics/rss', title: 'The Guardian Politics', category: 'Politics' },
+  { url: 'https://feeds.politico.com/playbook.rss', title: 'Politico', category: 'Politics' },
+  
+  // Environment
+  { url: 'https://feeds.theguardian.com/theguardian/environment/rss', title: 'The Guardian Environment', category: 'Environment' },
+  { url: 'https://www.mongabay.com/feed/', title: 'Mongabay', category: 'Environment' },
   
   // India-specific
   { url: 'https://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms', title: 'Times of India', category: 'Global News' },
-  { url: 'https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en', title: 'Google News India', category: 'Global News' },
-  { url: 'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml', title: 'NY Times Technology', category: 'Tech & Innovation' },
+  { url: 'https://www.thehindu.com/news/?service=rss', title: 'The Hindu', category: 'Global News' },
 ];
 
 // Fallback sample data for development/testing when feeds are unavailable
@@ -273,27 +310,50 @@ export const FALLBACK_ARTICLES: Article[] = [
     id: 'fallback-1',
     title: 'Artificial Intelligence Breakthroughs Reshape Technology Industry in 2026',
     description: 'Latest developments in AI technology continue to transform how companies approach product development and customer service.',
-    link: 'https://example.com',
+    link: 'https://techcrunch.com/2026/02/11/ai-breakthroughs/',
     pubDate: new Date('2026-02-11'),
     image: undefined,
     source: 'TechCrunch',
+    category: 'Tech & Innovation',
   },
   {
     id: 'fallback-2',
     title: 'Global Tech Stocks Rally on Strong Quarterly Earnings Reports',
     description: 'Major technology companies report better-than-expected earnings, driving investor confidence across the sector.',
-    link: 'https://example.com',
+    link: 'https://www.nytimes.com/2026/02/11/business/tech-stocks-earnings.html',
     pubDate: new Date('2026-02-11'),
     image: undefined,
     source: 'NY Times Technology',
+    category: 'Business & Finance',
   },
   {
     id: 'fallback-3',
     title: 'New Smartphone Features Focus on Battery Life and Sustainability',
     description: 'Manufacturers prioritize environmental concerns as consumers demand longer-lasting devices with reduced carbon footprint.',
-    link: 'https://example.com',
+    link: 'https://www.theverge.com/2026/2/11/smartphone-battery-sustainability',
     pubDate: new Date('2026-02-11'),
     image: undefined,
     source: 'The Verge',
+    category: 'Tech & Innovation',
+  },
+  {
+    id: 'fallback-4',
+    title: 'Renewable Energy Production Reaches New Records Globally',
+    description: 'Clean energy initiatives across continents show unprecedented growth, signaling shift toward sustainable power systems.',
+    link: 'https://www.bbc.com/news/science_and_environment',
+    pubDate: new Date('2026-02-10'),
+    image: undefined,
+    source: 'BBC News',
+    category: 'Environment',
+  },
+  {
+    id: 'fallback-5',
+    title: 'Major Science Discovery in Medical Research Could Transform Treatment Options',
+    description: 'Researchers announce breakthrough findings that could revolutionize how doctors treat chronic diseases.',
+    link: 'https://www.sciencedaily.com',
+    pubDate: new Date('2026-02-10'),
+    image: undefined,
+    source: 'Science Daily',
+    category: 'Science & Health',
   },
 ];

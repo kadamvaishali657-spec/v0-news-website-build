@@ -8,6 +8,9 @@ import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
 import { Pagination } from '@/components/pagination';
 import { NewsletterCTA } from '@/components/newsletter-cta';
+import { TimelineSection } from '@/components/timeline-section';
+import { ChatBotWidget } from '@/components/chatbot-widget';
+import { AppPromotionSection } from '@/components/app-promotion-section';
 import { Article, RSSFeed, DEFAULT_FEEDS, parseFeed } from '@/lib/rss-parser';
 import { Loader2, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -29,7 +32,7 @@ export default function HomePage() {
   useEffect(() => {
     const savedFeeds = localStorage.getItem('rss-feeds');
     const savedDisabled = localStorage.getItem('disabled-feeds');
-    
+
     if (savedFeeds) {
       try {
         const parsed = JSON.parse(savedFeeds);
@@ -38,7 +41,7 @@ export default function HomePage() {
         console.error('Error parsing saved feeds:', e);
       }
     }
-    
+
     if (savedDisabled) {
       try {
         const parsed = JSON.parse(savedDisabled);
@@ -109,9 +112,8 @@ export default function HomePage() {
             );
             const customArticlesResults = await Promise.all(customArticlesPromises);
             const customArticles = customArticlesResults.flat();
-            
+
             if (customArticles.length > 0) {
-              // Combine, deduplicate by link, and sort
               loadedArticles = [...customArticles, ...loadedArticles].filter(
                 (a, i, arr) => arr.findIndex((article) => article.link === a.link) === i
               );
@@ -157,8 +159,10 @@ export default function HomePage() {
     if (selectedCategory !== 'All') {
       result = result.filter((article) => {
         const articleCategory = article.category || article.source || '';
-        return articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-               selectedCategory.toLowerCase().includes(articleCategory.toLowerCase());
+        return (
+          articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+          selectedCategory.toLowerCase().includes(articleCategory.toLowerCase())
+        );
       });
     }
 
@@ -175,7 +179,6 @@ export default function HomePage() {
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1);
   }, []);
 
   const stats = [
@@ -191,14 +194,12 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/40">
-        {/* Background Mesh */}
         <div className="absolute inset-0 mesh-gradient" />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-radial from-purple-500/10 via-transparent to-transparent" />
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="max-w-3xl">
-            {/* Live Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 fade-in-up">
               <span className="relative flex h-2 w-2">
                 <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -213,17 +214,15 @@ export default function HomePage() {
               <br />
               Command Center
             </h1>
-            
+
             <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up" style={{ animationDelay: '0.2s' }}>
               Curated technology and global intelligence, aggregated directly from the world&apos;s most trusted tech newsrooms.
             </p>
 
-            {/* Search Bar */}
             <div className="fade-in-up" style={{ animationDelay: '0.3s' }}>
               <SearchBar onSearch={handleSearch} />
             </div>
 
-            {/* Stats Row */}
             <div className="flex flex-wrap gap-6 mt-10 fade-in-up" style={{ animationDelay: '0.4s' }}>
               {stats.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="flex items-center gap-2.5">
@@ -259,89 +258,3 @@ export default function HomePage() {
               {featuredArticles.map((article) => (
                 <NewsCard key={article.id} article={article} />
               ))}
-            </div>
-          </section>
-        )}
-
-        {/* Category & Controls Section */}
-        <section className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Browse by Category</h3>
-          </div>
-
-          <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
-        </section>
-
-        {/* Error State */}
-        {error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-5 text-destructive mb-8 flex items-start gap-3">
-            <div className="w-5 h-5 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-xs font-bold">!</span>
-            </div>
-            <div>
-              <p className="font-medium">Something went wrong</p>
-              <p className="text-sm text-destructive/80 mt-1">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-              <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-b-purple-500/50 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
-            </div>
-            <p className="text-sm text-muted-foreground animate-pulse">Loading latest news...</p>
-          </div>
-        )}
-
-        {/* Articles Grid */}
-        {!loading && (
-          <>
-            <div className="flex items-center justify-between mb-6 mt-8">
-              <p className="text-sm text-muted-foreground">
-                Showing <span className="font-medium text-foreground">{filteredArticles.length === 0 ? '0' : startIdx + 1}-{Math.min(endIdx, filteredArticles.length)}</span> of{' '}
-                <span className="font-medium text-foreground">{filteredArticles.length}</span> articles
-              </p>
-            </div>
-
-            {paginatedArticles.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 stagger-children">
-                  {paginatedArticles.map((article) => (
-                    <NewsCard key={article.id} article={article} />
-                  ))}
-                </div>
-
-                {totalPages > 1 && (
-                  <div className="flex justify-center mb-12">
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setCurrentPage}
-                    />
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="text-center py-24">
-                <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
-                  <Newspaper className="w-8 h-8 text-muted-foreground/50" />
-                </div>
-                <p className="text-foreground font-medium mb-1">No articles found</p>
-                <p className="text-muted-foreground text-sm">Try adjusting your search or category filters.</p>
-              </div>
-            )}
-          </>
-        )}
-      </main>
-
-      {/* Newsletter CTA */}
-      <NewsletterCTA />
-
-      {/* Footer */}
-      <Footer />
-    </div>
-  );
-}

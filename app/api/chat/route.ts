@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     let articleContext = '';
     if (articles && Array.isArray(articles) && articles.length > 0) {
       try {
-        articleContext = '\n\nCurrent articles available on the news feed:\n';
+articleContext = '\n\nCurrent articles available on the news feed:\n';
         articles.slice(0, 10).forEach((article: any, index: number) => {
           const title = article.title || 'Untitled';
           const source = article.source || 'Unknown Source';
@@ -96,10 +96,8 @@ export async function POST(request: NextRequest) {
         // Continue without article context if it fails
       }
     }
-
     // [6] BUILD SYSTEM PROMPT
     const systemPrompt = `You are INFORMED Assistant - a highly knowledgeable and professional news assistant chatbot for the INFORMED news aggregator.
-
 Your responsibilities:
 1. Answer questions about news, current events, and world affairs accurately and objectively.
 2. Provide concise and clear summaries of news stories in simple terms.
@@ -107,16 +105,13 @@ Your responsibilities:
 4. Recommend relevant articles based on user interests.
 5. Provide context and background on major news events.
 6. Engage in helpful, professional, and friendly conversation about news and world events.
-
 Available articles:${articleContext}
-
 Guidelines:
 - Keep responses concise but comprehensive (2-3 sentences for quick questions, up to 1 paragraph for detailed requests).
 - Be accurate, objective, and avoid speculation.
 - If you don't know the answer, say so honestly.
 - Always cite article titles and sources when referencing specific stories.
 - Current time: ${new Date().toLocaleString()}`;
-
     // [7] PREPARE MESSAGES
     const groqMessages = [
       {

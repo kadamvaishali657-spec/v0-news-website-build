@@ -91,8 +91,14 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
               </div>
             ) : (
               <>
-                {messages.map((message) => (
-                  <ChatMessage key={message.id} message={message} />
+                {messages.map((message, idx) => (
+                  <div
+                    key={message.id}
+                    className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+                    style={{ animationDelay: `${idx * 50}ms` }}
+                  >
+                    <ChatMessage message={message} />
+                  </div>
                 ))}
                 <div ref={messagesEndRef} />
               </>
