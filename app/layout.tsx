@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   description: 'Experience revolutionary news aggregation with AI insights, immersive visuals, and interactive storytelling. Breaking stories from 25+ trusted sources.',
   keywords: ['news', 'technology', 'RSS feeds', 'news aggregator', 'AI insights', 'breaking news'],
   authors: [{ name: 'INFORMED' }],
+  verification: {
+    google: 'TdsH1dug5CMhswHNx_K_3svi2PelAWOUW2ZWCwSRGsU',
+  },
   icons: {
     icon: '/favicon.png',
     shortcut: '/favicon.png',
