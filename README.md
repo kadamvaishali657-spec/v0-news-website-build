@@ -1,23 +1,4 @@
-# JustinNews.tech - Tech News Aggregator
 
-A modern, fully functional tech news website that automatically fetches and displays news using RSS feeds from TechCrunch, The Verge, and NY Times.
-
-## Features
-
-✅ **Automatic RSS Feed Fetching** - Real-time news aggregation from multiple sources
-✅ **Multiple RSS Feeds** - Pre-configured with TechCrunch, The Verge, and NY Times
-✅ **Auto-Update** - Automatically refreshes feed data every 15 minutes
-✅ **Clean Modern UI** - Dark theme with responsive design
-✅ **Featured Articles** - Top 5 latest stories displayed prominently
-✅ **Category Filters** - Filter by AI, Gadgets, Startups, and Cybersecurity
-✅ **Search Functionality** - Real-time search across all articles
-✅ **Pagination** - Navigate through news with smart pagination
-✅ **Fully Responsive** - Works seamlessly on mobile, tablet, and desktop
-✅ **SEO Optimized** - Meta tags and structured data for search engines
-✅ **Error Handling** - Graceful fallbacks for RSS feed failures
-✅ **Admin Dashboard** - Add/remove RSS feeds on the fly
-✅ **CORS Handling** - Multiple proxy services for CORS compatibility
-✅ **Fast Loading** - Optimized images and lazy loading
 
 ## Getting Started
 
