@@ -70,6 +70,24 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
 
+        {/* Google Analytics */}
+        <Script
+          id="ga-script"
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-5TK241WF78"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="ga-config"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5TK241WF78');`,
+          }}
+        />
+
         {/* Google Subscribe with Google News */}
         <Script
           id="swg-script"
