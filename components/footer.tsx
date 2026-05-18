@@ -16,15 +16,14 @@ export function Footer() {
           <div className="md:col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-shadow duration-300">
-                <span className="text-white font-black text-xs tracking-tight">JN</span>
+                <span className="text-white font-black text-xs tracking-tight">I</span>
               </div>
               <span className="text-lg font-bold text-foreground tracking-tight">
-                Justin<span className="gradient-text">News</span>
-                <span className="text-muted-foreground font-normal">.tech</span>
+                Informed
               </span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-sm leading-relaxed">
-              A modern, fully automated technology news aggregator bringing you real-time stories from TechCrunch, The Verge, NY Times, and beyond—enriched with lightning-fast AI summaries.
+              A modern, professional technology news aggregator bringing you real-time stories from TechCrunch, The Verge, NY Times, and beyond.
             </p>
           </div>
 
@@ -73,7 +72,7 @@ export function Footer() {
         {/* Bottom Section */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>&copy; {new Date().getFullYear()} JustinNews.tech. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} Informed. All rights reserved.</span>
           </div>
           
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
@@ -83,8 +82,8 @@ export function Footer() {
             </span>
             <span className="hidden sm:inline">&middot;</span>
             <span className="flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-              AI Synthesized Summaries
+              <FileText className="w-3.5 h-3.5 text-purple-500" />
+              Verified Outlets
             </span>
             <span className="hidden sm:inline">&middot;</span>
             <span className="flex items-center gap-1 hover:text-foreground transition-colors cursor-default">

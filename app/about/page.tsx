@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { Info, Sparkles, Zap, Shield, Cpu, Code, Rss, ArrowLeft } from 'lucide-react';
+import { Info, Zap, Shield, Cpu, Code, Rss, ArrowLeft, Layers } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AboutPage() {
@@ -13,14 +13,14 @@ export default function AboutPage() {
       description: 'We continuously poll and parse live feeds from the tech industry’s leading outlets like TechCrunch, The Verge, and the New York Times, consolidating them into one central command center.'
     },
     {
-      icon: Sparkles,
-      title: 'AI-Powered Syntheses',
-      description: 'Say goodbye to information overload. With our intelligent client-side summarization option, get brief, key bullet-point breakdowns of long articles instantly.'
+      icon: Layers,
+      title: 'Deep Category Indexing',
+      description: 'Filter stories seamlessly through 8 distinct categories, from technology and business to education and sports, so you can locate what matters in a heartbeat.'
     },
     {
       icon: Shield,
       title: 'Zero-Trackers & No Databases',
-      description: 'Your privacy is paramount. JustinNews.tech runs entirely in your browser. All configuration preferences, saved articles, and custom RSS feeds are stored locally in your browser’s localStorage.'
+      description: 'Your privacy is paramount. Informed runs entirely in your browser. All configuration preferences, saved articles, and custom RSS feeds are stored locally in your browser’s localStorage.'
     },
     {
       icon: Zap,
@@ -52,11 +52,11 @@ export default function AboutPage() {
             </div>
 
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground mb-6">
-              About <span className="gradient-text">JustinNews</span>.tech
+              About <span className="gradient-text">Informed</span>
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              We aggregate and synthesize the world’s technology news so you can stay ahead of the curve, distraction-free.
+              We aggregate and curate the world’s technology news so you can stay ahead of the curve, distraction-free.
             </p>
           </div>
         </section>
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 Our Mission: Curate the Pulse of Tech
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                In an era flooded with clickbait and fragmented websites, JustinNews.tech was created to offer a clean, unified space for tech professionals, enthusiasts, and innovators. 
+                In an era flooded with clickbait and fragmented websites, Informed was created to offer a clean, unified space for tech professionals, enthusiasts, and innovators. 
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 We believe in an open web, giving you direct control over your news sources. Through our customized Admin dashboard, you can add your own XML feeds, disable default sources, and structure a custom-tailored front page that fits your exact interests.
@@ -98,8 +98,8 @@ export default function AboutPage() {
                     <span><strong>Hybrid CORS Proxies:</strong> Leverages seamless CORS-anywhere fallbacks for unrestricted access.</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Sparkles className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
-                    <span><strong>AI-Synthesizer Integration:</strong> Instant high-fidelity summarization model for smart text extraction.</span>
+                    <Rss className="w-4 h-4 text-pink-500 mt-0.5 flex-shrink-0" />
+                    <span><strong>Verified Source Curation:</strong> Direct XML parsing from top publications with complete editorial transparency.</span>
                   </li>
                 </ul>
               </div>
@@ -109,7 +109,7 @@ export default function AboutPage() {
           {/* Core Pillars */}
           <div className="space-y-8">
             <div className="text-center max-w-xl mx-auto mb-12">
-              <h3 className="text-xl md:text-2xl font-bold text-foreground">Why JustinNews.tech?</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-foreground">Why Informed?</h3>
               <p className="text-sm text-muted-foreground mt-2">Built around four fundamental pillars designed for premium news reading.</p>
             </div>
 

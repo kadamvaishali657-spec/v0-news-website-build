@@ -10,12 +10,12 @@ export default function PrivacyPage() {
     {
       icon: Lock,
       title: '1. No Databases or User Accounts',
-      content: 'JustinNews.tech is a completely serverless, stateless RSS feed aggregator. We do not require accounts, logins, email verification, or third-party OAuth access. Because of this architectural design, we do not capture, register, or maintain any personal profile databases on our servers.'
+      content: 'Informed is a completely serverless, stateless RSS feed aggregator. We do not require accounts, logins, email verification, or third-party OAuth access. Because of this architectural design, we do not capture, register, or maintain any personal profile databases on our servers.'
     },
     {
       icon: Eye,
       title: '2. Local Browser Storage Only',
-      content: 'All configuration settings, active or inactive feeds, bookmarks, and display states (such as your preference to render AI summaries) are stored directly in your browser’s local storage (localStorage). This data never leaves your machine, is completely managed by your own browser settings, and can be cleared by you at any time.'
+      content: 'All configuration settings, active or inactive feeds, bookmarks, and display states (such as custom added XML feeds) are stored directly in your browser’s local storage (localStorage). This data never leaves your machine, is completely managed by your own browser settings, and can be cleared by you at any time.'
     },
     {
       icon: Shield,
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
     {
       icon: Cookie,
       title: '4. External Links and Content',
-      content: 'JustinNews.tech aggregates and references articles belonging to third-party publishers (such as TechCrunch, The Verge, or the New York Times). Clicking "Read full article" redirects you to the respective publisher’s domain. We have no authority over external websites and encourage you to review their specific privacy policies concerning cookies, trackers, and data logging.'
+      content: 'Informed aggregates and references articles belonging to third-party publishers (such as TechCrunch, The Verge, or the New York Times). Clicking "Read full article" redirects you to the respective publisher’s domain. We have no authority over external websites and encourage you to review their specific privacy policies concerning cookies, trackers, and data logging.'
     }
   ];
 
@@ -72,7 +72,7 @@ export default function PrivacyPage() {
               Privacy Commitment
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              JustinNews.tech is designed with privacy-first principles. We believe that your browsing activity, news interests, and subscription lists should remain exclusively yours. We do not use third-party tracking scripts, analytic cookies, behavioral advertising tracking pixel scripts, or tracking cookies.
+              Informed is designed with privacy-first principles. We believe that your browsing activity, news interests, and subscription lists should remain exclusively yours. We do not use third-party tracking scripts, analytic cookies, behavioral advertising tracking pixel scripts, or tracking cookies.
             </p>
           </div>
 

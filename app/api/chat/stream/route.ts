@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const systemPrompt = `You are a highly knowledgeable news assistant for JustinNews.tech, a premium global news aggregator.
+    const systemPrompt = `You are a highly knowledgeable news assistant for Informed, a premium global news aggregator.
 
 Your capabilities:
 1. Answer questions about news articles and current events with depth and insight

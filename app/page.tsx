@@ -7,11 +7,9 @@ import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
 import { Pagination } from '@/components/pagination';
-import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
-import { ChatBotWidget } from '@/components/chatbot-widget';
 import { Article, RSSFeed, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2, Sparkles, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
+import { Loader2, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const ARTICLES_PER_PAGE = 12;
@@ -26,13 +24,11 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
   const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
-  const [showSummaries, setShowSummaries] = useState(false);
 
   // Load feeds and preferences from localStorage
   useEffect(() => {
     const savedFeeds = localStorage.getItem('rss-feeds');
     const savedDisabled = localStorage.getItem('disabled-feeds');
-    const savedShowSummaries = localStorage.getItem('show-ai-summaries');
     
     if (savedFeeds) {
       try {
@@ -50,10 +46,6 @@ export default function HomePage() {
       } catch (e) {
         console.error('Error parsing disabled feeds:', e);
       }
-    }
-
-    if (savedShowSummaries) {
-      setShowSummaries(JSON.parse(savedShowSummaries));
     }
   }, []);
 
@@ -153,17 +145,11 @@ export default function HomePage() {
     setCurrentPage(1);
   }, []);
 
-  const toggleSummaries = useCallback(() => {
-    const newValue = !showSummaries;
-    setShowSummaries(newValue);
-    localStorage.setItem('show-ai-summaries', JSON.stringify(newValue));
-  }, [showSummaries]);
-
   const stats = [
     { icon: Newspaper, label: 'Articles', value: articles.length.toString() },
     { icon: Globe, label: 'Sources', value: `${feeds.length}+` },
     { icon: TrendingUp, label: 'Categories', value: '8' },
-    { icon: Zap, label: 'AI Powered', value: 'Yes' },
+    { icon: Zap, label: 'Real-time', value: 'Yes' },
   ];
 
   return (
@@ -196,7 +182,7 @@ export default function HomePage() {
             </h1>
             
             <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up" style={{ animationDelay: '0.2s' }}>
-              Curated intelligence from the world&apos;s most trusted newsrooms, powered by AI summarization.
+              Curated technology and global intelligence, aggregated directly from the world&apos;s most trusted tech newsrooms.
             </p>
 
             {/* Search Bar */}
@@ -248,17 +234,6 @@ export default function HomePage() {
         <section className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Browse by Category</h3>
-            <button
-              onClick={toggleSummaries}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
-                showSummaries
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
-                  : 'bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/30'
-              }`}
-            >
-              <Sparkles className={`w-4 h-4 ${showSummaries ? 'text-white/90' : 'text-primary/50'}`} />
-              {showSummaries ? 'Hide AI Summaries' : 'Show AI Summaries'}
-            </button>
           </div>
 
           <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
@@ -300,16 +275,9 @@ export default function HomePage() {
 
             {paginatedArticles.length > 0 ? (
               <>
-                <div className={showSummaries ? 'space-y-6 mb-12' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 stagger-children'}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 stagger-children">
                   {paginatedArticles.map((article) => (
-                    <div key={article.id} className={showSummaries ? 'bg-card border border-border/40 rounded-2xl overflow-hidden shadow-card card-hover' : ''}>
-                      <NewsCard article={article} />
-                      {showSummaries && (
-                        <div className="px-5 pb-5 pt-3 border-t border-border/30 bg-muted/30">
-                          <ArticleSummary article={article} />
-                        </div>
-                      )}
-                    </div>
+                    <NewsCard key={article.id} article={article} />
                   ))}
                 </div>
 
@@ -341,9 +309,6 @@ export default function HomePage() {
 
       {/* Footer */}
       <Footer />
-
-      {/* AI Chatbot Widget */}
-      <ChatBotWidget articles={articles} />
     </div>
   );
 }

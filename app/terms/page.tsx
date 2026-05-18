@@ -10,17 +10,17 @@ export default function TermsPage() {
     {
       icon: Scale,
       title: '1. Aggregator and RSS Usage',
-      content: 'JustinNews.tech is a client-side technology news aggregator that loads public, standard XML schemas (RSS/Atom feeds). By accessing our website, you understand and acknowledge that all headlines, summaries, full article links, and publisher logos displayed belong entirely to their respective authors and media outlets.'
+      content: 'Informed is a client-side technology news aggregator that loads public, standard XML schemas (RSS/Atom feeds). By accessing our website, you understand and acknowledge that all headlines, summaries, full article links, and publisher logos displayed belong entirely to their respective authors and media outlets.'
     },
     {
       icon: Award,
       title: '2. Intellectual Property & Brand Ownership',
-      content: 'The articles and images indexed by this platform are the property of their publishers (such as TechCrunch, The Verge, NY Times). We do not claim authorship, licensing, or commercial distribution rights over foreign feed elements. The source code of JustinNews.tech itself is open source and can be modified or deployed under general public terms.'
+      content: 'The articles and images indexed by this platform are the property of their publishers (such as TechCrunch, The Verge, NY Times). We do not claim authorship, licensing, or commercial distribution rights over foreign feed elements. The source code of Informed itself is open source and can be modified or deployed under general public terms.'
     },
     {
       icon: AlertCircle,
       title: '3. Disclaimer of Content & Availability',
-      content: 'We rely entirely on external publisher XML formats and independent browser CORS proxies to load data. As a result, JustinNews.tech does not warrant or guarantee that RSS feeds will always be reachable, that parsed image formats will render perfectly, or that third-party proxy networks will be free of lag or rate limits. We provide this client-side template strictly "as is" and "as available".'
+      content: 'We rely entirely on external publisher XML formats and independent browser CORS proxies to load data. As a result, Informed does not warrant or guarantee that RSS feeds will always be reachable, that parsed image formats will render perfectly, or that third-party proxy networks will be free of lag or rate limits. We provide this client-side template strictly "as is" and "as available".'
     },
     {
       icon: HelpCircle,
@@ -69,7 +69,7 @@ export default function TermsPage() {
             <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-500 to-purple-600" />
             <h2 className="text-lg font-bold text-foreground mb-2">Acceptance of Agreement</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              By launching and interacting with JustinNews.tech, you acknowledge that you have read, understood, and agree to be bound by these terms. If you do not agree to the client-side parsing rules, direct network requests, or disclaimers, you should immediately cease using the platform.
+              By launching and interacting with Informed, you acknowledge that you have read, understood, and agree to be bound by these terms. If you do not agree to the client-side parsing rules, direct network requests, or disclaimers, you should immediately cease using the platform.
             </p>
           </div>
 

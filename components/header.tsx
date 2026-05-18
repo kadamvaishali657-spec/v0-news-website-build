@@ -48,12 +48,11 @@ export function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-shadow duration-300">
-              <span className="text-white font-black text-sm tracking-tight">JN</span>
+              <span className="text-white font-black text-sm tracking-tight">I</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-300 -z-10" />
             </div>
             <span className="text-xl font-bold text-foreground tracking-tight">
-              Justin<span className="gradient-text">News</span>
-              <span className="text-muted-foreground font-normal">.tech</span>
+              Informed
             </span>
           </Link>
 
