@@ -108,15 +108,13 @@ export function NewsCard({ article }: NewsCardProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-2 border-t border-border">
-          <a
-            href={article.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center gap-2 px-3 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90 transition-colors font-medium text-sm"
+          <Link
+            href={`/article/${article.id}`}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-accent text-accent-foreground rounded hover:bg-accent/90 transition-colors font-medium text-sm"
           >
             Read Article
             <ArrowUpRight className="w-4 h-4" />
-          </a>
+          </Link>
 
           <button
             onClick={handleSave}
