@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
+import { AdUnit } from '@/components/ad-unit';
 import { Search, Filter, ShieldAlert } from 'lucide-react';
 import { Article, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 
@@ -187,6 +188,9 @@ export default function SearchPage() {
             </div>
           )}
         </main>
+        
+        {/* Google AdSense Ad Unit */}
+        <AdUnit />
       </div>
 
       <Footer />
