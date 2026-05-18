@@ -8,7 +8,7 @@ import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
 import { Pagination } from '@/components/pagination';
 import { NewsletterCTA } from '@/components/newsletter-cta';
-import { Article, RSSFeed, DEFAULT_FEEDS } from '@/lib/rss-parser';
+import { Article, RSSFeed, DEFAULT_FEEDS, parseFeed } from '@/lib/rss-parser';
 import { Loader2, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -86,6 +86,39 @@ export default function HomePage() {
             }));
             sessionStorage.setItem('articles-session-cache', JSON.stringify(loadedArticles));
             sessionStorage.setItem('articles-cache-time', Date.now().toString());
+          }
+        }
+
+        // Hybrid Loading of Custom Client Feeds
+        const savedFeedsStr = localStorage.getItem('rss-feeds');
+        let currentFeeds = DEFAULT_FEEDS;
+        if (savedFeedsStr) {
+          try {
+            currentFeeds = JSON.parse(savedFeedsStr);
+          } catch {}
+        }
+
+        const customFeeds = currentFeeds.filter(
+          (f) => !DEFAULT_FEEDS.some((df) => df.url === f.url)
+        );
+
+        if (customFeeds.length > 0) {
+          try {
+            const customArticlesPromises = customFeeds.map((feed) =>
+              parseFeed(feed.url, feed.title, feed.category)
+            );
+            const customArticlesResults = await Promise.all(customArticlesPromises);
+            const customArticles = customArticlesResults.flat();
+            
+            if (customArticles.length > 0) {
+              // Combine, deduplicate by link, and sort
+              loadedArticles = [...customArticles, ...loadedArticles].filter(
+                (a, i, arr) => arr.findIndex((article) => article.link === a.link) === i
+              );
+              loadedArticles.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+            }
+          } catch (e) {
+            console.error('Error loading custom client feeds:', e);
           }
         }
 
