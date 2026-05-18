@@ -88,6 +88,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
 
+        {/* Google AdSense */}
+        <Script
+          id="adsense-script"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7901268014546748"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+
         {/* Google Subscribe with Google News */}
         <Script
           id="swg-script"
