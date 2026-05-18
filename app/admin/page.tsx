@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { RSSFeed, DEFAULT_FEEDS } from '@/lib/rss-parser';
 import { Plus, Trash2, Save, Eye, EyeOff, RefreshCw, X } from 'lucide-react';
 
@@ -341,6 +342,8 @@ export default function AdminPage() {
           </ul>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

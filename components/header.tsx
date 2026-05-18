@@ -183,6 +183,22 @@ export function Header() {
             </Link>
 
             <Link 
+              href="/about" 
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About Us
+            </Link>
+
+            <Link 
+              href="/contact" 
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-foreground hover:bg-primary/5 transition-colors font-medium text-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact Us
+            </Link>
+
+            <Link 
               href="/admin" 
               className="flex items-center gap-2 mx-2 mt-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-sm shadow-md shadow-indigo-500/20"
               onClick={() => setMobileMenuOpen(false)}

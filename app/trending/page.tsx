@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
 import { Flame, TrendingUp } from 'lucide-react';
 import { Article } from '@/lib/rss-parser';
@@ -93,6 +94,8 @@ export default function TrendingPage() {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }

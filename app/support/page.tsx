@@ -1,6 +1,7 @@
 'use client';
 
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { BottomNav } from '@/components/bottom-nav';
 import { Mail, Phone, MessageSquare, ExternalLink } from 'lucide-react';
 
@@ -118,6 +119,7 @@ export default function SupportPage() {
       </main>
 
       <BottomNav />
+      <Footer />
     </div>
   );
 }

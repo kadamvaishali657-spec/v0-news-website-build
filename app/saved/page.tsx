@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
 import { Bookmark, Trash2 } from 'lucide-react';
 import { Article } from '@/lib/rss-parser';
@@ -68,6 +69,8 @@ export default function SavedArticlesPage() {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }

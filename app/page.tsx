@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
@@ -339,25 +340,7 @@ export default function HomePage() {
       <NewsletterCTA />
 
       {/* Footer */}
-      <footer className="border-t border-border/40 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-xs">JN</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                &copy; 2026 JustinNews.tech
-              </span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <span>Powered by RSS &middot; AI Summaries</span>
-              <span className="hidden sm:inline">&middot;</span>
-              <span className="hidden sm:inline">TechCrunch &middot; The Verge &middot; NY Times &middot; 20+ more</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* AI Chatbot Widget */}
       <ChatBotWidget articles={articles} />
