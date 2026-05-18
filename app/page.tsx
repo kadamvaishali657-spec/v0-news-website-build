@@ -20,8 +20,6 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [feeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
 
-
-
   // Fetch articles on mount
   useEffect(() => {
     const loadArticles = async () => {
