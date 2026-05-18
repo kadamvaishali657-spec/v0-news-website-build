@@ -101,7 +101,7 @@ export function GlobeSelector({ articles, onLocationSelect }: GlobeSelectorProps
                     const vertAngle = (region.lat) * (Math.PI / 180);
                     const distance = 180 * Math.cos(vertAngle);
                     const x = 200 + distance * cos;
-                    const y = 200 + distance * Math.sin(vertAngle);
+                    const y = 200 + distance * sin;
 
                     return (
                       <g key={idx}>
