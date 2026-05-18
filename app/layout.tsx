@@ -1,24 +1,27 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { ParticleBackground } from '@/components/particle-background'
 import { ThemeProvider } from '@/providers/theme-provider'
 
 import './globals.css'
 
-const _geist = Geist({ subsets: ['latin'] })
-const _geistMono = Geist_Mono({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
 
 export const viewport: Viewport = {
-  themeColor: '#F59E0B',
+  themeColor: '#6366f1',
   userScalable: true,
 }
 
 export const metadata: Metadata = {
-  title: 'INFORMED - Reimagined News Experience',
-  description: 'Experience revolutionary news aggregation with AI insights, immersive visuals, and interactive storytelling. Breaking stories from 25+ trusted sources.',
-  keywords: ['news', 'technology', 'RSS feeds', 'news aggregator', 'AI insights', 'breaking news'],
-  authors: [{ name: 'INFORMED' }],
+  title: 'Informed - Tech News Aggregator | Latest Technology Updates',
+  description: 'Stay updated with the latest technology news from TechCrunch, The Verge, and NY Times. Real-time RSS feed aggregation with advanced filtering and search.',
+  keywords: ['tech news', 'technology', 'RSS feeds', 'TechCrunch', 'The Verge', 'news aggregator'],
+  authors: [{ name: 'Informed' }],
   verification: {
     google: 'TdsH1dug5CMhswHNx_K_3svi2PelAWOUW2ZWCwSRGsU',
   },
@@ -28,22 +31,22 @@ export const metadata: Metadata = {
     apple: '/favicon.png',
   },
   openGraph: {
-    title: 'INFORMED - Revolutionary News Experience',
-    description: 'AI-powered news aggregation with immersive visuals and interactive storytelling',
+    title: 'Informed - Tech News Delivered Daily',
+    description: 'Real-time technology news aggregator with AI, gadgets, startups, and cybersecurity coverage',
     type: 'website',
-    url: 'https://informed-news.vercel.app',
+    url: 'https://informed.tech',
     images: [
       {
         url: '/favicon.png',
         width: 512,
         height: 512,
-        alt: 'INFORMED Logo',
+        alt: 'Informed Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'INFORMED - News Reimagined',
+    title: 'Informed - Tech News',
     description: 'Latest technology news aggregated from top sources',
     images: ['/favicon.jpg'],
   },
@@ -55,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="scroll-smooth bg-background">
+    <html lang="en" className={`${inter.variable} scroll-smooth bg-background`}>
       <head>
         {/* Google Tag Manager */}
         <Script

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { RSSFeed, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Plus, Trash2, Save, Eye, EyeOff, RefreshCw, X } from 'lucide-react';
+import { Plus, Trash2, Save, Eye, EyeOff, RefreshCw, X, Sliders, Rss, ShieldAlert, Check } from 'lucide-react';
 
 export default function AdminPage() {
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
@@ -137,210 +138,410 @@ export default function AdminPage() {
   const activeFeedsCount = feeds.length - disabledFeeds.length;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+body {
+  font-family: 'Merriweather', serif;
+}
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Admin Panel</h1>
-          <p className="text-muted-foreground">Manage RSS feeds and published content</p>
-        </div>
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 
-        {/* Message Alert */}
-        {message && (
-          <div className={`mb-6 p-4 rounded-lg flex items-center justify-between ${
-            message.type === 'success' 
-              ? 'bg-green-100/20 border border-green-500/30 dark:bg-green-900/20 dark:border-green-700/50' 
-              : 'bg-red-100/20 border border-red-500/30 dark:bg-red-900/20 dark:border-red-700/50'
-          }`}>
-            <span className={message.type === 'success' ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}>
-              {message.text}
-            </span>
-            <button onClick={() => setMessage(null)} className="text-muted-foreground hover:text-foreground">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+  .font-display {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+  }
+}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-card rounded-lg border border-border p-6">
-            <p className="text-muted-foreground text-sm font-medium">Total Feeds</p>
-            <p className="text-3xl font-bold text-foreground mt-2">{feeds.length}</p>
-          </div>
-          <div className="bg-card rounded-lg border border-border p-6">
-            <p className="text-muted-foreground text-sm font-medium">Active Feeds</p>
-            <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">{activeFeedsCount}</p>
-          </div>
-          <div className="bg-card rounded-lg border border-border p-6">
-            <p className="text-muted-foreground text-sm font-medium">Disabled Feeds</p>
-            <p className="text-3xl font-bold text-red-600 dark:text-red-400 mt-2">{disabledFeeds.length}</p>
-          </div>
-        </div>
+@layer base {
+  :root {
+    /* Unified Light Theme */
+    --background: 220 20% 97%;
+    --foreground: 224 30% 12%;
 
-        {/* Add Feed Form */}
-        <div className="mb-8">
-          {!showAddForm ? (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 transition-colors font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              Add New Feed
-            </button>
-          ) : (
-            <div className="bg-card rounded-lg border border-border p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-foreground">Add New RSS Feed</h2>
-                <button onClick={() => setShowAddForm(false)} className="text-muted-foreground hover:text-foreground">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <form onSubmit={handleAddFeed} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Feed Title</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., TechCrunch, The Verge"
-                    value={newFeedTitle}
-                    onChange={(e) => setNewFeedTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-border bg-input text-foreground rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-muted-foreground"
-                  />
-                </div>
+    --card: 0 0% 100%;
+    --card-foreground: 224 30% 12%;
 
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">RSS Feed URL</label>
-                  <input
-                    type="url"
-                    placeholder="https://example.com/rss.xml"
-                    value={newFeedUrl}
-                    onChange={(e) => setNewFeedUrl(e.target.value)}
-                    className="w-full px-4 py-2 border border-border bg-input text-foreground rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-muted-foreground"
-                  />
-                </div>
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 30% 12%;
 
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Category (Optional)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Technology, Business"
-                    value={newFeedCategory}
-                    onChange={(e) => setNewFeedCategory(e.target.value)}
-                    className="w-full px-4 py-2 border border-border bg-input text-foreground rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-muted-foreground"
-                  />
-                </div>
+    --primary: 245 82% 60%;
+    --primary-foreground: 0 0% 100%;
 
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white rounded-lg transition-colors font-medium"
-                  >
-                    <Save className="w-4 h-4" />
-                    Add Feed
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddForm(false)}
-                    className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors font-medium"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-        </div>
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 224 30% 12%;
 
-        {/* Feeds List */}
-        <div className="bg-card rounded-lg border border-border overflow-hidden">
-          <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">RSS Feeds ({feeds.length})</h2>
-            <button
-              onClick={handleResetToDefault}
-              className="text-sm text-accent hover:text-accent/80 font-medium flex items-center gap-1"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Reset to Default
-            </button>
-          </div>
-          
-          {feeds.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-secondary border-b border-border">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">URL</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-secondary-foreground uppercase">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {feeds.map((feed, index) => {
-                    const isDisabled = disabledFeeds.includes(feed.url);
-                    return (
-                      <tr key={index} className={`border-b border-border hover:bg-secondary/30 ${isDisabled ? 'opacity-60' : ''}`}>
-                        <td className="px-6 py-4 text-sm font-medium text-foreground">{feed.title}</td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">{feed.category || '-'}</td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground max-w-xs truncate" title={feed.url}>{feed.url}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            isDisabled 
-                              ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300' 
-                              : 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300'
-                          }`}>
-                            {isDisabled ? 'Disabled' : 'Active'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm flex gap-2">
-                          <button
-                            onClick={() => handleToggleFeed(feed.url)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              isDisabled 
-                                ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/60' 
-                                : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/60'
-                            }`}
-                            title={isDisabled ? 'Enable feed' : 'Disable feed'}
-                          >
-                            {isDisabled ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                          </button>
-                          <button
-                            onClick={() => handleRemoveFeed(feed.url)}
-                            className="p-2 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60 transition-colors"
-                            title="Delete feed"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <p className="font-medium">No feeds configured</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">Add a feed to get started</p>
-            </div>
-          )}
-        </div>
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 10% 46%;
 
-        {/* Info Box */}
-        <div className="mt-8 bg-accent/10 border border-accent/30 rounded-lg p-6">
-          <h3 className="font-semibold text-foreground mb-2">How to Use</h3>
-          <ul className="text-sm text-muted-foreground space-y-2">
-            <li>• Click "Add New Feed" to add an RSS feed</li>
-            <li>• Toggle the eye icon to enable/disable feeds</li>
-            <li>• Delete feeds you no longer want to use</li>
-            <li>• Changes are saved to your browser automatically</li>
-            <li>• Only active feeds appear on the home page</li>
-            <li>• Use "Reset to Default" to restore original feeds</li>
-          </ul>
-        </div>
-      </main>
-    </div>
-  );
+    --accent: 25 95% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 245 82% 60%;
+
+    --chart-1: 245 82% 60%;
+    --chart-2: 330 80% 60%;
+    --chart-3: 170 75% 45%;
+    --chart-4: 35 92% 55%;
+    --chart-5: 280 70% 60%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 224 30% 12%;
+    --sidebar-primary: 245 82% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 94%;
+    --sidebar-accent-foreground: 224 30% 12%;
+    --sidebar-border: 220 14% 90%;
+    --sidebar-ring: 245 82% 60%;
+  }
+
+  .dark {
+    /* Unified Dark Theme */
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 6%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 250 89% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 10% 12%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 10% 12%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 25 95% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 10% 15%;
+    --input: 240 10% 15%;
+    --ring: 250 89% 65%;
+
+    --chart-1: 250 89% 65%;
+    --chart-2: 330 80% 65%;
+    --chart-3: 170 75% 50%;
+    --chart-4: 35 92% 60%;
+    --chart-5: 280 70% 65%;
+
+    --sidebar-background: 240 10% 4%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 250 89% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 10% 12%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 10% 15%;
+    --sidebar-ring: 250 89% 65%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground transition-colors duration-200;
+  }
+}
+
+/* Components */
+@layer components {
+  .immersive-transition {
+    @apply transition-all duration-700 ease-out;
+  }
+
+  .hero-text {
+    @apply font-display leading-tight tracking-tighter;
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .section-heading {
+    @apply font-display tracking-tight;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .article-hover {
+    @apply cursor-pointer transition-all duration-500;
+  }
+
+  .article-hover:hover {
+    transform: translateY(-8px);
+  }
+
+  .overlay-gradient {
+    @apply absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .dark .glass {
+    background: rgba(15, 18, 35, 0.72);
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      #6366f1 0%,
+      #8b5cf6 25%,
+      #a855f7 50%,
+      #ec4899 75%,
+      #f43f5e 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-border {
+    position: relative;
+    border-radius: var(--radius);
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: linear-gradient(
+      135deg,
+      #6366f1,
+      #8b5cf6,
+      #a855f7,
+      #ec4899
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .gradient-border:hover::before {
+    opacity: 1;
+  }
+
+  .card-hover {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow:
+      0 20px 60px -15px rgba(99, 102, 241, 0.2),
+      0 10px 20px -10px rgba(0, 0, 0, 0.08);
+  }
+
+  .mesh-gradient {
+    background-image:
+      radial-gradient(
+        at 20% 80%,
+        rgba(99, 102, 241, 0.15) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 80% 20%,
+        rgba(139, 92, 246, 0.12) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 40% 40%,
+        rgba(168, 85, 247, 0.08) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 70% 70%,
+        rgba(236, 72, 153, 0.1) 0px,
+        transparent 50%
+      );
+  }
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+
+  66% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Utilities */
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  .fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+
+  .pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  .ticker {
+    animation: ticker 30s linear infinite;
+  }
+
+  .ticker:hover {
+    animation-play-state: paused;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(99, 102, 241, 0.08) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  .stagger-children > * {
+    opacity: 0;
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  .stagger-children > *:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  .stagger-children > *:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-children > *:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+
+  .stagger-children > *:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-children > *:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* Selection */
+::selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: inherit;
+}
+
+/* Focus */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
 }

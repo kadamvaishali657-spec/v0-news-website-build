@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
 import { AdUnit } from '@/components/ad-unit';
 import { Search, Filter, ShieldAlert } from 'lucide-react';
@@ -27,7 +28,10 @@ export default function SearchPage() {
         const savedArticles = localStorage.getItem('saved-articles');
         if (savedArticles) {
           try {
-            const saved = JSON.parse(savedArticles);
+            const saved = JSON.parse(savedArticles).map((a: any) => ({
+              ...a,
+              pubDate: new Date(a.pubDate)
+            }));
             // Combine and deduplicate
             allArticles = [...feedArticles, ...saved].filter((a, i, arr) =>
               arr.findIndex(article => article.id === a.id) === i
@@ -89,7 +93,7 @@ export default function SearchPage() {
         <section className="relative overflow-hidden border-b border-border/40">
           <div className="absolute inset-0 mesh-gradient" />
           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
-
+          
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
@@ -100,7 +104,7 @@ export default function SearchPage() {
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
               Advanced <span className="gradient-text">Search</span>
             </h1>
-
+            
             <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
               Query our vast real-time index of technology publications. Filter by publisher source, publishing date range, or keywords.
             </p>
@@ -111,7 +115,7 @@ export default function SearchPage() {
           {/* Search Filters Card */}
           <div className="bg-card/40 backdrop-blur-md border border-border/60 rounded-3xl p-6 md:p-8 mb-8 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
-
+            
             <div className="space-y-5">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
@@ -186,19 +190,15 @@ export default function SearchPage() {
               ))}
             </div>
           )}
+
+          {/* Google AdSense Ad Unit */}
+          <div className="mt-12">
+            <AdUnit />
+          </div>
         </main>
-        
-        {/* Google AdSense Ad Unit */}
-        <AdUnit />
       </div>
 
-      {/* Footer */}
-      <footer className="bg-card border-t border-border py-16 px-6 mt-24">
-        <div className="max-w-7xl mx-auto text-center text-foreground/60 text-sm">
-          <p>&copy; 2026 INFORMED - Reimagined news experience</p>
-          <p className="mt-2">Sourced from global RSS feeds • Powered by AI insights</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

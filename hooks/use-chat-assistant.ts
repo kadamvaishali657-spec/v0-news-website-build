@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   ChatMessage,
   saveChatHistory,
@@ -13,6 +13,7 @@ export function useChatAssistant(articles: Article[]) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Load chat history on mount
   useEffect(() => {
@@ -31,6 +32,13 @@ export function useChatAssistant(articles: Article[]) {
     async (content: string) => {
       if (!content.trim()) return;
 
+      // Cancel any ongoing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       // Add user message
       const userMessage: ChatMessage = {
         id: generateMessageId(),
@@ -39,48 +47,117 @@ export function useChatAssistant(articles: Article[]) {
         timestamp: Date.now(),
       };
 
+      const assistantMsgId = generateMessageId();
+
       setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetch('/api/chat', {
+        // Try streaming endpoint first
+        const response = await fetch('/api/chat/stream', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: messages.map((m) => ({
+            messages: [...messages, userMessage].map((m) => ({
               role: m.role,
               content: m.content,
             })),
-            userMessage: content,
-            articleContext: articles.slice(0, 10),
+            articles: articles.slice(0, 15).map((a) => ({
+              title: a.title,
+              source: a.source,
+              category: a.category,
+              description: typeof a.description === 'string' ? a.description.substring(0, 120) : '',
+            })),
           }),
+          signal: abortController.signal,
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to get response');
+          // Fall back to non-streaming endpoint
+          const fallbackResponse = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              messages: [...messages, userMessage].map((m) => ({
+                role: m.role,
+                content: m.content,
+              })),
+              articles: articles.slice(0, 10),
+            }),
+            signal: abortController.signal,
+          });
+
+          if (!fallbackResponse.ok) {
+            const errorData = await fallbackResponse.json();
+            throw new Error(errorData.error || 'Failed to get response');
+          }
+
+          const data = await fallbackResponse.json();
+          const assistantMessage: ChatMessage = {
+            id: assistantMsgId,
+            role: 'assistant',
+            content: data.message,
+            timestamp: Date.now(),
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
+          return;
         }
 
-        const data = await response.json();
+        // Stream the response
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No response body');
 
-        // Add assistant message
-        const assistantMessage: ChatMessage = {
-          id: generateMessageId(),
+        const decoder = new TextDecoder();
+        let accumulated = '';
+
+        // Add empty assistant message that we'll stream into
+        const streamingMessage: ChatMessage = {
+          id: assistantMsgId,
           role: 'assistant',
-          content: data.message,
+          content: '',
           timestamp: Date.now(),
         };
+        setMessages((prev) => [...prev, streamingMessage]);
 
-        setMessages((prev) => [...prev, assistantMessage]);
+        let buffer = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith('data: ')) continue;
+
+            const data = trimmed.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) {
+                accumulated += parsed.content;
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantMsgId ? { ...m, content: accumulated } : m
+                  )
+                );
+              }
+            } catch {
+              // Skip malformed chunks
+            }
+          }
+        }
       } catch (err) {
+        if (abortController.signal.aborted) return;
+
         const errorMsg =
           err instanceof Error ? err.message : 'Unknown error occurred';
         setError(errorMsg);
 
-        // Add error message to chat
         const errorMessage: ChatMessage = {
           id: generateMessageId(),
           role: 'assistant',
@@ -91,6 +168,7 @@ export function useChatAssistant(articles: Article[]) {
         setMessages((prev) => [...prev, errorMessage]);
       } finally {
         setIsLoading(false);
+        abortControllerRef.current = null;
       }
     },
     [messages, articles]
@@ -99,6 +177,9 @@ export function useChatAssistant(articles: Article[]) {
   const clearMessages = useCallback(() => {
     setMessages([]);
     setError(null);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
   }, []);
 
   return {
