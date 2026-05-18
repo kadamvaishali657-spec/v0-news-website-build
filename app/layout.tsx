@@ -69,6 +69,28 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-PH73JX7W');`,
           }}
         />
+
+        {/* Google Subscribe with Google News */}
+        <Script
+          id="swg-script"
+          async
+          src="https://news.google.com/swg/js/v1/swg-basic.js"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="swg-config"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(self.SWG_BASIC = self.SWG_BASIC || []).push(basicSubscriptions => {
+    basicSubscriptions.init({
+      type: "NewsArticle",
+      isPartOfType: ["Product"],
+      isPartOfProductId: "CAowo8_GDA:openaccess",
+      clientOptions: { theme: "light", lang: "en" },
+    });
+  });`,
+          }}
+        />
       </head>
       <body className="font-sans antialiased bg-background min-h-screen relative">
         {/* Google Tag Manager (noscript) */}
