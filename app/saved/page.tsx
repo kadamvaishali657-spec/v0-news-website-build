@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
+import { AdUnit } from '@/components/ad-unit';
 import { Bookmark, Trash2 } from 'lucide-react';
 import { Article } from '@/lib/rss-parser';
 
@@ -94,6 +95,11 @@ export default function SavedArticlesPage() {
               ))}
             </div>
           )}
+
+          {/* Google AdSense Ad Unit */}
+          <div className="mt-12">
+            <AdUnit />
+          </div>
         </main>
       </div>
 

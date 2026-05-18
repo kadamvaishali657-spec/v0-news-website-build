@@ -1,16 +1,14 @@
 'use client';
+// INFORMED Premium News Aggregation Platform - Fresh Vercel Build Trigger
 
 import { useState, useEffect, useCallback } from 'react';
 import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
 import { SearchBar } from '@/components/search-bar';
-import { CategoryFilter } from '@/components/category-filter';
 import { NewsCard } from '@/components/news-card';
-import { Pagination } from '@/components/pagination';
-import { NewsletterCTA } from '@/components/newsletter-cta';
 import { TimelineSection } from '@/components/timeline-section';
 import { ChatBotWidget } from '@/components/chatbot-widget';
 import { AppPromotionSection } from '@/components/app-promotion-section';
+import { AdUnit } from '@/components/ad-unit';
 import { Article, RSSFeed, DEFAULT_FEEDS, parseFeed } from '@/lib/rss-parser';
 import { Loader2, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -170,11 +168,6 @@ export default function HomePage() {
     setCurrentPage(1);
   }, [articles, searchQuery, selectedCategory, disabledFeeds]);
 
-  const startIdx = (currentPage - 1) * ARTICLES_PER_PAGE;
-  const endIdx = startIdx + ARTICLES_PER_PAGE;
-  const paginatedArticles = filteredArticles.slice(startIdx, endIdx);
-  const totalPages = Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE);
-
   const featuredArticles = articles.slice(0, 4);
 
   const handleSearch = useCallback((query: string) => {
@@ -240,9 +233,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Featured Section */}
-        {!loading && featuredArticles.length > 0 && (
+      {/* Featured Section */}
+      {!loading && featuredArticles.length > 0 && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <section className="mb-16 fade-in-up">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -258,3 +251,32 @@ export default function HomePage() {
               {featuredArticles.map((article) => (
                 <NewsCard key={article.id} article={article} />
               ))}
+            </div>
+          </section>
+        </main>
+      )}
+
+      {/* Google AdSense Ad Unit */}
+      <AdUnit />
+
+      {/* App Promotion Section */}
+      <AppPromotionSection />
+
+      {/* Timeline Section */}
+      {!loading && articles.length > 0 && (
+        <TimelineSection articles={articles} />
+      )}
+
+      {/* Footer */}
+      <footer className="bg-card border-t border-border py-16 px-6 mt-24">
+        <div className="max-w-7xl mx-auto text-center text-foreground/60 text-sm">
+          <p>&copy; 2026 INFORMED - Reimagined news experience</p>
+          <p className="mt-2">Sourced from global RSS feeds • Powered by AI insights</p>
+        </div>
+      </footer>
+
+      {/* AI Chatbot Widget */}
+      <ChatBotWidget articles={articles} />
+    </div>
+  );
+}

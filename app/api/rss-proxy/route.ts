@@ -25,10 +25,44 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Security: Only allow configured feeds
-  if (!isValidFeedUrl(feedUrl)) {
+  // Security Validation: Ensure URL is valid, external, and not an SSRF target
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(decodeURIComponent(feedUrl));
+  } catch (e) {
+    try {
+      parsedUrl = new URL(feedUrl);
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid URL parameter format' },
+        { status: 400 }
+      );
+    }
+  }
+
+  // Enforce HTTP/HTTPS protocols only
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
     return NextResponse.json(
-      { error: 'Unauthorized feed URL' },
+      { error: 'Only HTTP and HTTPS protocols are authorized' },
+      { status: 403 }
+    );
+  }
+
+  const hostname = parsedUrl.hostname.toLowerCase();
+
+  // Block local loopbacks and private networks to prevent SSRF
+  const isLocalOrPrivate = 
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0' ||
+    hostname === '169.254.169.254' || // AWS metadata endpoint
+    hostname.startsWith('10.') ||
+    hostname.startsWith('192.168.') ||
+    !!hostname.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./); // Private IP Class B
+
+  if (isLocalOrPrivate) {
+    return NextResponse.json(
+      { error: 'Access to local or private network feeds is unauthorized' },
       { status: 403 }
     );
   }

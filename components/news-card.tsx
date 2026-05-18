@@ -131,9 +131,9 @@ export function NewsCard({ article }: NewsCardProps) {
         </p>
 
         {/* Actions */}
-<div className="flex items-center gap-3 pt-4 border-t border-border/30 mt-auto">
+        <div className="flex items-center gap-3 pt-4 border-t border-border/30 mt-auto">
           <Link
-            href={`/article/${encodeURIComponent(article.id)}`}
+            href={`/article/${article.id}`}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-foreground text-background dark:bg-white dark:text-black rounded-xl hover:bg-primary hover:text-white dark:hover:bg-primary transition-all duration-300 font-semibold text-sm shadow-md hover:shadow-primary/30 group/btn overflow-hidden relative"
           >
             <span className="relative z-10 flex items-center gap-2">
