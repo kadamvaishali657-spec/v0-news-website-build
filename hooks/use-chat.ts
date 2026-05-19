@@ -1,13 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+import { ChatMessage } from '@/lib/chat-utils';
 
 const CHAT_STORAGE_KEY = 'newsbot-chat-history';
 const MAX_STORED_MESSAGES = 50;
@@ -23,11 +17,7 @@ export function useChat(articleContext?: any[]) {
       const stored = localStorage.getItem(CHAT_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        const messagesWithDates = parsed.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
-        }));
-        setMessages(messagesWithDates);
+        setMessages(parsed);
       }
     } catch (e) {
       // Silently fail if localStorage is not available or corrupted
@@ -58,7 +48,7 @@ export function useChat(articleContext?: any[]) {
         id: `user-${Date.now()}`,
         role: 'user',
         content: userMessage,
-        timestamp: new Date(),
+        timestamp: Date.now(),
       };
 
       setMessages((prev) => [...prev, userMsg]);
@@ -107,7 +97,7 @@ export function useChat(articleContext?: any[]) {
           id: `assistant-${Date.now()}`,
           role: 'assistant',
           content: data.message,
-          timestamp: new Date(),
+          timestamp: Date.now(),
         };
 
         setMessages((prev) => [...prev, assistantMsg]);
@@ -131,7 +121,7 @@ export function useChat(articleContext?: any[]) {
             id: `assistant-${Date.now()}`,
             role: 'assistant',
             content: 'I apologize, but the chat service is temporarily unavailable. Please try again in a moment. In the meantime, you can browse articles or use the search feature.',
-            timestamp: new Date(),
+            timestamp: Date.now(),
           };
           setMessages((prev) => [...prev, assistantMsg]);
         }
