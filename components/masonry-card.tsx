@@ -40,9 +40,12 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
   const validImageUrl = isValidImageUrl(article.image) ? article.image : null;
 
   return (
-    <Link 
-      href={`/article/${article.id}`}
+    <a 
+      href={article.link || '#'}
+      target="_blank"
+      rel="noopener noreferrer"
       className="block h-full cursor-pointer"
+      onClick={handleClick}
     >
       <div
         className={`${cardClass} article-hover relative overflow-hidden bg-gradient-to-br from-card to-card/50 border border-border/60 h-80 md:h-96 ${featured ? 'md:h-full' : ''} shadow-lg hover:shadow-3xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 group`}
@@ -119,6 +122,6 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
           </div>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { NewsCard } from '@/components/news-card';
-import { AdUnit } from '@/components/ad-unit';
 import { Search, Filter, ShieldAlert } from 'lucide-react';
 import { Article, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
 
@@ -22,7 +21,7 @@ export default function SearchPage() {
       try {
         // Load articles from feeds
         const feedArticles = await fetchAllFeeds(DEFAULT_FEEDS);
-
+        
         // Also load saved articles
         let allArticles = feedArticles;
         const savedArticles = localStorage.getItem('saved-articles');
@@ -33,14 +32,14 @@ export default function SearchPage() {
               pubDate: new Date(a.pubDate)
             }));
             // Combine and deduplicate
-            allArticles = [...feedArticles, ...saved].filter((a, i, arr) =>
+            allArticles = [...feedArticles, ...saved].filter((a, i, arr) => 
               arr.findIndex(article => article.id === a.id) === i
             );
           } catch (e) {
             console.error('Error loading saved articles:', e);
           }
         }
-
+        
         setArticles(allArticles);
         // Extract unique sources
         const uniqueSources = [...new Set(allArticles.map(a => a.source))];
@@ -62,9 +61,9 @@ export default function SearchPage() {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       results = results.filter(
-        a => a.title.toLowerCase().includes(query) ||
-          a.description.toLowerCase().includes(query) ||
-          a.source.toLowerCase().includes(query)
+        a => a.title.toLowerCase().includes(query) || 
+             a.description.toLowerCase().includes(query) ||
+             a.source.toLowerCase().includes(query)
       );
     }
 
@@ -88,7 +87,7 @@ export default function SearchPage() {
     <div className="min-h-screen bg-background flex flex-col justify-between">
       <div>
         <Header />
-
+        
         {/* Hero Header */}
         <section className="relative overflow-hidden border-b border-border/40">
           <div className="absolute inset-0 mesh-gradient" />
@@ -190,11 +189,6 @@ export default function SearchPage() {
               ))}
             </div>
           )}
-
-          {/* Google AdSense Ad Unit */}
-          <div className="mt-12">
-            <AdUnit />
-          </div>
         </main>
       </div>
 
