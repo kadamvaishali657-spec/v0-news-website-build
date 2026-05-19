@@ -93,7 +93,7 @@ export async function parseFeed(feedUrl: string, feedTitle: string, category?: s
   }
 }
 
-async function parseFeedContent(text: string, feedTitle: string, category?: string): Promise<Article[]> {
+async function parseFeedContent(text: string | null, feedTitle: string, category?: string): Promise<Article[]> {
   try {
     if (!text || typeof text !== 'string') {
       return [];
