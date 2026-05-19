@@ -108,7 +108,7 @@ export function MasonryCard({ article, featured = false }: MasonryCardProps) {
               {article.title}
             </h3>
             <p className={`text-xs md:text-sm font-light text-background/90 line-clamp-2 transition-all duration-300 ${isHovered ? 'opacity-100 line-clamp-3' : 'opacity-75'}`}>
-              {article.description?.replace(/<[^>]*>/g, '') || 'Click to read the full story'}
+              {article.description || 'Click to read the full story'}
             </p>
           </div>
 

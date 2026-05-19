@@ -194,37 +194,12 @@ async function parseFeedContent(text: string, feedTitle: string, category?: stri
 }
 
 function cleanText(text: string): string {
-  if (!text) return '';
-  
-  // Remove HTML tags completely
+  // Remove HTML tags
   let clean = text.replace(/<[^>]*>/g, '');
-  
-  // Decode common HTML entities
-  const entities: { [key: string]: string } = {
-    '&amp;': '&',
-    '&lt;': '<',
-    '&gt;': '>',
-    '&quot;': '"',
-    '&#39;': "'",
-    '&apos;': "'",
-    '&nbsp;': ' ',
-  };
-  
-  Object.entries(entities).forEach(([entity, char]) => {
-    clean = clean.replace(new RegExp(entity, 'g'), char);
-  });
-  
-  // Decode numeric entities (&#123; or &#x1F;)
-  clean = clean.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(parseInt(dec, 10)));
-  clean = clean.replace(/&#x([0-9a-f]+);/gi, (match, hex) => String.fromCharCode(parseInt(hex, 16)));
-  
-  // Remove excessive whitespace and normalize
-  clean = clean.replace(/\s+/g, ' ').trim();
-  
-  // Remove any remaining HTML-like patterns that might have slipped through
-  clean = clean.replace(/[<>]/g, '');
-  
-  return clean;
+  // Decode HTML entities
+  const txt = document.createElement('textarea');
+  txt.innerHTML = clean;
+  return txt.value;
 }
 
 export async function fetchAllFeeds(feeds: RSSFeed[]): Promise<Article[]> {
