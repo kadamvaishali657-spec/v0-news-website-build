@@ -121,12 +121,12 @@ export function NewsCard({ article }: NewsCardProps) {
         </div>
 
         {/* Title */}
-        <h3 className="text-[1.1rem] font-bold text-foreground line-clamp-2 leading-snug group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all duration-300">
+        <h3 className="text-[1.15rem] font-bold text-foreground line-clamp-3 leading-1.4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all duration-300 tracking-tight">
           {article.title}
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground/90 line-clamp-2 flex-1 leading-relaxed opacity-80">
+        <p className="text-sm text-muted-foreground/95 line-clamp-3 flex-1 leading-1.5 opacity-85">
           {article.description}
         </p>
 
