@@ -125,7 +125,7 @@ export function ScaryMasonryCard({ article, featured = false, index = 0 }: Scary
               {/* Description - Subtle */}
               {article.description && (
                 <p className="text-xs md:text-sm text-slate-300 line-clamp-2 opacity-80">
-                  {article.description.replace(/<[^>]*>/g, '')}
+                  {article.description}
                 </p>
               )}
             </div>
