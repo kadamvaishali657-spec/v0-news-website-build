@@ -127,7 +127,7 @@ export function NewsCard({ article }: NewsCardProps) {
 
         {/* Description */}
         <p className="text-sm text-muted-foreground/95 line-clamp-3 flex-1 leading-1.5 opacity-85">
-          {article.description}
+          {article.description?.replace(/<[^>]*>/g, '') || 'Click to read the full story'}
         </p>
 
         {/* Actions */}

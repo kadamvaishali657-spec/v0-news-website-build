@@ -101,7 +101,7 @@ export function NewsCardWithSummary({ article, showSummary = true }: NewsCardWit
 
         {/* Description */}
         <p className="text-sm text-gray-600 line-clamp-2">
-          {article.description}
+          {article.description?.replace(/<[^>]*>/g, '')}
         </p>
 
         {/* AI Summary - Expandable */}
