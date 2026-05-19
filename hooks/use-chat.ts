@@ -113,7 +113,7 @@ export function useChat(articleContext?: any[]) {
         setMessages((prev) => [...prev, assistantMsg]);
       } catch (err) {
         let errorMsg = 'Failed to send message';
-
+        
         if (err instanceof Error) {
           if (err.name === 'AbortError') {
             errorMsg = 'Request timeout. Please try again.';
@@ -121,11 +121,11 @@ export function useChat(articleContext?: any[]) {
             errorMsg = err.message;
           }
         }
-
+        
         // Check if it's a network/API error
         if (errorMsg.includes('Failed') || errorMsg.includes('fetch')) {
           errorMsg = 'Chat service temporarily unavailable. Please try again later.';
-
+          
           // Add a helpful assistant message
           const assistantMsg: ChatMessage = {
             id: `assistant-${Date.now()}`,
@@ -135,7 +135,7 @@ export function useChat(articleContext?: any[]) {
           };
           setMessages((prev) => [...prev, assistantMsg]);
         }
-
+        
         setError(errorMsg);
         setIsLoading(false);
       }

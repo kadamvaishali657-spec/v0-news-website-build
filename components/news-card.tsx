@@ -121,19 +121,19 @@ export function NewsCard({ article }: NewsCardProps) {
         </div>
 
         {/* Title */}
-        <h3 className="text-[1.1rem] font-bold text-foreground line-clamp-2 leading-snug group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all duration-300">
+        <h3 className="text-[1.15rem] font-bold text-foreground line-clamp-3 leading-1.4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-all duration-300 tracking-tight">
           {article.title}
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground/90 line-clamp-2 flex-1 leading-relaxed opacity-80">
-          {article.description}
+        <p className="text-sm text-muted-foreground/95 line-clamp-3 flex-1 leading-1.5 opacity-85">
+          {article.description?.replace(/<[^>]*>/g, '') || 'Click to read the full story'}
         </p>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 pt-4 border-t border-border/30 mt-auto">
+<div className="flex items-center gap-3 pt-4 border-t border-border/30 mt-auto">
           <Link
-            href={`/article/${article.id}`}
+            href={`/article/${encodeURIComponent(article.id)}`}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-foreground text-background dark:bg-white dark:text-black rounded-xl hover:bg-primary hover:text-white dark:hover:bg-primary transition-all duration-300 font-semibold text-sm shadow-md hover:shadow-primary/30 group/btn overflow-hidden relative"
           >
             <span className="relative z-10 flex items-center gap-2">

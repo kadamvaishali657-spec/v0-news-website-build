@@ -91,7 +91,7 @@ export function TimelineSection({ articles }: TimelineSectionProps) {
                   </h3>
                   
                   <p className="text-foreground/70 text-sm line-clamp-2 group-hover:text-foreground/90 transition-all duration-300">
-                    {article.description || 'Discover this story'}
+                    {article.description?.replace(/<[^>]*>/g, '') || 'Discover this story'}
                   </p>
                 </div>
 
