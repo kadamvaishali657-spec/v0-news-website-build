@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
@@ -9,82 +9,69 @@ import { Pagination } from '@/components/pagination';
 import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { ChatBotWidget } from '@/components/chatbot-widget';
+import { 
+  NewsCardGridSkeleton, 
+  FeaturedArticlesGridSkeleton,
+  SearchBarSkeleton,
+  CategoryFilterSkeleton
+} from '@/components/skeleton-loaders';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2, Sparkles, Newspaper, TrendingUp, Globe, Zap, ArrowRight } from 'lucide-react';
+import { Loader2, Sparkles, Newspaper, TrendingUp, Globe, Zap, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 const ARTICLES_PER_PAGE = 12;
 
-export default function HomePage() {
+/**
+ * Custom hook for feed fetching with caching
+ */
+function useFeedFetching(feeds: RSSFeed[]) {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [filteredArticles, setFilteredArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
-  const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
-  const [showSummaries, setShowSummaries] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
-  // Load feeds and preferences from localStorage
-  useEffect(() => {
-    const savedFeeds = localStorage.getItem('rss-feeds');
-    const savedDisabled = localStorage.getItem('disabled-feeds');
-    const savedShowSummaries = localStorage.getItem('show-ai-summaries');
-
-    if (savedFeeds) {
-      try {
-        const parsed = JSON.parse(savedFeeds);
-        setFeeds(parsed);
-      } catch (e) {
-        console.error('Error parsing saved feeds:', e);
-      }
-    }
-
-    if (savedDisabled) {
-      try {
-        const parsed = JSON.parse(savedDisabled);
-        setDisabledFeeds(parsed);
-      } catch (e) {
-        console.error('Error parsing disabled feeds:', e);
-      }
-    }
-
-    if (savedShowSummaries) {
-      setShowSummaries(JSON.parse(savedShowSummaries));
-    }
-  }, []);
-
-  // Fetch articles when feeds change (with session caching)
   useEffect(() => {
     const loadArticles = async () => {
       setLoading(true);
       setError(null);
+      
       try {
-        const cached = sessionStorage.getItem('articles-session-cache');
-        let articles: Article[] = [];
+        // Try to use cached data first (5 minute cache)
+        const cacheKey = 'articles-cache';
+        const cached = localStorage.getItem(cacheKey);
+        const cacheTime = localStorage.getItem(`${cacheKey}-time`);
+        const now = Date.now();
 
-        if (cached) {
-          try {
-            articles = JSON.parse(cached);
-          } catch (e) {
-            articles = await fetchAllFeeds(feeds);
-            sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+        if (cached && cacheTime) {
+          const cachedDate = parseInt(cacheTime, 10);
+          if (now - cachedDate < 5 * 60 * 1000) {
+            // Cache is fresh
+            try {
+              const cachedArticles = JSON.parse(cached);
+              if (Array.isArray(cachedArticles) && cachedArticles.length > 0) {
+                setArticles(cachedArticles);
+                setLoading(false);
+                return;
+              }
+            } catch (e) {
+              // Invalid cache, continue to fetch
+            }
           }
+        }
+
+        // Fetch fresh articles
+        const freshArticles = await fetchAllFeeds(feeds);
+        
+        if (freshArticles.length > 0) {
+          localStorage.setItem(cacheKey, JSON.stringify(freshArticles));
+          localStorage.setItem(`${cacheKey}-time`, now.toString());
+          setArticles(freshArticles);
         } else {
-          articles = await fetchAllFeeds(feeds);
-          sessionStorage.setItem('articles-session-cache', JSON.stringify(articles));
+          setError('No articles could be loaded. RSS feeds may be temporarily unavailable. Showing cached data.');
         }
-
-        if (articles.length === 0) {
-          setError('No articles loaded. RSS feeds may be temporarily unavailable. Try again in a moment.');
-        }
-
-        setArticles(articles);
-        setCurrentPage(1);
       } catch (err) {
-        setError('Failed to load news. Please try again later.');
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        setError(`Failed to load news: ${errorMessage}`);
       } finally {
         setLoading(false);
       }
@@ -93,14 +80,31 @@ export default function HomePage() {
     if (feeds.length > 0) {
       loadArticles();
     }
-  }, [feeds]);
+  }, [feeds, retryCount]);
 
-  // Filter and search articles
-  useEffect(() => {
+  const retry = useCallback(() => {
+    setRetryCount((prev) => prev + 1);
+  }, []);
+
+  return { articles, loading, error, retry };
+}
+
+/**
+ * Custom hook for article filtering
+ */
+function useArticleFiltering(
+  articles: Article[],
+  searchQuery: string,
+  selectedCategory: string,
+  disabledFeeds: string[]
+) {
+  return useMemo(() => {
     let result = articles;
 
+    // Filter by disabled feeds
     result = result.filter((article) => !disabledFeeds.includes(article.source));
 
+    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -111,17 +115,53 @@ export default function HomePage() {
       );
     }
 
+    // Filter by category
     if (selectedCategory !== 'All') {
       result = result.filter((article) => {
         const articleCategory = article.category || article.source || '';
-        return articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-               selectedCategory.toLowerCase().includes(articleCategory.toLowerCase());
+        return (
+          articleCategory.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+          selectedCategory.toLowerCase().includes(articleCategory.toLowerCase())
+        );
       });
     }
 
-    setFilteredArticles(result);
-    setCurrentPage(1);
+    return result;
   }, [articles, searchQuery, selectedCategory, disabledFeeds]);
+}
+
+export default function HomePage() {
+  const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
+  const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showSummaries, setShowSummaries] = useState(false);
+
+  // Load preferences from localStorage
+  useEffect(() => {
+    try {
+      const savedFeeds = localStorage.getItem('rss-feeds');
+      if (savedFeeds) {
+        setFeeds(JSON.parse(savedFeeds));
+      }
+
+      const savedDisabled = localStorage.getItem('disabled-feeds');
+      if (savedDisabled) {
+        setDisabledFeeds(JSON.parse(savedDisabled));
+      }
+
+      const savedShowSummaries = localStorage.getItem('show-ai-summaries');
+      if (savedShowSummaries) {
+        setShowSummaries(JSON.parse(savedShowSummaries));
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }, []);
+
+  const { articles, loading, error, retry } = useFeedFetching(feeds);
+  const filteredArticles = useArticleFiltering(articles, searchQuery, selectedCategory, disabledFeeds);
 
   const startIdx = (currentPage - 1) * ARTICLES_PER_PAGE;
   const endIdx = startIdx + ARTICLES_PER_PAGE;
@@ -145,7 +185,7 @@ export default function HomePage() {
     { icon: Newspaper, label: 'Articles', value: articles.length.toString() },
     { icon: Globe, label: 'Sources', value: `${feeds.length}+` },
     { icon: TrendingUp, label: 'Categories', value: '8' },
-    { icon: Zap, label: 'AI Powered', value: 'Yes' },
+    { icon: Zap, label: 'Live', value: 'Updated' },
   ];
 
   return (
@@ -170,24 +210,27 @@ export default function HomePage() {
               Live updates from {feeds.length}+ sources
             </div>
 
-            <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 fade-in-up" style={{ animationDelay: '0.1s' }}>
-              Your{' '}
-              <span className="gradient-text">Global News</span>
+            <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 fade-in-up">
+              Your <span className="gradient-text">Global News</span>
               <br />
               Command Center
             </h1>
 
-            <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up" style={{ animationDelay: '0.2s' }}>
-              Curated intelligence from the world&apos;s most trusted newsrooms, powered by AI summarization.
+            <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up">
+              Curated intelligence from 40+ trusted newsrooms, powered by AI summarization and real-time feed parsing.
             </p>
 
             {/* Search Bar */}
-            <div className="fade-in-up" style={{ animationDelay: '0.3s' }}>
-              <SearchBar onSearch={handleSearch} />
+            <div className="fade-in-up">
+              {loading && !articles.length ? (
+                <SearchBarSkeleton />
+              ) : (
+                <SearchBar onSearch={handleSearch} />
+              )}
             </div>
 
             {/* Stats Row */}
-            <div className="flex flex-wrap gap-6 mt-10 fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <div className="flex flex-wrap gap-6 mt-10 fade-in-up">
               {stats.map(({ icon: Icon, label, value }) => (
                 <div key={label} className="flex items-center gap-2.5">
                   <div className="p-2 rounded-lg bg-primary/10">
@@ -218,7 +261,8 @@ export default function HomePage() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
+            <FeaturedArticlesGridSkeleton count={4} />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children -mt-24 relative z-10">
               {featuredArticles.map((article) => (
                 <NewsCard key={article.id} article={article} />
               ))}
@@ -243,35 +287,47 @@ export default function HomePage() {
             </button>
           </div>
 
-          <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+          {loading && !articles.length ? (
+            <CategoryFilterSkeleton />
+          ) : (
+            <CategoryFilter selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+          )}
         </section>
 
-        {/* Error State */}
+        {/* Error State with Retry */}
         {error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-5 text-destructive mb-8 flex items-start gap-3">
-            <div className="w-5 h-5 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-xs font-bold">!</span>
-            </div>
-            <div>
-              <p className="font-medium">Something went wrong</p>
+          <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-5 mb-8 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-medium text-destructive">Connection Issue</p>
               <p className="text-sm text-destructive/80 mt-1">{error}</p>
+              <button
+                onClick={retry}
+                className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-destructive hover:text-destructive/80 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Try Again
+              </button>
             </div>
           </div>
         )}
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="relative">
-              <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-              <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-b-purple-500/50 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+        {/* Loading State with Skeletons */}
+        {loading && articles.length === 0 && (
+          <div className="space-y-12">
+            <div>
+              <h3 className="text-lg font-semibold mb-6">Featured Stories</h3>
+              <FeaturedArticlesGridSkeleton count={4} />
             </div>
-            <p className="text-sm text-muted-foreground animate-pulse">Loading latest news...</p>
+            <div>
+              <h3 className="text-lg font-semibold mb-6">Latest Articles</h3>
+              <NewsCardGridSkeleton count={6} />
+            </div>
           </div>
         )}
 
         {/* Articles Grid */}
-        {!loading && (
+        {!loading && articles.length > 0 && (
           <>
             <div className="flex items-center justify-between mb-6 mt-8">
               <p className="text-sm text-muted-foreground">
@@ -316,6 +372,17 @@ export default function HomePage() {
             )}
           </>
         )}
+
+        {/* Empty State */}
+        {!loading && articles.length === 0 && !error && (
+          <div className="text-center py-24">
+            <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
+              <Newspaper className="w-8 h-8 text-muted-foreground/50" />
+            </div>
+            <p className="text-foreground font-medium mb-1">No articles available</p>
+            <p className="text-muted-foreground text-sm">Please check back soon for fresh content.</p>
+          </div>
+        )}
       </main>
 
       {/* Newsletter CTA */}
@@ -327,16 +394,16 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-xs">JN</span>
+                <span className="text-white font-bold text-xs">IN</span>
               </div>
               <span className="text-sm text-muted-foreground">
-                &copy; 2026 JustinNews.tech
+                &copy; 2026 Informed News. All rights reserved.
               </span>
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <span>Powered by RSS &middot; AI Summaries</span>
               <span className="hidden sm:inline">&middot;</span>
-              <span className="hidden sm:inline">TechCrunch &middot; The Verge &middot; NY Times &middot; 20+ more</span>
+              <span className="hidden sm:inline text-xs">40+ Premium News Sources</span>
             </div>
           </div>
         </div>
