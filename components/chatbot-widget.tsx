@@ -19,7 +19,7 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, isOpen]);
 
   const handleSendMessage = (content: string) => {
     sendMessage(content);
@@ -33,59 +33,68 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
 
   return (
     <>
-      {/* Floating Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-2xl shadow-xl transition-all duration-300 ${
-          isOpen
-            ? 'bg-card border border-border/60 text-foreground hover:bg-muted/60 rotate-0'
-            : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700 hover:shadow-2xl hover:shadow-indigo-500/30 hover:scale-105'
-        }`}
-        aria-label="Toggle chat"
-      >
-        {isOpen ? (
-          <X className="w-5 h-5" />
-        ) : (
-          <MessageCircle className="w-5 h-5" />
-        )}
-      </button>
+      {/* Floating Button with Glow Effect */}
+      <div className="fixed bottom-6 right-6 z-40 group">
+        <div className="absolute inset-0 bg-accent/30 rounded-2xl blur-xl group-hover:bg-accent/50 transition-all duration-300 animate-pulse" />
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`relative flex items-center justify-center w-14 h-14 rounded-2xl shadow-xl transition-all duration-500 transform ${
+            isOpen
+              ? 'bg-card border border-border/60 text-foreground rotate-90 scale-90'
+              : 'bg-accent text-white hover:scale-110 active:scale-95'
+          }`}
+          aria-label="Toggle news assistant"
+        >
+          {isOpen ? (
+            <X className="w-5 h-5" />
+          ) : (
+            <MessageCircle className="w-6 h-6" />
+          )}
 
-      {/* Chat Window */}
+          {!isOpen && (
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-md animate-bounce">
+              <Sparkles className="w-2.5 h-2.5 text-accent" />
+            </div>
+          )}
+        </button>
+      </div>
+
+      {/* Premium Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-[380px] max-w-[calc(100vw-2rem)] h-[480px] bg-card rounded-2xl shadow-2xl shadow-black/[0.12] flex flex-col z-40 border border-border/40 overflow-hidden animate-scale-in">
+        <div className="fixed bottom-24 right-6 w-[400px] max-w-[calc(100vw-2rem)] h-[550px] max-h-[calc(100vh-8rem)] glass rounded-3xl shadow-2xl flex flex-col z-40 border border-white/10 overflow-hidden animate-in fade-in zoom-in duration-300">
           {/* Header */}
-          <div className="relative bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5" />
+          <div className="relative bg-gradient-to-r from-accent to-accent/80 text-white px-6 py-5 flex items-center justify-between shadow-lg">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-md">
+                <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-semibold text-sm">News Assistant</h3>
-                <p className="text-xs text-white/70">AI-powered news chat</p>
+                <h3 className="font-display font-bold text-base tracking-wide">INFORMED AI</h3>
+                <p className="text-[10px] uppercase tracking-widest text-white/70 font-medium">Global Intelligence Partner</p>
               </div>
             </div>
             <button
               onClick={handleClear}
-              className="p-2 hover:bg-white/10 rounded-xl transition-colors"
-              title="Clear history"
+              className="p-2 hover:bg-white/10 rounded-xl transition-all duration-200"
+              title="Reset Intelligence"
             >
-              <Trash2 className="w-4 h-4 text-white/70 hover:text-white" />
+              <Trash2 className="w-4 h-4 text-white/60 hover:text-white" />
             </button>
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-background/30 custom-scrollbar">
             {messages.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-center px-4">
-                <div>
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                    <MessageCircle className="w-7 h-7 text-primary/40" />
+              <div className="h-full flex items-center justify-center text-center px-6">
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-6">
+                    <MessageCircle className="w-10 h-10 text-accent/40" />
                   </div>
-                  <p className="text-sm font-medium text-foreground mb-1">
-                    How can I help?
-                  </p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Ask me about articles, get summaries, or find news on topics you&apos;re interested in.
+                  <h4 className="font-display font-bold text-lg text-foreground mb-2">
+                    System Online
+                  </h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-serif italic">
+                    "I am your dedicated intelligence partner. Ask me to summarize the news, find specific topics, or analyze global trends."
                   </p>
                 </div>
               </div>
@@ -106,7 +115,7 @@ export function ChatBotWidget({ articles }: ChatBotProps) {
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-border/40 bg-card p-3">
+          <div className="p-4 bg-background/50 backdrop-blur-md border-t border-white/5">
             <ChatInput
               onSendMessage={handleSendMessage}
               isLoading={isLoading}

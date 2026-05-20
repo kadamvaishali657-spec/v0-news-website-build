@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
-import { Inter } from 'next/font/google'
+import { Inter, Syne, Merriweather } from 'next/font/google'
 import { ParticleBackground } from '@/components/particle-background'
 import { ThemeProvider } from '@/providers/theme-provider'
 
@@ -12,16 +12,29 @@ const inter = Inter({
   display: 'swap',
 })
 
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+  display: 'swap',
+})
+
+const merriweather = Merriweather({
+  subsets: ['latin'],
+  weight: ['300', '400', '700', '900'],
+  variable: '--font-merriweather',
+  display: 'swap',
+})
+
 export const viewport: Viewport = {
-  themeColor: '#6366f1',
+  themeColor: '#FF7F40',
   userScalable: true,
 }
 
 export const metadata: Metadata = {
-  title: 'Informed - Tech News Aggregator | Latest Technology Updates',
-  description: 'Stay updated with the latest technology news from TechCrunch, The Verge, and NY Times. Real-time RSS feed aggregation with advanced filtering and search.',
-  keywords: ['tech news', 'technology', 'RSS feeds', 'TechCrunch', 'The Verge', 'news aggregator'],
-  authors: [{ name: 'Informed' }],
+  title: 'INFORMED - Premium Global News Intelligence | Breaking Technology & Beyond',
+  description: 'Stay ahead with INFORMED. A premium news intelligence platform aggregating the world\'s most trusted sources. Powered by AI summarization and real-time global tracking.',
+  keywords: ['breaking news', 'tech news', 'global intelligence', 'AI news', 'RSS aggregator', 'TechCrunch', 'The Verge', 'NY Times', 'Reuters', 'Bloomberg'],
+  authors: [{ name: 'INFORMED' }],
   verification: {
     google: 'TdsH1dug5CMhswHNx_K_3svi2PelAWOUW2ZWCwSRGsU',
   },
@@ -31,8 +44,8 @@ export const metadata: Metadata = {
     apple: '/favicon.png',
   },
   openGraph: {
-    title: 'Informed - Tech News Delivered Daily',
-    description: 'Real-time technology news aggregator with AI, gadgets, startups, and cybersecurity coverage',
+    title: 'INFORMED - Global News Command Center',
+    description: 'Immersive news experience with real-time global intelligence and AI-powered insights.',
     type: 'website',
     url: 'https://informed.tech',
     images: [
@@ -40,14 +53,14 @@ export const metadata: Metadata = {
         url: '/favicon.png',
         width: 512,
         height: 512,
-        alt: 'Informed Logo',
+        alt: 'INFORMED Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Informed - Tech News',
-    description: 'Latest technology news aggregated from top sources',
+    title: 'INFORMED Intelligence',
+    description: 'World-class news aggregation and AI-powered insights.',
     images: ['/favicon.jpg'],
   },
 }
@@ -58,7 +71,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth bg-background`}>
+    <html lang="en" className={`${inter.variable} ${syne.variable} ${merriweather.variable} scroll-smooth bg-background`}>
       <head>
         {/* Google Tag Manager */}
         <Script
@@ -122,7 +135,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
       </head>
-      <body className="font-sans antialiased bg-background min-h-screen relative">
+      <body className="font-sans antialiased bg-background min-h-screen relative overflow-x-hidden">
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
