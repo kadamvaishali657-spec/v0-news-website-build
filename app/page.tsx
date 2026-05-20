@@ -1,6 +1,20 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
+import {
+  ArrowRight,
+  AlertCircle,
+  BadgeCheck,
+  BarChart3,
+  Globe,
+  Loader2,
+  Newspaper,
+  RefreshCw,
+  Sparkles,
+  TrendingUp,
+  Zap,
+} from 'lucide-react';
 import { Header } from '@/components/header';
 import { SearchBar } from '@/components/search-bar';
 import { CategoryFilter } from '@/components/category-filter';
@@ -9,21 +23,16 @@ import { Pagination } from '@/components/pagination';
 import { ArticleSummary } from '@/components/article-summary';
 import { NewsletterCTA } from '@/components/newsletter-cta';
 import { ChatBotWidget } from '@/components/chatbot-widget';
-import { 
-  NewsCardGridSkeleton, 
+import {
+  NewsCardGridSkeleton,
   FeaturedArticlesGridSkeleton,
   SearchBarSkeleton,
-  CategoryFilterSkeleton
+  CategoryFilterSkeleton,
 } from '@/components/skeleton-loaders';
 import { Article, RSSFeed, fetchAllFeeds, DEFAULT_FEEDS } from '@/lib/rss-parser';
-import { Loader2, Sparkles, Newspaper, TrendingUp, Globe, Zap, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
-import Link from 'next/link';
 
 const ARTICLES_PER_PAGE = 12;
 
-/**
- * Custom hook for feed fetching with caching
- */
 function useFeedFetching(feeds: RSSFeed[]) {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,9 +43,8 @@ function useFeedFetching(feeds: RSSFeed[]) {
     const loadArticles = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
-        // Try to use cached data first (5 minute cache)
         const cacheKey = 'articles-cache';
         const cached = localStorage.getItem(cacheKey);
         const cacheTime = localStorage.getItem(`${cacheKey}-time`);
@@ -45,7 +53,6 @@ function useFeedFetching(feeds: RSSFeed[]) {
         if (cached && cacheTime) {
           const cachedDate = parseInt(cacheTime, 10);
           if (now - cachedDate < 5 * 60 * 1000) {
-            // Cache is fresh
             try {
               const cachedArticles = JSON.parse(cached);
               if (Array.isArray(cachedArticles) && cachedArticles.length > 0) {
@@ -53,25 +60,25 @@ function useFeedFetching(feeds: RSSFeed[]) {
                 setLoading(false);
                 return;
               }
-            } catch (e) {
-              // Invalid cache, continue to fetch
+            } catch {
+              // Continue with fresh fetch when cache parsing fails
             }
           }
         }
 
-        // Fetch fresh articles
         const freshArticles = await fetchAllFeeds(feeds);
-        
+
         if (freshArticles.length > 0) {
           localStorage.setItem(cacheKey, JSON.stringify(freshArticles));
           localStorage.setItem(`${cacheKey}-time`, now.toString());
           setArticles(freshArticles);
-        } else {
-          setError('No articles could be loaded. RSS feeds may be temporarily unavailable. Showing cached data.');
+          return;
         }
+
+        setError('We could not load fresh articles right now. Please try again shortly.');
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(`Failed to load news: ${errorMessage}`);
+        setError(`Unable to load news at this time. ${errorMessage}`);
       } finally {
         setLoading(false);
       }
@@ -89,9 +96,6 @@ function useFeedFetching(feeds: RSSFeed[]) {
   return { articles, loading, error, retry };
 }
 
-/**
- * Custom hook for article filtering
- */
 function useArticleFiltering(
   articles: Article[],
   searchQuery: string,
@@ -101,10 +105,8 @@ function useArticleFiltering(
   return useMemo(() => {
     let result = articles;
 
-    // Filter by disabled feeds
     result = result.filter((article) => !disabledFeeds.includes(article.source));
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -115,7 +117,6 @@ function useArticleFiltering(
       );
     }
 
-    // Filter by category
     if (selectedCategory !== 'All') {
       result = result.filter((article) => {
         const articleCategory = article.category || article.source || '';
@@ -130,6 +131,10 @@ function useArticleFiltering(
   }, [articles, searchQuery, selectedCategory, disabledFeeds]);
 }
 
+function getUniqueCount(values: string[]) {
+  return new Set(values.map((value) => value.toLowerCase())).size;
+}
+
 export default function HomePage() {
   const [feeds, setFeeds] = useState<RSSFeed[]>(DEFAULT_FEEDS);
   const [disabledFeeds, setDisabledFeeds] = useState<string[]>([]);
@@ -138,7 +143,6 @@ export default function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showSummaries, setShowSummaries] = useState(false);
 
-  // Load preferences from localStorage
   useEffect(() => {
     try {
       const savedFeeds = localStorage.getItem('rss-feeds');
@@ -155,8 +159,8 @@ export default function HomePage() {
       if (savedShowSummaries) {
         setShowSummaries(JSON.parse(savedShowSummaries));
       }
-    } catch (e) {
-      // Ignore localStorage errors
+    } catch {
+      // Ignore localStorage read errors
     }
   }, []);
 
@@ -168,7 +172,36 @@ export default function HomePage() {
   const paginatedArticles = filteredArticles.slice(startIdx, endIdx);
   const totalPages = Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE);
 
-  const featuredArticles = articles.slice(0, 4);
+  const featuredArticle = articles[0];
+  const spotlightArticles = articles.slice(1, 5);
+  const liveBriefing = filteredArticles.slice(0, 3);
+
+  const stats = [
+    {
+      icon: Newspaper,
+      label: 'Articles Indexed',
+      value: articles.length.toLocaleString(),
+      hint: 'Continuously refreshed feed inventory',
+    },
+    {
+      icon: Globe,
+      label: 'Source Publications',
+      value: getUniqueCount(articles.map((article) => article.source)).toString(),
+      hint: 'Cross-publication coverage for balanced context',
+    },
+    {
+      icon: BarChart3,
+      label: 'Topic Clusters',
+      value: getUniqueCount(articles.map((article) => article.category || article.source)).toString(),
+      hint: 'Structured categories to improve discovery',
+    },
+    {
+      icon: BadgeCheck,
+      label: 'Update Status',
+      value: loading ? 'Syncing' : 'Live',
+      hint: 'Near real-time updates from configured feeds',
+    },
+  ];
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
@@ -176,115 +209,158 @@ export default function HomePage() {
   }, []);
 
   const toggleSummaries = useCallback(() => {
-    const newValue = !showSummaries;
-    setShowSummaries(newValue);
-    localStorage.setItem('show-ai-summaries', JSON.stringify(newValue));
+    const nextValue = !showSummaries;
+    setShowSummaries(nextValue);
+    localStorage.setItem('show-ai-summaries', JSON.stringify(nextValue));
   }, [showSummaries]);
-
-  const stats = [
-    { icon: Newspaper, label: 'Articles', value: articles.length.toString() },
-    { icon: Globe, label: 'Sources', value: `${feeds.length}+` },
-    { icon: TrendingUp, label: 'Categories', value: '8' },
-    { icon: Zap, label: 'Live', value: 'Updated' },
-  ];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border/40">
-        {/* Background Mesh */}
         <div className="absolute inset-0 mesh-gradient" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-radial from-purple-500/10 via-transparent to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-[520px] bg-gradient-to-l from-indigo-500/10 to-transparent" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="max-w-3xl">
-            {/* Live Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 fade-in-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
               <span className="relative flex h-2 w-2">
-                <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
               </span>
-              Live updates from {feeds.length}+ sources
+              Professional global newsroom briefing
             </div>
 
-            <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5 fade-in-up">
-              Your <span className="gradient-text">Global News</span>
+            <h1 className="text-balance text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-5">
+              Reliable headlines.
               <br />
-              Command Center
+              <span className="gradient-text">Clear decisions.</span>
             </h1>
 
-            <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed fade-in-up">
-              Curated intelligence from 40+ trusted newsrooms, powered by AI summarization and real-time feed parsing.
+            <p className="text-balance text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl leading-relaxed">
+              Track major stories, compare sources, and surface key developments faster with a structured,
+              premium-grade news experience.
             </p>
 
-            {/* Search Bar */}
-            <div className="fade-in-up">
-              {loading && !articles.length ? (
-                <SearchBarSkeleton />
-              ) : (
-                <SearchBar onSearch={handleSearch} />
-              )}
-            </div>
+            {loading && !articles.length ? (
+              <SearchBarSkeleton />
+            ) : (
+              <SearchBar
+                onSearch={handleSearch}
+                placeholder="Search by story, topic, publication, or keyword..."
+              />
+            )}
 
-            {/* Stats Row */}
-            <div className="flex flex-wrap gap-6 mt-10 fade-in-up">
-              {stats.map(({ icon: Icon, label, value }) => (
-                <div key={label} className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Icon className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-foreground">{value}</div>
-                    <div className="text-xs text-muted-foreground">{label}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex flex-wrap items-center gap-3 mt-8">
+              <Link
+                href="/trending"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium text-sm hover:opacity-95 transition-opacity"
+              >
+                Explore Trending
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <button
+                onClick={toggleSummaries}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                  showSummaries
+                    ? 'bg-primary/15 text-primary border border-primary/30'
+                    : 'bg-card border border-border/60 text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Sparkles className="w-4 h-4" />
+                {showSummaries ? 'AI Summaries Enabled' : 'Enable AI Summaries'}
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Featured Section */}
-        {!loading && featuredArticles.length > 0 && (
-          <section className="mb-16 fade-in-up">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Featured Stories</h2>
-                <p className="text-muted-foreground text-sm mt-1">Top picks from our editors</p>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-14">
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {stats.map(({ icon: Icon, label, value, hint }) => (
+            <article key={label} className="rounded-2xl border border-border/60 bg-card/80 p-5 shadow-card">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+                <Icon className="w-4 h-4 text-primary" />
               </div>
-              <Link href="/trending" className="group flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
-                View all
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              <p className="text-2xl font-bold text-foreground">{value}</p>
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{hint}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-6">
+          <article className="rounded-2xl border border-border/60 bg-card/80 p-6">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Lead Story</h2>
+                <p className="text-sm text-muted-foreground">Editorial spotlight from live feeds</p>
+              </div>
+              <Link href="/trending" className="text-sm text-primary font-medium inline-flex items-center gap-1">
+                See all <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <FeaturedArticlesGridSkeleton count={4} />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children -mt-24 relative z-10">
-              {featuredArticles.map((article) => (
-                <NewsCard key={article.id} article={article} />
-              ))}
-            </div>
-          </section>
-        )}
 
-        {/* Category & Controls Section */}
-        <section className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Browse by Category</h3>
-            <button
-              onClick={toggleSummaries}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
-                showSummaries
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/20'
-                  : 'bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/30'
-              }`}
-            >
-              <Sparkles className={`w-4 h-4 ${showSummaries ? 'text-white/90' : 'text-primary/50'}`} />
-              {showSummaries ? 'Hide AI Summaries' : 'Show AI Summaries'}
-            </button>
+            {loading && !articles.length ? (
+              <FeaturedArticlesGridSkeleton count={1} />
+            ) : featuredArticle ? (
+              <div className="space-y-4">
+                <NewsCard article={featuredArticle} />
+                {showSummaries && (
+                  <div className="rounded-xl border border-border/50 bg-muted/40 p-4">
+                    <ArticleSummary article={featuredArticle} />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-xl bg-muted/50 p-8 text-center text-sm text-muted-foreground">
+                No lead story available right now.
+              </div>
+            )}
+          </article>
+
+          <article className="rounded-2xl border border-border/60 bg-card/80 p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <Zap className="w-4 h-4 text-primary" />
+              <h3 className="text-lg font-semibold">Live Briefing</h3>
+            </div>
+            <div className="space-y-3">
+              {loading && !articles.length ? (
+                <div className="space-y-3">
+                  <div className="h-20 rounded-xl bg-muted/50 animate-pulse" />
+                  <div className="h-20 rounded-xl bg-muted/50 animate-pulse" />
+                  <div className="h-20 rounded-xl bg-muted/50 animate-pulse" />
+                </div>
+              ) : liveBriefing.length > 0 ? (
+                liveBriefing.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/article/${encodeURIComponent(article.id)}`}
+                    className="block rounded-xl border border-border/50 bg-background/40 p-4 hover:border-primary/30 transition-colors"
+                  >
+                    <p className="text-xs text-primary font-medium mb-1">{article.source}</p>
+                    <p className="text-sm font-semibold text-foreground line-clamp-2">{article.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{article.description}</p>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-muted-foreground">No briefing items match current filters.</p>
+              )}
+            </div>
+          </article>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Explore by Category</h2>
+              <p className="text-sm text-muted-foreground">Focus coverage by domain and monitor what matters most.</p>
+            </div>
+            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+              <TrendingUp className="w-4 h-4 text-primary" />
+              {filteredArticles.length.toLocaleString()} relevant articles
+            </div>
           </div>
 
           {loading && !articles.length ? (
@@ -294,53 +370,72 @@ export default function HomePage() {
           )}
         </section>
 
-        {/* Error State with Retry */}
         {error && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-5 mb-8 flex items-start gap-3">
+          <section className="rounded-2xl border border-destructive/30 bg-destructive/10 p-5 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-medium text-destructive">Connection Issue</p>
+              <p className="font-semibold text-destructive">Content refresh issue</p>
               <p className="text-sm text-destructive/80 mt-1">{error}</p>
               <button
                 onClick={retry}
                 className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-destructive hover:text-destructive/80 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
-                Try Again
+                Retry
               </button>
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Loading State with Skeletons */}
         {loading && articles.length === 0 && (
-          <div className="space-y-12">
+          <section className="space-y-8">
             <div>
-              <h3 className="text-lg font-semibold mb-6">Featured Stories</h3>
+              <h3 className="text-lg font-semibold mb-4">Featured Coverage</h3>
               <FeaturedArticlesGridSkeleton count={4} />
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-6">Latest Articles</h3>
+              <h3 className="text-lg font-semibold mb-4">Latest Coverage</h3>
               <NewsCardGridSkeleton count={6} />
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Articles Grid */}
+        {!loading && spotlightArticles.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Spotlight Stories</h2>
+                <p className="text-sm text-muted-foreground">Handpicked coverage from the live stream.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              {spotlightArticles.map((article) => (
+                <NewsCard key={article.id} article={article} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {!loading && articles.length > 0 && (
-          <>
-            <div className="flex items-center justify-between mb-6 mt-8">
-              <p className="text-sm text-muted-foreground">
-                Showing <span className="font-medium text-foreground">{filteredArticles.length === 0 ? '0' : startIdx + 1}-{Math.min(endIdx, filteredArticles.length)}</span> of{' '}
-                <span className="font-medium text-foreground">{filteredArticles.length}</span> articles
-              </p>
+          <section>
+            <div className="flex items-center justify-between mb-6 mt-2">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Latest Headlines</h2>
+                <p className="text-sm text-muted-foreground">
+                  Showing {filteredArticles.length === 0 ? '0' : startIdx + 1}-{Math.min(endIdx, filteredArticles.length)} of{' '}
+                  {filteredArticles.length.toLocaleString()} articles
+                </p>
+              </div>
             </div>
 
             {paginatedArticles.length > 0 ? (
               <>
-                <div className={showSummaries ? 'space-y-6 mb-12' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 stagger-children'}>
+                <div className={showSummaries ? 'space-y-6 mb-10' : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-10'}>
                   {paginatedArticles.map((article) => (
-                    <div key={article.id} className={showSummaries ? 'bg-card border border-border/40 rounded-2xl overflow-hidden shadow-card card-hover' : ''}>
+                    <div
+                      key={article.id}
+                      className={showSummaries ? 'bg-card border border-border/40 rounded-2xl overflow-hidden shadow-card' : ''}
+                    >
                       <NewsCard article={article} />
                       {showSummaries && (
                         <div className="px-5 pb-5 pt-3 border-t border-border/30 bg-muted/30">
@@ -352,64 +447,52 @@ export default function HomePage() {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex justify-center mb-12">
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setCurrentPage}
-                    />
+                  <div className="flex justify-center">
+                    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                   </div>
                 )}
               </>
             ) : (
-              <div className="text-center py-24">
-                <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
-                  <Newspaper className="w-8 h-8 text-muted-foreground/50" />
-                </div>
-                <p className="text-foreground font-medium mb-1">No articles found</p>
-                <p className="text-muted-foreground text-sm">Try adjusting your search or category filters.</p>
+              <div className="text-center py-20 rounded-2xl border border-border/60 bg-card/60">
+                <Loader2 className="w-7 h-7 text-muted-foreground/60 mx-auto mb-3" />
+                <p className="text-foreground font-medium">No matching articles found</p>
+                <p className="text-muted-foreground text-sm mt-1">Adjust your search terms or category filters.</p>
               </div>
             )}
-          </>
+          </section>
         )}
 
-        {/* Empty State */}
         {!loading && articles.length === 0 && !error && (
-          <div className="text-center py-24">
-            <div className="w-16 h-16 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
-              <Newspaper className="w-8 h-8 text-muted-foreground/50" />
+          <section className="text-center py-20 rounded-2xl border border-border/60 bg-card/60">
+            <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
+              <Newspaper className="w-7 h-7 text-muted-foreground/50" />
             </div>
-            <p className="text-foreground font-medium mb-1">No articles available</p>
-            <p className="text-muted-foreground text-sm">Please check back soon for fresh content.</p>
-          </div>
+            <p className="text-foreground font-medium">No articles are available right now</p>
+            <p className="text-muted-foreground text-sm mt-1">Please check back shortly for the next update cycle.</p>
+          </section>
         )}
       </main>
 
-      {/* Newsletter CTA */}
       <NewsletterCTA />
 
-      {/* Footer */}
       <footer className="border-t border-border/40 mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                 <span className="text-white font-bold text-xs">IN</span>
               </div>
-              <span className="text-sm text-muted-foreground">
-                &copy; 2026 Informed News. All rights reserved.
-              </span>
+              <span className="text-sm text-muted-foreground">© 2026 Informed News. All rights reserved.</span>
             </div>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <span>Powered by RSS &middot; AI Summaries</span>
-              <span className="hidden sm:inline">&middot;</span>
-              <span className="hidden sm:inline text-xs">40+ Premium News Sources</span>
+            <div className="flex items-center gap-5 text-sm text-muted-foreground">
+              <span>Verified multi-source aggregation</span>
+              <span className="hidden sm:inline">•</span>
+              <span className="hidden sm:inline">Professional-grade editorial structure</span>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* AI Chatbot Widget */}
       <ChatBotWidget articles={articles} />
     </div>
   );
