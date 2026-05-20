@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
   if (!groqApiKey) {
     return new Response(
       JSON.stringify({ error: 'The AI assistant is currently unavailable. Please try again later.' }),
-      { status: 503, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 

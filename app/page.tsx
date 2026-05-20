@@ -8,7 +8,6 @@ import {
   BadgeCheck,
   BarChart3,
   Globe,
-  Loader2,
   Newspaper,
   RefreshCw,
   Sparkles,
@@ -131,7 +130,7 @@ function useArticleFiltering(
   }, [articles, searchQuery, selectedCategory, disabledFeeds]);
 }
 
-function getUniqueCount(values: string[]) {
+function countUniqueValuesCaseInsensitive(values: string[]) {
   return new Set(values.map((value) => value.toLowerCase())).size;
 }
 
@@ -186,13 +185,13 @@ export default function HomePage() {
     {
       icon: Globe,
       label: 'Source Publications',
-      value: getUniqueCount(articles.map((article) => article.source)).toString(),
+      value: countUniqueValuesCaseInsensitive(articles.map((article) => article.source)).toString(),
       hint: 'Cross-publication coverage for balanced context',
     },
     {
       icon: BarChart3,
       label: 'Topic Clusters',
-      value: getUniqueCount(articles.map((article) => article.category || article.source)).toString(),
+      value: countUniqueValuesCaseInsensitive(articles.map((article) => article.category || article.source)).toString(),
       hint: 'Structured categories to improve discovery',
     },
     {
@@ -454,7 +453,7 @@ export default function HomePage() {
               </>
             ) : (
               <div className="text-center py-20 rounded-2xl border border-border/60 bg-card/60">
-                <Loader2 className="w-7 h-7 text-muted-foreground/60 mx-auto mb-3" />
+                <Newspaper className="w-7 h-7 text-muted-foreground/60 mx-auto mb-3" />
                 <p className="text-foreground font-medium">No matching articles found</p>
                 <p className="text-muted-foreground text-sm mt-1">Adjust your search terms or category filters.</p>
               </div>

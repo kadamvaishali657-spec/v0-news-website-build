@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * AI Status Check Endpoint
@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * - Checks connectivity to Groq service
  * - Returns configuration status and diagnostics
  */
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     // [1] CHECK GROQ API KEY
     const groqApiKey = process.env.GROQ_API_KEY?.trim();
@@ -70,7 +70,9 @@ export async function GET(_request: NextRequest) {
         message: 'Unable to connect to the AI provider.',
         details: connectError instanceof Error && connectError.name === 'AbortError'
           ? 'Connection timed out.'
-          : 'Network request failed.',
+          : connectError instanceof Error
+            ? `Request failed (${connectError.name || 'UnknownError'}).`
+            : 'Network request failed.',
         ...status,
       }, { status: 503 });
     }
