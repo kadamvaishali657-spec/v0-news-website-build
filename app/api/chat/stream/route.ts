@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   const rateCheck = chatRateLimiter.check(clientId);
   if (!rateCheck.allowed) {
     return new Response(
-      JSON.stringify({ error: 'Too many chat requests. Please wait a moment.' }),
+      JSON.stringify({ error: 'You have reached the request limit. Please try again shortly.' }),
       { status: 429, headers: { 'Content-Type': 'application/json' } }
     );
   }
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   const groqApiKey = process.env.GROQ_API_KEY;
   if (!groqApiKey) {
     return new Response(
-      JSON.stringify({ error: 'Groq API key not configured.' }),
+      JSON.stringify({ error: 'The AI assistant is currently unavailable. Please try again later.' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
@@ -46,7 +46,17 @@ export async function POST(request: NextRequest) {
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
-        JSON.stringify({ error: 'Invalid messages format' }),
+        JSON.stringify({ error: 'Please provide a non-empty "messages" array.' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const hasInvalidMessage = messages.some(
+      (msg) => !msg || !msg.role || !msg.content || !['user', 'assistant'].includes(msg.role)
+    );
+    if (hasInvalidMessage) {
+      return new Response(
+        JSON.stringify({ error: 'Each message must include a valid role and content.' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -105,7 +115,7 @@ Current time: ${new Date().toLocaleString()}`;
       const errorText = await groqResponse.text();
       console.error('Groq streaming error:', errorText);
       return new Response(
-        JSON.stringify({ error: 'Failed to generate response' }),
+        JSON.stringify({ error: 'The AI service could not complete your request at this time.' }),
         { status: groqResponse.status, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -175,7 +185,7 @@ Current time: ${new Date().toLocaleString()}`;
   } catch (error) {
     console.error('Chat stream error:', error);
     return new Response(
-      JSON.stringify({ error: 'Failed to process chat request' }),
+      JSON.stringify({ error: 'We could not process your request at this time. Please try again later.' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * AI Status Check Endpoint
@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * - Checks connectivity to Groq service
  * - Returns configuration status and diagnostics
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // [1] CHECK GROQ API KEY
     const groqApiKey = process.env.GROQ_API_KEY?.trim();
@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
     if (!groqApiKey) {
       return NextResponse.json({
         status: 'unconfigured',
-        message: 'Groq API key not configured',
-        details: 'Set GROQ_API_KEY environment variable to enable AI chatbot',
+        message: 'AI service is not configured.',
+        details: 'Configure GROQ_API_KEY to enable the AI assistant.',
         ...status,
       }, { status: 503 });
     }
@@ -50,11 +50,10 @@ export async function GET(request: NextRequest) {
       });
 
       if (!testResponse.ok) {
-        const errorData = await testResponse.json().catch(() => ({}));
         return NextResponse.json({
           status: 'error',
-          message: 'Groq API connectivity check failed',
-          details: `HTTP ${testResponse.status}: ${errorData?.error?.message || 'Unknown error'}`,
+          message: 'AI service connectivity check failed.',
+          details: `Provider returned HTTP ${testResponse.status}.`,
           ...status,
         }, { status: 503 });
       }
@@ -62,22 +61,26 @@ export async function GET(request: NextRequest) {
       // [3] SUCCESS
       return NextResponse.json({
         status: 'active',
-        message: 'AI chatbot is fully operational',
+        message: 'AI service is operational.',
         ...status,
       });
     } catch (connectError) {
       return NextResponse.json({
         status: 'error',
-        message: 'Failed to connect to Groq API',
-        details: connectError instanceof Error ? connectError.message : 'Network error',
+        message: 'Unable to connect to the AI provider.',
+        details: connectError instanceof Error && connectError.name === 'AbortError'
+          ? 'Connection timed out.'
+          : connectError instanceof Error
+            ? `Request failed (${connectError.name || 'UnknownError'}).`
+            : 'Network request failed.',
         ...status,
       }, { status: 503 });
     }
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({
       status: 'error',
-      message: 'AI status check failed',
-      details: error instanceof Error ? error.message : 'Unknown error',
+      message: 'Unable to complete AI status check.',
+      details: 'An unexpected server error occurred.',
     }, { status: 500 });
   }
 }

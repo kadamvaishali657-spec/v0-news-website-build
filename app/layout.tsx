@@ -1,16 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
-import { Inter } from 'next/font/google'
 import { ParticleBackground } from '@/components/particle-background'
 import { ThemeProvider } from '@/providers/theme-provider'
 
 import './globals.css'
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
 
 export const viewport: Viewport = {
   themeColor: '#6366f1',
@@ -73,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-smooth bg-background`}>
+    <html lang="en" className="scroll-smooth bg-background">
       <head>
         {/* Google Tag Manager */}
         {analyticsConfig.enableAnalytics && analyticsConfig.gtmId && (

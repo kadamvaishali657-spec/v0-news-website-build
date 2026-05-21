@@ -18,10 +18,10 @@ export async function POST(request: NextRequest) {
   const clientId = getRateLimitId(request);
   const rateCheck = chatRateLimiter.check(clientId);
   if (!rateCheck.allowed) {
-    return NextResponse.json(
-      { error: 'Too many chat requests. Please wait a moment.' },
-      { status: 429, headers: rateLimitHeaders(rateCheck.remaining, rateCheck.resetMs) }
-    );
+      return NextResponse.json(
+        { error: 'You have reached the request limit. Please try again shortly.' },
+        { status: 429, headers: rateLimitHeaders(rateCheck.remaining, rateCheck.resetMs) }
+      );
   }
 
   try {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       requestBody = await request.json();
     } catch {
       return NextResponse.json(
-        { error: 'Invalid JSON in request body' },
+        { error: 'The request body must be valid JSON.' },
         { status: 400 }
       );
     }
@@ -40,15 +40,15 @@ export async function POST(request: NextRequest) {
 
     // [2] VALIDATE MESSAGES
     if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json(
-        { error: 'Messages must be an array' },
-        { status: 400 }
-      );
+        return NextResponse.json(
+          { error: 'The "messages" field must be an array.' },
+          { status: 400 }
+        );
     }
 
     if (messages.length === 0) {
       return NextResponse.json(
-        { error: 'At least one message is required' },
+        { error: 'At least one message is required.' },
         { status: 400 }
       );
     }
@@ -57,13 +57,13 @@ export async function POST(request: NextRequest) {
     for (const msg of messages) {
       if (!msg.role || !msg.content) {
         return NextResponse.json(
-          { error: 'Each message must have role and content' },
+          { error: 'Each message must include both "role" and "content".' },
           { status: 400 }
         );
       }
       if (!['user', 'assistant'].includes(msg.role)) {
         return NextResponse.json(
-          { error: 'Message role must be "user" or "assistant"' },
+          { error: 'Message role must be either "user" or "assistant".' },
           { status: 400 }
         );
       }
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     if (!groqApiKey) {
       console.error('[v0-chat] GROQ_API_KEY environment variable not set');
       return NextResponse.json(
-        { error: 'AI chatbot is not configured. Please set GROQ_API_KEY environment variable.' },
+        { error: 'The AI assistant is currently unavailable. Please try again later.' },
         { status: 503 }
       );
     }
@@ -160,22 +160,22 @@ Guidelines:
       // Map Groq errors to user-friendly messages
       if (groqResponse.status === 401) {
         return NextResponse.json(
-          { error: 'Authentication failed with AI service' },
+          { error: 'The AI service configuration is invalid. Please contact support.' },
           { status: 503 }
         );
       } else if (groqResponse.status === 429) {
         return NextResponse.json(
-          { error: 'AI service rate limit exceeded. Please try again in a moment.' },
+          { error: 'The AI service is currently busy. Please try again shortly.' },
           { status: 429 }
         );
       } else if (groqResponse.status === 503) {
         return NextResponse.json(
-          { error: 'AI service is temporarily unavailable. Please try again later.' },
+          { error: 'The AI service is temporarily unavailable. Please try again later.' },
           { status: 503 }
         );
       } else {
         return NextResponse.json(
-          { error: `AI service returned error: ${groqResponse.status}` },
+          { error: 'The AI service could not complete your request at this time.' },
           { status: groqResponse.status }
         );
       }
@@ -188,7 +188,7 @@ Guidelines:
     } catch {
       console.error('[v0-chat] Failed to parse Groq response');
       return NextResponse.json(
-        { error: 'Failed to parse AI response' },
+        { error: 'We could not process the AI response. Please try again.' },
         { status: 500 }
       );
     }
@@ -199,7 +199,7 @@ Guidelines:
     if (!assistantMessage) {
       console.error('[v0-chat] Empty response from Groq', groqData);
       return NextResponse.json(
-        { error: 'AI service returned empty response' },
+        { error: 'The AI service returned an empty response. Please try again.' },
         { status: 500 }
       );
     }
@@ -215,7 +215,7 @@ Guidelines:
       if (error.name === 'AbortError') {
         console.error('[v0-chat] Request timeout');
         return NextResponse.json(
-          { error: 'Request to AI service timed out' },
+          { error: 'The request timed out while waiting for the AI service.' },
           { status: 504 }
         );
       }
@@ -225,7 +225,7 @@ Guidelines:
     }
     
     return NextResponse.json(
-      { error: 'Failed to generate response' },
+      { error: 'We could not generate a response at this time. Please try again later.' },
       { status: 500 }
     );
   }
