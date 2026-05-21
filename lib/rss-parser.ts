@@ -1,5 +1,3 @@
-'use server';
-
 import { logger } from './logger';
 
 export interface Article {
