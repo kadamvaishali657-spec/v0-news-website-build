@@ -62,13 +62,23 @@ export default function ArticlePage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-background/50">
-        <div className="text-center">
-          <div className="inline-block p-4 bg-accent/10 rounded-full mb-4">
-            <Loader2 className="w-10 h-10 text-accent animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-background/80 to-background/60 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
+        <div className="relative text-center max-w-md">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl mb-6 border border-accent/20">
+            <Loader2 className="w-8 h-8 text-accent animate-spin" />
           </div>
-          <p className="text-foreground font-display text-lg">Opening article...</p>
-          <p className="text-foreground/60 text-sm mt-2">Redirecting to source</p>
+          <p className="text-foreground font-black text-xl">Opening article</p>
+          <p className="text-foreground/60 text-sm mt-3 font-medium">Redirecting to source publication...</p>
+          <div className="mt-6 flex items-center justify-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-accent/60 animate-pulse" style={{ animationDelay: '0s' }} />
+            <div className="w-2 h-2 rounded-full bg-accent/60 animate-pulse" style={{ animationDelay: '0.3s' }} />
+            <div className="w-2 h-2 rounded-full bg-accent/60 animate-pulse" style={{ animationDelay: '0.6s' }} />
+          </div>
         </div>
       </div>
     </>

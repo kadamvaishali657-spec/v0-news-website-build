@@ -89,54 +89,57 @@ export default function SearchPage() {
         <Header />
         
         {/* Hero Header */}
-        <section className="relative overflow-hidden border-b border-border/40">
+        <section className="relative overflow-hidden border-b border-border/30">
           <div className="absolute inset-0 mesh-gradient" />
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent pointer-events-none rounded-full blur-3xl" />
           
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32 text-center">
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30">
                 <Search className="w-7 h-7 text-white" />
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
-              Advanced <span className="gradient-text">Search</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-foreground mb-5">
+              Advanced <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">Search</span>
             </h1>
             
-            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Query our vast real-time index of technology publications. Filter by publisher source, publishing date range, or keywords.
+            <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed font-light">
+              Query our real-time index by keywords, source, or date range.
             </p>
           </div>
         </section>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           {/* Search Filters Card */}
-          <div className="bg-card/40 backdrop-blur-md border border-border/60 rounded-3xl p-6 md:p-8 mb-8 shadow-xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/40 rounded-2xl p-8 md:p-10 mb-12 shadow-sm hover:shadow-lg transition-shadow duration-300 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
             
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <Filter className="w-3.5 h-3.5 text-primary" />
-                  Search Publications
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest flex items-center gap-2">
+                  <Search className="w-4 h-4 text-primary" />
+                  Search Articles
                 </label>
                 <input
                   type="text"
-                  placeholder="Type title, description keywords, or publisher source name..."
+                  placeholder="Search by title, keywords, or publisher..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-muted/40 border border-border/80 text-foreground text-sm focus:border-primary focus:bg-background outline-none transition-all duration-200"
+                  className="w-full px-5 py-4 rounded-lg bg-gradient-to-br from-background/60 to-background/40 border border-border/40 text-foreground text-base placeholder-foreground/40 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-background outline-none transition-all duration-200 font-medium"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Filter by Source</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-primary" />
+                    Filter by Source
+                  </label>
                   <select
                     value={selectedSource}
                     onChange={(e) => setSelectedSource(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-muted/40 border border-border/80 text-foreground text-sm focus:border-primary focus:bg-background outline-none transition-all duration-200"
+                    className="w-full px-5 py-4 rounded-lg bg-gradient-to-br from-background/60 to-background/40 border border-border/40 text-foreground text-base focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-background outline-none transition-all duration-200 font-medium"
                   >
                     <option value="all">All Sources</option>
                     {sources.map(source => (
@@ -145,12 +148,15 @@ export default function SearchPage() {
                   </select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Date Limit</label>
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-foreground/70 uppercase tracking-widest flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-primary" />
+                    Date Range
+                  </label>
                   <select
                     value={dateRange}
                     onChange={(e) => setDateRange(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-muted/40 border border-border/80 text-foreground text-sm focus:border-primary focus:bg-background outline-none transition-all duration-200"
+                    className="w-full px-5 py-4 rounded-lg bg-gradient-to-br from-background/60 to-background/40 border border-border/40 text-foreground text-base focus:border-primary focus:ring-2 focus:ring-primary/20 focus:bg-background outline-none transition-all duration-200 font-medium"
                   >
                     <option value="all">All Time</option>
                     <option value="today">Today Only</option>
@@ -163,24 +169,26 @@ export default function SearchPage() {
           </div>
 
           {/* Results Indicators */}
-          <div className="mb-6">
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Discovered <span className="font-semibold text-foreground">{filteredArticles.length}</span> matching index records
+          <div className="mb-8">
+            <p className="text-sm text-foreground/70 font-bold uppercase tracking-wider">
+              Results: <span className="text-foreground font-black">{filteredArticles.length}</span> articles found
             </p>
           </div>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <div className="flex flex-col items-center justify-center py-32 gap-4">
               <div className="relative">
-                <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                <div className="w-12 h-12 rounded-full border-3 border-primary/20 border-t-primary animate-spin" />
               </div>
-              <p className="text-sm text-muted-foreground animate-pulse">Scanning news index databases...</p>
+              <p className="text-sm text-foreground/60 animate-pulse font-medium">Searching articles...</p>
             </div>
           ) : filteredArticles.length === 0 ? (
-            <div className="text-center py-20 bg-card/40 backdrop-blur-md border border-border/60 rounded-3xl p-8 max-w-xl mx-auto shadow-xl">
-              <ShieldAlert className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 animate-pulse" />
-              <p className="text-foreground font-semibold mb-2">No Matching Records</p>
-              <p className="text-sm text-muted-foreground">Try adjusting your filters or keyword query criteria to scan a wider scope.</p>
+            <div className="text-center py-32 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/40 rounded-2xl p-12 max-w-2xl mx-auto shadow-sm hover:shadow-lg transition-shadow">
+              <div className="w-14 h-14 rounded-xl bg-muted/30 flex items-center justify-center mx-auto mb-5">
+                <ShieldAlert className="w-8 h-8 text-foreground/40" />
+              </div>
+              <p className="text-foreground font-bold text-lg mb-2">No Results Found</p>
+              <p className="text-sm text-foreground/60">Try adjusting your search terms or filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
