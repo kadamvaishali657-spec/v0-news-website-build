@@ -35,43 +35,45 @@ export default function SavedArticlesPage() {
         <Header />
 
         {/* Hero Header */}
-        <section className="relative overflow-hidden border-b border-border/40">
+        <section className="relative overflow-hidden border-b border-border/30">
           <div className="absolute inset-0 mesh-gradient" />
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-radial from-indigo-500/10 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent pointer-events-none rounded-full blur-3xl" />
           
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20 animate-pulse">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32 text-center">
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30">
                 <Bookmark className="w-7 h-7 text-white" />
               </div>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
-              Saved <span className="gradient-text">Bookmarks</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-foreground mb-5">
+              Saved <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">Bookmarks</span>
             </h1>
             
-            <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Your customized catalog of bookmarked tech articles. Access them instantly, offline, and manage them directly.
+            <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed font-light">
+              Your curated collection of bookmarked articles. Access instantly anytime.
             </p>
           </div>
         </section>
         
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <div className="flex flex-col items-center justify-center py-32 gap-4">
               <div className="relative">
-                <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                <div className="w-12 h-12 rounded-full border-3 border-primary/20 border-t-primary animate-spin" />
               </div>
-              <p className="text-sm text-muted-foreground animate-pulse">Loading bookmarks...</p>
+              <p className="text-sm text-foreground/60 animate-pulse font-medium">Loading bookmarks...</p>
             </div>
           ) : savedArticles.length === 0 ? (
-            <div className="text-center py-20 bg-card/40 backdrop-blur-md border border-border/60 rounded-3xl p-8 max-w-xl mx-auto shadow-xl">
-              <Bookmark className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4 animate-pulse" />
-              <p className="text-foreground font-semibold mb-2">No Saved Bookmarks</p>
-              <p className="text-sm text-muted-foreground mb-6">Start reading tech news and tap the bookmark icon on any card to build your personalized archive.</p>
+            <div className="text-center py-32 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/40 rounded-2xl p-12 max-w-2xl mx-auto shadow-sm hover:shadow-lg transition-shadow">
+              <div className="w-14 h-14 rounded-xl bg-muted/30 flex items-center justify-center mx-auto mb-5">
+                <Bookmark className="w-8 h-8 text-foreground/40" />
+              </div>
+              <p className="text-foreground font-bold text-lg mb-2">No Saved Bookmarks</p>
+              <p className="text-sm text-foreground/60 mb-8">Start reading news and tap the bookmark icon to build your collection.</p>
               <a
                 href="/"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold text-xs shadow-md shadow-indigo-500/20 hover:shadow-lg transition-all duration-200"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
               >
                 Browse Latest News
               </a>
@@ -82,13 +84,13 @@ export default function SavedArticlesPage() {
                 <div key={article.id} className="relative group">
                   <NewsCard article={article} />
                   
-                  {/* Clean Non-Overlapping Delete Button */}
+                  {/* Delete Button */}
                   <button
                     onClick={() => removeSavedArticle(article.id)}
-                    className="absolute top-4 left-4 z-30 p-2.5 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive hover:bg-destructive/20 hover:shadow-lg transition-all duration-200"
+                    className="absolute top-5 left-5 z-30 p-2.5 rounded-lg bg-destructive/15 border border-destructive/30 text-destructive hover:bg-destructive/25 hover:shadow-lg transition-all duration-200"
                     title="Remove from saved"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
               ))}
