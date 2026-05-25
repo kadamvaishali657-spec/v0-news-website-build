@@ -76,25 +76,27 @@ export default function NewsletterPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-16 md:py-20">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-4">
-            <Mail className="w-12 h-12 text-accent" />
+        <div className="text-center mb-16">
+          <div className="flex justify-center mb-6">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/10 border border-accent/20">
+              <Mail className="w-10 h-10 text-accent" />
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-4">Stay Updated</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Subscribe to our newsletter and get personalized news delivered to your inbox. Choose your preferred topics and frequency.
+          <h1 className="text-5xl md:text-6xl font-black text-foreground mb-5">Stay Updated</h1>
+          <p className="text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed font-light">
+            Subscribe to personalized news delivered to your inbox. Choose your topics and frequency.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12">
           {/* Subscription Form */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-gradient-to-br from-card/80 to-card/40 border border-border/40 rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 backdrop-blur-sm">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Email Input */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-sm font-bold text-foreground mb-3 uppercase tracking-wider">
                   Email Address
                 </label>
                 <input
@@ -103,29 +105,36 @@ export default function NewsletterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your.email@example.com"
-                  className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full px-5 py-3 bg-gradient-to-br from-background/60 to-background/40 border border-border/40 rounded-lg text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all font-medium"
                 />
               </div>
 
               {/* Frequency Selection */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-3">
+                <label className="block text-sm font-bold text-foreground mb-4 uppercase tracking-wider">
                   Delivery Frequency
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {FREQUENCY_OPTIONS.map((option) => (
-                    <label key={option.value} className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-accent/5 transition-colors">
+                    <label key={option.value} className="flex items-start p-4 border border-border/40 bg-gradient-to-r from-background/30 to-background/10 rounded-lg cursor-pointer hover:border-accent/40 hover:bg-gradient-to-r hover:from-background/50 hover:to-background/20 transition-all group">
                       <input
                         type="radio"
                         name="frequency"
                         value={option.value}
                         checked={frequency === option.value}
                         onChange={(e) => setFrequency(e.target.value)}
-                        className="w-4 h-4 text-accent"
+                        className="sr-only"
                       />
-                      <div className="ml-3">
-                        <p className="font-medium text-foreground">{option.label}</p>
-                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                        frequency === option.value
+                          ? 'bg-accent border-accent'
+                          : 'border-border/40 group-hover:border-accent'
+                      }`}>
+                        {frequency === option.value && <div className="w-2 h-2 rounded-full bg-white" />}
+                      </div>
+                      <div className="ml-4">
+                        <p className="font-bold text-foreground">{option.label}</p>
+                        <p className="text-sm text-foreground/60 mt-1">{option.description}</p>
                       </div>
                     </label>
                   ))}
@@ -136,7 +145,7 @@ export default function NewsletterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                className="w-full px-6 py-4 bg-gradient-to-r from-accent to-accent/80 text-accent-foreground rounded-lg font-bold hover:shadow-lg hover:shadow-accent/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 text-lg hover:-translate-y-0.5"
               >
                 {loading ? (
                   <>
@@ -144,70 +153,86 @@ export default function NewsletterPage() {
                     Subscribing...
                   </>
                 ) : (
-                  'Subscribe to Newsletter'
+                  'Subscribe Now'
                 )}
               </button>
 
               {/* Messages */}
               {submitted && (
-                <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <p className="text-sm text-green-800">Successfully subscribed! Check your email for confirmation.</p>
+                <div className="flex items-start gap-3 p-5 bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/30 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-green-700 font-medium">Successfully subscribed! Check your email for confirmation.</p>
                 </div>
               )}
 
               {error && (
-                <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-red-600" />
-                  <p className="text-sm text-red-800">{error}</p>
+                <div className="flex items-start gap-3 p-5 bg-gradient-to-br from-destructive/10 to-destructive/5 border border-destructive/30 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-destructive/80 font-medium">{error}</p>
                 </div>
               )}
             </form>
           </div>
 
           {/* Topics Selection */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Choose Topics</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Select the news categories you want to receive in your newsletter.
+          <div className="bg-gradient-to-br from-card/80 to-card/40 border border-border/40 rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 backdrop-blur-sm">
+            <h2 className="text-2xl font-black text-foreground mb-2">Choose Topics</h2>
+            <p className="text-foreground/60 mb-8 font-medium">
+              Select news categories for your newsletter.
             </p>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {CATEGORY_OPTIONS.map((category) => (
-                <label key={category} className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-accent/5 transition-colors">
+                <label key={category} className="flex items-center p-4 border border-border/40 bg-gradient-to-r from-background/30 to-background/10 rounded-lg cursor-pointer hover:border-accent/40 hover:bg-gradient-to-r hover:from-background/50 hover:to-background/20 transition-all group">
                   <input
                     type="checkbox"
                     checked={selectedCategories.includes(category)}
                     onChange={() => handleCategoryToggle(category)}
-                    className="w-4 h-4 text-accent rounded"
+                    className="sr-only"
                   />
-                  <span className="ml-3 text-foreground font-medium">{category}</span>
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                    selectedCategories.includes(category)
+                      ? 'bg-accent border-accent'
+                      : 'border-border/40 group-hover:border-accent'
+                  }`}>
+                    {selectedCategories.includes(category) && <div className="text-white text-xs font-bold">✓</div>}
+                  </div>
+                  <span className="ml-4 text-foreground font-medium">{category}</span>
                 </label>
               ))}
             </div>
 
             {selectedCategories.length === 0 && (
-              <p className="text-sm text-orange-600 mt-4">Please select at least one category</p>
+              <p className="text-sm text-amber-600 mt-6 font-medium">Please select at least one category</p>
             )}
           </div>
         </div>
 
         {/* Benefits Section */}
-        <div className="mt-16 grid md:grid-cols-3 gap-6">
-          <div className="bg-card border border-border rounded-lg p-6 text-center">
-            <h3 className="font-bold text-foreground mb-2">Personalized</h3>
-            <p className="text-sm text-muted-foreground">
+        <div className="mt-20 grid md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-br from-card/80 to-card/40 border border-border/40 rounded-2xl p-8 text-center shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-6 h-6 text-accent" />
+            </div>
+            <h3 className="font-bold text-foreground mb-3">Personalized</h3>
+            <p className="text-sm text-foreground/60 leading-relaxed">
               Get news curated to your interests and preferences.
             </p>
           </div>
-          <div className="bg-card border border-border rounded-lg p-6 text-center">
-            <h3 className="font-bold text-foreground mb-2">Flexible</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="bg-gradient-to-br from-card/80 to-card/40 border border-border/40 rounded-2xl p-8 text-center shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center mx-auto mb-4">
+              <MessageSquare className="w-6 h-6 text-accent" />
+            </div>
+            <h3 className="font-bold text-foreground mb-3">Flexible</h3>
+            <p className="text-sm text-foreground/60 leading-relaxed">
               Choose how often and what topics you want to receive.
             </p>
           </div>
-          <div className="bg-card border border-border rounded-lg p-6 text-center">
-            <h3 className="font-bold text-foreground mb-2">Easy to Manage</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="bg-gradient-to-br from-card/80 to-card/40 border border-border/40 rounded-2xl p-8 text-center shadow-sm hover:shadow-lg transition-all hover:-translate-y-1">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-6 h-6 text-accent" />
+            </div>
+            <h3 className="font-bold text-foreground mb-3">Easy to Manage</h3>
+            <p className="text-sm text-foreground/60 leading-relaxed">
               Update your preferences or unsubscribe anytime.
             </p>
           </div>
